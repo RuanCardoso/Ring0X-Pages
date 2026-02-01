@@ -1,14 +1,97 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ring0X</title>
-    <script type="module" crossorigin src="/assets/index-BKG6Nsq1.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DbdlkirE.css">
+    <title>Ring0X - Plataforma de Engenharia Reversa para Jogos</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="data:text/jsx;base64,aW1wb3J0IHsgU3RyaWN0TW9kZSB9IGZyb20gJ3JlYWN0JwppbXBvcnQgeyBjcmVhdGVSb290IH0gZnJvbSAncmVhY3QtZG9tL2NsaWVudCcKaW1wb3J0ICcuL2luZGV4LmNzcycKaW1wb3J0IEFwcCBmcm9tICcuL0FwcC5qc3gnCgovLyBSZW1vdmUgaW5pdGlhbCBsb2FkZXIgYW5kIHNob3cgUmVhY3QgY29udGVudApjb25zdCByZW1vdmVJbml0aWFsTG9hZGVyID0gKCkgPT4gewogIGNvbnN0IGxvYWRlciA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbml0aWFsLWxvYWRlcicpCiAgY29uc29sZS5sb2coJ0xvYWRlciBlbmNvbnRyYWRvOicsICEhbG9hZGVyKQogIAogIGlmIChsb2FkZXIpIHsKICAgIC8vIE1hbnRlciBsb2FkZXIgcG9yIDAuNSBzZWd1bmRvcyBwcm9wb3NpdGFsbWVudGUKICAgIHNldFRpbWVvdXQoKCkgPT4gewogICAgICBjb25zb2xlLmxvZygnSW5pY2lhbmRvIHJlbW/Dp8OjbyBkbyBsb2FkZXIuLi4nKQogICAgICAvLyBBZGljaW9uYSBjbGFzc2UgcGFyYSBpbmljaWFyIHRyYW5zacOnw6NvIGRlIHNhw61kYQogICAgICBsb2FkZXIuY2xhc3NMaXN0LmFkZCgnaGlkaW5nJykKICAgICAgc2V0VGltZW91dCgoKSA9PiB7CiAgICAgICAgbG9hZGVyLnJlbW92ZSgpCiAgICAgICAgZG9jdW1lbnQuYm9keS5jbGFzc0xpc3QuYWRkKCdyZWFjdC1yZWFkeScpCiAgICAgICAgY29uc29sZS5sb2coJ0xvYWRlciByZW1vdmlkbycpCiAgICAgIH0sIDMwMCkKICAgIH0sIDUwMCkKICB9IGVsc2UgewogICAgZG9jdW1lbnQuYm9keS5jbGFzc0xpc3QuYWRkKCdyZWFjdC1yZWFkeScpCiAgICBjb25zb2xlLmxvZygnTG9hZGVyIG7Do28gZW5jb250cmFkbywgYWRpY2lvbmFuZG8gY2xhc3NlIHJlYWN0LXJlYWR5JykKICB9Cn0KCi8vIEluaXRpYWxpemUgUmVhY3QKY3JlYXRlUm9vdChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm9vdCcpKS5yZW5kZXIoCiAgPFN0cmljdE1vZGU+CiAgICA8QXBwIC8+CiAgPC9TdHJpY3RNb2RlPiwKKQoKLy8gUmVtb3ZlIGxvYWRlciB3aGVuIFJlYWN0IGlzIHJlYWR5CmlmIChkb2N1bWVudC5yZWFkeVN0YXRlID09PSAnbG9hZGluZycpIHsKICBkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdET01Db250ZW50TG9hZGVkJywgcmVtb3ZlSW5pdGlhbExvYWRlcikKfSBlbHNlIHsKICByZW1vdmVJbml0aWFsTG9hZGVyKCkKfQo=" as="script" type="module" />
+    <link rel="preload" href="/logo.png" as="image" />
+    
+    <!-- Critical CSS to prevent FOUC -->
+    <style>
+      /* Prevent flash of unstyled content */
+      body {
+        margin: 0;
+        padding: 0;
+        background: oklch(0.145 0 0);
+        color: oklch(0.985 0 0);
+        font-family: system-ui, -apple-system, sans-serif;
+        overflow-x: hidden;
+      }
+      
+      /* Esconder completamente o conteúdo React até o loader ser removido */
+      #root {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in, visibility 0.3s ease-in;
+      }
+      
+      /* Mostrar conteúdo quando React está pronto */
+      .react-ready #root {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-BQN3KSUS.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/utils-C4EsywqX.js">
+    <link rel="modulepreload" crossorigin href="/assets/radix-3Y3e2MZ0.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-qAq_yItp.css">
   </head>
   <body>
+    <!-- Loader fora do root para não ser substituído pelo React -->
+    <div id="initial-loader" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: oklch(0.145 0 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease-out;
+    ">
+      <div style="text-align: center;">
+        <img src="/logo.png" alt="Ring0X" style="width: 80px; height: 80px; margin-bottom: 20px;">
+        <div class="spinner" style="
+          width: 40px;
+          height: 40px;
+          border: 3px solid #333;
+          border-top: 3px solid #10b981;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto;
+        "></div>
+      </div>
+    </div>
+    
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Estilo simples e garantido para o spinner */
+      .spinner {
+        animation: spin 1s linear infinite !important;
+      }
+      
+      /* Mantém o loader visível durante todo o período */
+      #initial-loader {
+        opacity: 1 !important;
+        background: oklch(0.145 0 0) !important;
+      }
+      
+      /* Transição suave apenas no final */
+      #initial-loader.hiding {
+        opacity: 0 !important;
+      }
+    </style>
+    
     <div id="root"></div>
   </body>
 </html>
