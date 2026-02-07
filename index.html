@@ -7,7 +7,7 @@
     <title>Ring0X - Plataforma de Engenharia Reversa para Jogos</title>
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="data:text/jsx;base64,aW1wb3J0IHsgU3RyaWN0TW9kZSB9IGZyb20gJ3JlYWN0JwppbXBvcnQgeyBjcmVhdGVSb290IH0gZnJvbSAncmVhY3QtZG9tL2NsaWVudCcKaW1wb3J0ICcuL2luZGV4LmNzcycKaW1wb3J0IEFwcCBmcm9tICcuL0FwcC5qc3gnCgovLyBSZW1vdmUgaW5pdGlhbCBsb2FkZXIgYW5kIHNob3cgUmVhY3QgY29udGVudApjb25zdCByZW1vdmVJbml0aWFsTG9hZGVyID0gKCkgPT4gewogIGNvbnN0IGxvYWRlciA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbml0aWFsLWxvYWRlcicpCiAgY29uc29sZS5sb2coJ0xvYWRlciBlbmNvbnRyYWRvOicsICEhbG9hZGVyKQogIAogIGlmIChsb2FkZXIpIHsKICAgIC8vIE1hbnRlciBsb2FkZXIgcG9yIDEuNSBzZWd1bmRvcyBwYXJhIG1lbGhvciBVWAogICAgc2V0VGltZW91dCgoKSA9PiB7CiAgICAgIGNvbnNvbGUubG9nKCdJbmljaWFuZG8gcmVtb8Onw6NvIGRvIGxvYWRlci4uLicpCiAgICAgIC8vIEFkaWNpb25hIGNsYXNzZSBwYXJhIGluaWNpYXIgdHJhbnNpw6fDo28gZGUgc2HDrWRhCiAgICAgIGxvYWRlci5jbGFzc0xpc3QuYWRkKCdoaWRpbmcnKQogICAgICBzZXRUaW1lb3V0KCgpID0+IHsKICAgICAgICBsb2FkZXIucmVtb3ZlKCkKICAgICAgICBkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC5hZGQoJ3JlYWN0LXJlYWR5JykKICAgICAgICBjb25zb2xlLmxvZygnTG9hZGVyIHJlbW92aWRvJykKICAgICAgfSwgMzAwKQogICAgfSwgMTUwMCkKICB9IGVsc2UgewogICAgZG9jdW1lbnQuYm9keS5jbGFzc0xpc3QuYWRkKCdyZWFjdC1yZWFkeScpCiAgICBjb25zb2xlLmxvZygnTG9hZGVyIG7Do28gZW5jb250cmFkbywgYWRpY2lvbmFuZG8gY2xhc3NlIHJlYWN0LXJlYWR5JykKICB9Cn0KCi8vIEluaXRpYWxpemUgUmVhY3QKY3JlYXRlUm9vdChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm9vdCcpKS5yZW5kZXIoCiAgPFN0cmljdE1vZGU+CiAgICA8QXBwIC8+CiAgPC9TdHJpY3RNb2RlPiwKKQoKLy8gUmVtb3ZlIGxvYWRlciB3aGVuIFJlYWN0IGlzIHJlYWR5CmlmIChkb2N1bWVudC5yZWFkeVN0YXRlID09PSAnbG9hZGluZycpIHsKICBkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdET01Db250ZW50TG9hZGVkJywgcmVtb3ZlSW5pdGlhbExvYWRlcikKfSBlbHNlIHsKICByZW1vdmVJbml0aWFsTG9hZGVyKCkKfQo=" as="script" type="module" />
+    <link rel="preload" href="data:text/jsx;base64,aW1wb3J0IHsgU3RyaWN0TW9kZSB9IGZyb20gInJlYWN0IjsKaW1wb3J0IHsgY3JlYXRlUm9vdCB9IGZyb20gInJlYWN0LWRvbS9jbGllbnQiOwppbXBvcnQgIi4vaW5kZXguY3NzIjsKaW1wb3J0IEFwcCBmcm9tICIuL0FwcC5qc3giOwoKLy8gZXhww7VlIGZ1bsOnw6NvIGdsb2JhbAp3aW5kb3cucmVtb3ZlSW5pdGlhbExvYWRlciA9ICgpID0+IHsKICBjb25zdCBsb2FkZXIgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgiaW5pdGlhbC1sb2FkZXIiKTsKCiAgaWYgKCFsb2FkZXIpIHsKICAgIGRvY3VtZW50LmJvZHkuY2xhc3NMaXN0LmFkZCgicmVhY3QtcmVhZHkiKTsKICAgIHJldHVybjsKICB9CgogIGxvYWRlci5jbGFzc0xpc3QuYWRkKCJoaWRpbmciKTsKCiAgc2V0VGltZW91dCgoKSA9PiB7CiAgICBsb2FkZXIucmVtb3ZlKCk7CiAgICBkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC5hZGQoInJlYWN0LXJlYWR5Iik7CiAgfSwgMzAwKTsKfTsKCmNyZWF0ZVJvb3QoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInJvb3QiKSkucmVuZGVyKAogIDxTdHJpY3RNb2RlPgogICAgPEFwcCAvPgogIDwvU3RyaWN0TW9kZT4KKTsK" as="script" type="module" />
     <link rel="preload" href="/logo.png" as="image" />
     
     <!-- Critical CSS to prevent FOUC -->
@@ -35,7 +35,7 @@
         visibility: visible;
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-CVaGud2e.js"></script>
+    <script type="module" crossorigin src="/assets/index-BTU8rSem.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/utils-ABJpZGjj.js">
     <link rel="modulepreload" crossorigin href="/assets/radix-BA-RjeQv.js">
     <link rel="stylesheet" crossorigin href="/assets/index-Pj60ZArn.css">
