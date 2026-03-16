@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Aprovado - Ring0X</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.8); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+        }
+        
+        .success-gradient {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-2xl w-full">
+            <!-- Card Principal -->
+            <div class="bg-neutral-900/90 backdrop-blur-xl rounded-3xl border border-green-500/30 shadow-2xl shadow-green-500/20 p-8 md:p-12">
+                
+                <!-- Ícone de Sucesso -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-24 h-24 rounded-full success-gradient pulse-glow mb-6">
+                        <i class="fas fa-check text-4xl text-white"></i>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                        Pagamento <span class="text-green-400">Aprovado!</span>
+                    </h1>
+                    <p class="text-xl text-neutral-300">
+                        Sua compra foi processada com sucesso. Bem-vindo à Ring0X!
+                    </p>
+                </div>
+
+                <!-- Detalhes da Compra -->
+                <div class="bg-neutral-800/50 rounded-2xl p-6 mb-8">
+                    <h2 class="text-lg font-semibold text-green-400 mb-4">Resumo da Compra</h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-neutral-400">Número do Pedido:</span>
+                            <span class="text-white font-mono">#RNX-2024-<span id="orderNumber"></span></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-neutral-400">Data:</span>
+                            <span class="text-white" id="purchaseDate"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-neutral-400">Método:</span>
+                            <span class="text-white">Cartão de Crédito</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-neutral-400">Status:</span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Concluído
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Próximos Passos -->
+                <div class="bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-2xl p-6 mb-8 border border-green-500/20">
+                    <h3 class="text-lg font-semibold text-green-400 mb-4">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Próximos Passos
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope text-green-400 mt-1 mr-3"></i>
+                            <div>
+                                <span class="text-white">Email de confirmação enviado</span>
+                                <p class="text-neutral-400 text-sm mt-1">Verifique sua caixa de entrada (e spam)</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-graduation-cap text-green-400 mt-1 mr-3"></i>
+                            <div>
+                                <span class="text-white">Acesso imediato aos cursos</span>
+                                <p class="text-neutral-400 text-sm mt-1">Comece a estudar agora mesmo</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-users text-green-400 mt-1 mr-3"></i>
+                            <div>
+                                <span class="text-white">Comunidade exclusiva</span>
+                                <p class="text-neutral-400 text-sm mt-1">Junte-se a mais de 2.000 alunos</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="goToDashboard()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25">
+                        <i class="fas fa-play mr-2"></i>
+                        Ir para o Dashboard
+                    </button>
+                    <button onclick="goToHome()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-home mr-2"></i>
+                        Página Inicial
+                    </button>
+                </div>
+
+                <!-- Suporte -->
+                <div class="mt-8 pt-8 border-t border-neutral-800 text-center">
+                    <p class="text-neutral-400 mb-4">
+                        <i class="fas fa-headset mr-2"></i>
+                        Precisa de ajuda? 
+                        <a href="mailto:suporte@ring0x.com" class="text-green-400 hover:text-green-300 ml-1">
+                            suporte@ring0x.com
+                        </a>
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-neutral-400 hover:text-green-400 transition-colors">
+                            <i class="fab fa-discord text-xl"></i>
+                        </a>
+                        <a href="#" class="text-neutral-400 hover:text-green-400 transition-colors">
+                            <i class="fab fa-telegram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-neutral-400 hover:text-green-400 transition-colors">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gerar número do pedido aleatório
+        document.getElementById('orderNumber').textContent = 
+            Math.floor(Math.random() * 900000) + 100000;
+        
+        // Data atual formatada
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('purchaseDate').textContent = dateStr;
+        
+        // Funções de navegação
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+        
+        function goToHome() {
+            window.location.href = '/';
+        }
+        
+        // Confetes de celebração
+        function createConfetti() {
+            const colors = ['#22c55e', '#16a34a', '#15803d', '#84cc16', '#a3e635'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.cssText = `
+                    position: fixed;
+                    width: 10px;
+                    height: 10px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${Math.random() * 100}vw;
+                    top: -10px;
+                    opacity: ${Math.random() * 0.8 + 0.2};
+                    transform: rotate(${Math.random() * 360}deg);
+                    transition: all 2s ease-out;
+                    pointer-events: none;
+                    z-index: 9999;
+                `;
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.style.top = '100vh';
+                    confetti.style.transform = `rotate(${Math.random() * 720}deg)`;
+                    confetti.style.opacity = '0';
+                }, 100);
+                
+                setTimeout(() => confetti.remove(), 2100);
+            }
+        }
+        
+        // Disparar confetes após carregar
+        setTimeout(createConfetti, 500);
+    </script>
+</body>
+</html>

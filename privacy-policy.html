@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade - Ring0X</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --background: oklch(0.145 0 0);
+            --foreground: oklch(0.985 0 0);
+            --card: oklch(0.205 0 0);
+            --border: oklch(1 0 0 / 10%);
+            --muted-foreground: oklch(0.708 0 0);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--background);
+            color: var(--foreground);
+            line-height: 1.7;
+            padding: 4rem 1rem;
+        }
+
+        .main-content { max-width: 52rem; margin: 0 auto; }
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, white, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .content-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 3rem;
+        }
+
+        section { margin-bottom: 2.5rem; }
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #22c55e;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        p, li { color: var(--muted-foreground); font-size: 0.95rem; }
+        .strong { color: white; font-weight: 600; }
+        ul { list-style: disc; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+
+        .alert-box {
+            border-left: 4px solid #22c55e;
+            background: oklch(1 0 0 / 5%);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-content">
+        <h1 class="main-title">Política de Privacidade</h1>
+
+        <div class="content-card">
+            
+            <section>
+                <h2>1. Coleta de Informações</h2>
+                <p>A <strong>Ring0X</strong> opera sob o princípio da minimização de dados, coletando apenas o estritamente necessário para o acesso à plataforma educacional:</p>
+                <ul>
+                    <li><span class="strong">Informações Identificáveis:</span> Apenas o endereço de e-mail para criação de conta, autenticação e entrega de conteúdo.</li>
+                    <li><span class="strong">Dados Técnicos:</span> Endereço IP, registros de acesso (logs) e tipo de dispositivo, utilizados exclusivamente para fins de segurança e prevenção de fraudes.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>2. Processamento de Pagamentos (Checkout Externo)</h2>
+                <div class="alert-box">
+                    <p>A Ring0X <strong>não armazena, solicita ou processa dados financeiros</strong> diretamente. Toda a transação de compra é realizada em ambiente seguro provido pelas processadoras <strong>Stripe</strong> e <strong>Mercado Pago</strong>.</p>
+                </div>
+                <p>As informações de faturamento e pagamento são enviadas pelo usuário diretamente a esses parceiros, que possuem certificação PCI Compliance para proteção de dados sensíveis.</p>
+            </section>
+
+            <section>
+                <h2>3. Uso e Compartilhamento de Dados</h2>
+                <p>Os dados recolhidos são utilizados para:</p>
+                <ul>
+                    <li>Prover acesso aos cursos de programação e segurança;</li>
+                    <li>Identificar atividades suspeitas e garantir a segurança do sistema;</li>
+                    <li>Enviar atualizações críticas de segurança ou do conteúdo adquirido.</li>
+                </ul>
+                <p><span class="strong">Privacidade:</span> Não compartilhamos, vendemos ou alugamos seu e-mail para listas de marketing ou terceiros.</p>
+            </section>
+
+            <section>
+                <h2>4. Medidas de Segurança</h2>
+                <p>Para proteger as informações sob nossa responsabilidade, adotamos:</p>
+                <ul>
+                    <li>Uso de criptografia de ponta a ponta (SSL/TLS);</li>
+                    <li>Armazenamento de senhas via hashing robusto;</li>
+                    <li>Políticas rigorosas de acesso para evitar vazamentos de informações técnicas.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>5. Política de Reembolso e Conteúdo Digital</h2>
+                <p>Ao adquirir nossos cursos de engenharia reversa e segurança, o usuário declara estar ciente de que:</p>
+                <ul>
+                    <li>Trata-se de conteúdo digital de entrega imediata.</li>
+                    <li>O acesso é liberado assim que a confirmação é emitida pela Stripe ou Mercado Pago.</li>
+                    <li>Em conformidade com as diretrizes de produtos digitais, garantimos o prazo legal de arrependimento de 7 dias, após o qual o valor investido não é passível de reembolso devido à natureza do conteúdo.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>6. Contato e Transparência</h2>
+                <p>O usuário pode solicitar a exclusão total de sua conta e dados de acesso a qualquer momento através do nosso canal oficial de privacidade:</p>
+                <p class="strong">E-mail: support@ring0x.com</p>
+                <p>Local: Amazonas, AM - Brasil</p>
+            </section>
+
+        </div>
+    </main>
+
+</body>
+</html>
