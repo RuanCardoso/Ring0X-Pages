@@ -3,221 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagamento Falhou - Ring0X</title>
+    <title>Status da Transação - Ring0X</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        
-        @keyframes pulse-error {
-            0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.8); }
-        }
-        
-        .shake-animation {
-            animation: shake 0.5s ease-in-out;
-        }
-        
-        .pulse-error {
-            animation: pulse-error 2s ease-in-out infinite;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
-        }
-        
-        .error-gradient {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
-        }
+        .gradient-bg { background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%); }
+        .error-gradient { background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); }
+        .amber-gradient { background: linear-gradient(135deg, #d97706 0%, #92400e 100%); }
     </style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
+<body class="gradient-bg min-h-screen text-white font-sans">
     <div class="min-h-screen flex items-center justify-center px-4">
-        <div class="max-w-2xl w-full">
-            <!-- Card Principal -->
-            <div class="bg-neutral-900/90 backdrop-blur-xl rounded-3xl border border-red-500/30 shadow-2xl shadow-red-500/20 p-8 md:p-12">
+        <div class="max-w-xl w-full">
+            <div class="bg-neutral-900/90 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl p-8 md:p-10 text-center">
                 
-                <!-- Ícone de Erro -->
-                <div class="text-center mb-8">
-                    <div class="inline-flex items-center justify-center w-24 h-24 rounded-full error-gradient pulse-error mb-6 shake-animation">
-                        <i class="fas fa-times text-4xl text-white"></i>
-                    </div>
-                    <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-                        Pagamento <span class="text-red-400">Falhou</span>
-                    </h1>
-                    <p class="text-xl text-neutral-300">
-                        Ocorreu um erro ao processar seu pagamento. Por favor, tente novamente.
-                    </p>
+                <div id="iconContainer" class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6">
+                    <i id="mainIcon" class="fas fa-times text-3xl text-white"></i>
                 </div>
 
-                <!-- Mensagem de Erro -->
-                <div class="bg-red-900/30 border border-red-500/30 rounded-2xl p-6 mb-8">
-                    <div class="flex items-start">
-                        <i class="fas fa-exclamation-triangle text-red-400 mt-1 mr-3 text-xl"></i>
-                        <div>
-                            <h3 class="text-lg font-semibold text-red-400 mb-2">O que aconteceu?</h3>
-                            <p class="text-neutral-300 mb-3">
-                                Não foi possível concluir sua transação. Isso pode acontecer por vários motivos:
-                            </p>
-                            <ul class="space-y-2 text-neutral-400 text-sm">
-                                <li class="flex items-start">
-                                    <i class="fas fa-credit-card text-red-400 mt-0.5 mr-2 text-xs"></i>
-                                    <span>Cartão recusado pela instituição financeira</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <i class="fas fa-wifi text-red-400 mt-0.5 mr-2 text-xs"></i>
-                                    <span>Problema de conexão durante a transação</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <i class="fas fa-shield-alt text-red-400 mt-0.5 mr-2 text-xs"></i>
-                                    <span>Verificação de segurança falhou</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <i class="fas fa-clock text-red-400 mt-0.5 mr-2 text-xs"></i>
-                                    <span>Tempo limite da transação excedido</span>
-                                </li>
-                            </ul>
+                <h1 id="statusTitle" class="text-3xl md:text-4xl font-bold mb-2">Pagamento não concluído</h1>
+                <p id="statusDesc" class="text-neutral-400 mb-8 text-sm md:text-base">A transação não foi finalizada.</p>
+
+                <div class="bg-black/40 rounded-2xl p-5 mb-6 text-left border border-white/5">
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-neutral-500">Motivo:</span>
+                            <span id="errorReason" class="text-white font-medium">Interrompido</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-neutral-500">Referência:</span>
+                            <span class="font-mono text-neutral-400" id="refID"></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Soluções Sugeridas -->
-                <div class="bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-2xl p-6 mb-8 border border-amber-500/20">
-                    <h3 class="text-lg font-semibold text-amber-400 mb-4">
-                        <i class="fas fa-lightbulb mr-2"></i>
-                        O que você pode fazer
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="flex items-start">
-                            <span class="flex-shrink-0 w-6 h-6 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
-                            <div>
-                                <span class="text-white font-medium">Verifique seus dados</span>
-                                <p class="text-neutral-400 text-sm mt-1">Confirme se os dados do cartão estão corretos</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="flex-shrink-0 w-6 h-6 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
-                            <div>
-                                <span class="text-white font-medium">Tente outro método</span>
-                                <p class="text-neutral-400 text-sm mt-1">Use outro cartão ou método de pagamento</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="flex-shrink-0 w-6 h-6 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
-                            <div>
-                                <span class="text-white font-medium">Contate seu banco</span>
-                                <p class="text-neutral-400 text-sm mt-1">Verifique se há bloqueios ou limites</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Informações da Tentativa -->
-                <div class="bg-neutral-800/50 rounded-2xl p-6 mb-8">
-                    <h3 class="text-lg font-semibold text-neutral-400 mb-4">Detalhes da Tentativa</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-neutral-400">Código do Erro:</span>
-                            <span class="text-white font-mono text-sm">PAYMENT_FAILED_001</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-neutral-400">Data/Hora:</span>
-                            <span class="text-white text-sm" id="attemptDate"></span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-neutral-400">ID da Transação:</span>
-                            <span class="text-white font-mono text-sm">TXN_<span id="transactionId"></span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botões de Ação -->
-                <div class="flex flex-col sm:flex-row gap-4 mb-8">
-                    <button onclick="retryPayment()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-red-500/25">
-                        <i class="fas fa-redo mr-2"></i>
-                        Tentar Novamente
-                    </button>
-                    <button onclick="goToHome()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
-                        <i class="fas fa-home mr-2"></i>
-                        Voltar ao Site
-                    </button>
-                </div>
-
-                <!-- Suporte -->
-                <div class="bg-neutral-800/30 rounded-2xl p-6 text-center">
-                    <h4 class="text-lg font-semibold text-white mb-4">
-                        <i class="fas fa-headset mr-2"></i>
-                        Ainda com problemas?
-                    </h4>
-                    <p class="text-neutral-400 mb-4">
-                        Nossa equipe de suporte está pronta para ajudar você
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                        <a href="mailto:suporte@ring0x.com" class="inline-flex items-center justify-center bg-green-600 hover:bg-green-500 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
-                            <i class="fas fa-envelope mr-2"></i>
-                            suporte@ring0x.com
-                        </a>
-                        <a href="tel:+5511999999999" class="inline-flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
-                            <i class="fas fa-phone mr-2"></i>
-                            (11) 99999-9999
-                        </a>
-                    </div>
-                    <div class="flex justify-center space-x-4 mt-6">
-                        <a href="#" class="text-neutral-400 hover:text-green-400 transition-colors">
-                            <i class="fab fa-discord text-xl"></i>
-                        </a>
-                        <a href="#" class="text-neutral-400 hover:text-green-400 transition-colors">
-                            <i class="fab fa-telegram text-xl"></i>
-                        </a>
-                        <a href="#" class="text-neutral-400 hover:text-green-400 transition-colors">
-                            <i class="fab fa-whatsapp text-xl"></i>
-                        </a>
-                    </div>
-                </div>
+                <p class="text-xs text-neutral-600">
+                    Se você acredita que isso foi um erro, verifique os dados com sua instituição financeira.
+                </p>
             </div>
         </div>
     </div>
 
     <script>
-        // Gerar ID da transação
-        document.getElementById('transactionId').textContent = 
-            Math.random().toString(36).substr(2, 9).toUpperCase();
-        
-        // Data atual formatada
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        document.getElementById('attemptDate').textContent = dateStr;
-        
-        // Funções de navegação
-        function retryPayment() {
-            // Redirecionar para página de checkout
-            window.location.href = '/checkout';
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type');
+        const id = urlParams.get('id');
+
+        if (type === 'cancel') {
+            document.getElementById('statusTitle').innerText = "Pagamento Cancelado";
+            document.getElementById('statusTitle').classList.add('text-amber-500');
+            document.getElementById('statusDesc').innerText = "A operação foi cancelada antes da conclusão.";
+            document.getElementById('errorReason').innerText = "Cancelado pelo usuário";
+            document.getElementById('mainIcon').className = "fas fa-exclamation text-3xl text-white";
+            document.getElementById('iconContainer').classList.add('amber-gradient');
+        } else {
+            document.getElementById('statusTitle').classList.add('text-red-500');
+            document.getElementById('iconContainer').classList.add('error-gradient');
         }
-        
-        function goToHome() {
-            window.location.href = '/';
-        }
-        
-        // Efeito de shake periódico no ícone de erro
-        setInterval(() => {
-            const errorIcon = document.querySelector('.shake-animation');
-            if (errorIcon) {
-                errorIcon.classList.remove('shake-animation');
-                setTimeout(() => {
-                    errorIcon.classList.add('shake-animation');
-                }, 100);
-            }
-        }, 5000);
+
+        document.getElementById('refID').textContent = id ? id.toUpperCase() : 'ERR-' + Math.random().toString(36).substr(2, 6).toUpperCase();
     </script>
 </body>
 </html>
