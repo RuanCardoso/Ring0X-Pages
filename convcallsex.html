@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convenção de Chamadas — Windows</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #a78bfa;
+    --green: #22d3a0;
+    --red: #ff4d6d;
+    --yellow: #fbbf24;
+    --win-blue: #0078d4;
+    --win-blue-light: #2fa8ff;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  header { text-align: center; margin-bottom: 64px; }
+  header .tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--win-blue-light);
+    border: 1px solid var(--win-blue-light);
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    animation: pulse-border 3s ease-in-out infinite;
+  }
+  @keyframes pulse-border {
+    0%,100% { box-shadow: 0 0 0 0 rgba(47,168,255,0); }
+    50%      { box-shadow: 0 0 14px 3px rgba(47,168,255,0.22); }
+  }
+  header h1 {
+    font-size: clamp(2rem, 6vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+  header h1 span { color: var(--win-blue-light); }
+  header .win-logo {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    color: var(--muted); margin-bottom: 14px;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .win-icon { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px; }
+  .win-icon span { border-radius: 1px; }
+  header p { color: var(--muted); font-size: 1.05rem; max-width: 580px; margin: 0 auto; line-height: 1.7; }
+
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; }
+  .card.cyan::before   { background: linear-gradient(90deg,transparent,var(--accent),transparent); }
+  .card.orange::before { background: linear-gradient(90deg,transparent,var(--accent2),transparent); }
+  .card.purple::before { background: linear-gradient(90deg,transparent,var(--accent3),transparent); }
+  .card.green::before  { background: linear-gradient(90deg,transparent,var(--green),transparent); }
+  .card.red::before    { background: linear-gradient(90deg,transparent,var(--red),transparent); }
+  .card.blue::before   { background: linear-gradient(90deg,transparent,var(--win-blue-light),transparent); }
+
+  .card h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+  .card > p { color: var(--muted); font-size: 0.93rem; line-height: 1.7; margin-bottom: 24px; }
+
+  pre {
+    background: #070d1a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin-bottom: 16px;
+    tab-size: 4;
+  }
+  .kw  { color: var(--accent3); }
+  .ty  { color: var(--accent); }
+  .cm  { color: var(--muted); }
+  .nu  { color: var(--accent2); }
+  .fn  { color: var(--green); }
+  .reg { color: var(--yellow); }
+  .str { color: #86efac; }
+  .pp  { color: #fb7185; }
+  .win { color: var(--win-blue-light); }
+
+  .info-box {
+    display:flex;gap:14px;
+    background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.2);
+    border-radius:8px;padding:16px 20px;margin-top:20px;
+  }
+  .info-box .icon{font-size:1.4rem;flex-shrink:0;}
+  .info-box p{color:var(--text);font-size:0.88rem;line-height:1.65;margin:0;}
+  .info-box strong{color:var(--accent);}
+
+  .warn-box {
+    display:flex;gap:14px;
+    background:rgba(255,107,53,0.07);border:1px solid rgba(255,107,53,0.25);
+    border-radius:8px;padding:16px 20px;margin-top:16px;
+  }
+  .warn-box .icon{font-size:1.3rem;flex-shrink:0;}
+  .warn-box p{color:var(--text);font-size:0.88rem;line-height:1.65;margin:0;}
+  .warn-box strong{color:var(--accent2);}
+
+  .win-box {
+    display:flex;gap:14px;
+    background:rgba(0,120,212,0.08);border:1px solid rgba(47,168,255,0.25);
+    border-radius:8px;padding:16px 20px;margin-top:16px;
+  }
+  .win-box .icon{font-size:1.3rem;flex-shrink:0;}
+  .win-box p{color:var(--text);font-size:0.88rem;line-height:1.65;margin:0;}
+  .win-box strong{color:var(--win-blue-light);}
+
+  .green-box {
+    display:flex;gap:14px;
+    background:rgba(34,211,160,0.06);border:1px solid rgba(34,211,160,0.25);
+    border-radius:8px;padding:16px 20px;margin-top:16px;
+  }
+  .green-box .icon{font-size:1.3rem;flex-shrink:0;}
+  .green-box p{color:var(--text);font-size:0.88rem;line-height:1.65;margin:0;}
+  .green-box strong{color:var(--green);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:0.82rem;color:var(--muted);}
+  .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+  .fade-in{opacity:0;transform:translateY(20px);animation:fadeUp 0.5s ease forwards;}
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+  .fade-in:nth-child(1){animation-delay:.1s}
+  .fade-in:nth-child(2){animation-delay:.2s}
+  .fade-in:nth-child(3){animation-delay:.3s}
+  .fade-in:nth-child(4){animation-delay:.4s}
+  .fade-in:nth-child(5){animation-delay:.5s}
+  .fade-in:nth-child(6){animation-delay:.6s}
+  .fade-in:nth-child(7){animation-delay:.7s}
+
+  /* ── FAKE WINDOWS ── */
+  .win-window {
+    border:1px solid #2d3a52;border-radius:8px;overflow:hidden;
+    margin:20px 0;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  }
+  .win-titlebar {
+    background:#1a2235;padding:8px 14px;
+    display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid var(--border);
+  }
+  .win-controls{display:flex;gap:6px;}
+  .win-btn{width:12px;height:12px;border-radius:50%;display:inline-block;}
+  .win-btn.close{background:#ff5f57;}
+  .win-btn.min{background:#febc2e;}
+  .win-btn.max{background:#28c840;}
+  .win-title{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;flex:1;text-align:center;}
+  .win-body{background:#070d1a;padding:20px;font-family:'Space Mono',monospace;font-size:0.78rem;line-height:1.9;overflow-x:auto;}
+
+  /* ── REGISTER SLOTS ── */
+  .reg-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
+  @media(max-width:600px){.reg-slots{grid-template-columns:1fr 1fr;}}
+  .reg-slot{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;text-align:center;}
+  .reg-slot .rname{font-family:'Space Mono',monospace;font-size:0.82rem;font-weight:700;margin-bottom:3px;}
+  .reg-slot .rrole{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+  .reg-slot .rbadge{font-size:8px;padding:2px 7px;border-radius:20px;font-family:'Space Mono',monospace;letter-spacing:.5px;display:inline-block;}
+  .arg-slot{border-color:rgba(0,229,255,0.4);} .arg-slot .rname{color:var(--accent);} .arg-slot .rbadge{background:rgba(0,229,255,0.12);color:var(--accent);border:1px solid rgba(0,229,255,0.3);}
+  .ret-slot{border-color:rgba(34,211,160,0.4);} .ret-slot .rname{color:var(--green);} .ret-slot .rbadge{background:rgba(34,211,160,0.12);color:var(--green);border:1px solid rgba(34,211,160,0.3);}
+  .vol-slot{border-color:rgba(255,107,53,0.4);} .vol-slot .rname{color:var(--accent2);font-size:0.68rem;} .vol-slot .rbadge{background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3);}
+  .nvol-slot{border-color:rgba(167,139,250,0.4);} .nvol-slot .rname{color:var(--accent3);font-size:0.65rem;} .nvol-slot .rbadge{background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3);}
+  .sp-slot{border-color:rgba(251,191,36,0.4);} .sp-slot .rname{color:var(--yellow);} .sp-slot .rbadge{background:rgba(251,191,36,0.12);color:var(--yellow);border:1px solid rgba(251,191,36,0.3);}
+
+  /* ── STACK VIS ── */
+  .mem-scroll{overflow-x:auto;padding-bottom:8px;}
+  .mem-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:1px;}
+  .stack-vis{display:flex;flex-direction:column;gap:3px;font-family:'Space Mono',monospace;font-size:0.78rem;}
+  .stack-row{display:flex;align-items:stretch;gap:0;border-radius:5px;overflow:hidden;border:1px solid var(--border);min-height:40px;position:relative;transition:transform .15s;cursor:default;}
+  .stack-row:hover{transform:translateX(4px);}
+  .stack-row .sr-addr{width:80px;min-width:80px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);border-right:1px solid var(--border);padding:8px 0;}
+  .stack-row .sr-content{flex:1;display:flex;align-items:center;padding:8px 14px;font-size:11px;gap:8px;}
+  .stack-row .sr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .stack-row .sr-tag{font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:1px 7px;border-radius:20px;flex-shrink:0;}
+  .stack-row .sr-label{color:var(--text);}
+  .stack-row .sr-sp{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--yellow);letter-spacing:1px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);padding:1px 7px;border-radius:20px;}
+  .sr-ret{background:rgba(0,229,255,0.06);border-color:rgba(0,229,255,0.25)!important;}
+  .sr-local{background:rgba(167,139,250,0.06);border-color:rgba(167,139,250,0.25)!important;}
+  .sr-saved{background:rgba(34,211,160,0.06);border-color:rgba(34,211,160,0.25)!important;}
+  .sr-shadow{background:rgba(255,107,53,0.06);border-color:rgba(255,107,53,0.25)!important;}
+  .sr-main{background:rgba(34,211,160,0.04);border-color:rgba(34,211,160,0.2)!important;}
+
+  /* ── COMPARE ── */
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media(max-width:640px){.compare-grid{grid-template-columns:1fr;}}
+  .conv-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:20px;}
+  .conv-box h3{font-family:'Space Mono',monospace;font-size:0.82rem;letter-spacing:1px;margin-bottom:4px;}
+  .conv-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;padding:2px 10px;border-radius:20px;margin-bottom:14px;font-family:'Space Mono',monospace;}
+
+  /* ── TABLE ── */
+  .diff-table{width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:12px;}
+  .diff-table th{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+  .diff-table td{padding:10px 14px;border-bottom:1px solid rgba(30,45,69,0.5);vertical-align:top;line-height:1.6;color:var(--muted);font-size:0.83rem;}
+  .diff-table tr:last-child td{border-bottom:none;}
+  .diff-table td:first-child{color:var(--text);font-weight:600;font-family:'Space Mono',monospace;font-size:0.75rem;}
+  .badge{display:inline-block;font-size:9px;padding:2px 8px;border-radius:20px;font-family:'Space Mono',monospace;letter-spacing:.5px;vertical-align:middle;margin:2px 2px;}
+
+  @keyframes blink-pad{0%,100%{opacity:1}50%{opacity:.3}}
+  .blink{animation:blink-pad 1.8s ease-in-out infinite;}
+
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+  footer{text-align:center;margin-top:60px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header class="fade-in">
+    <div class="win-logo">
+      <div class="win-icon">
+        <span style="background:#0078d4"></span>
+        <span style="background:#0078d4"></span>
+        <span style="background:#0078d4"></span>
+        <span style="background:#0078d4"></span>
+      </div>
+      Windows Internals
+    </div>
+    <div class="tag">Arquitetura de Computadores</div>
+    <h1>Convenção de<br><span>Chamadas</span> no Windows</h1>
+    <p>Como funções do Windows passam parâmetros, retornam valores e organizam a pilha — com exemplos reais da WinAPI como <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">MessageBoxA</code> e <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">CreateFileW</code>.</p>
+  </header>
+
+  <!-- 01 -->
+  <div class="section-title fade-in">01 — Por que precisamos de uma convenção?</div>
+
+  <div class="card cyan fade-in">
+    <h2>Funções precisam de um contrato em comum</h2>
+    <p>Quando <code style="font-family:'Space Mono',monospace;color:var(--accent)">main()</code> chama <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">MessageBoxA()</code> da <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">user32.dll</code>, as duas foram compiladas separadamente — talvez em anos diferentes, por compiladores diferentes. Para funcionarem juntas precisam de um <strong>contrato fixo</strong>: onde estão os argumentos? Onde vai o resultado? Quem limpa a pilha?</p>
+
+    <div class="win-window">
+      <div class="win-titlebar">
+        <div class="win-controls"><span class="win-btn close"></span><span class="win-btn min"></span><span class="win-btn max"></span></div>
+        <div class="win-title">notepad.exe — chamando a WinAPI</div>
+      </div>
+      <div class="win-body"><span class="pp">#include</span> <span class="str">&lt;windows.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// 4 argumentos — a convenção diz ONDE cada um vai</span>
+    <span class="win">MessageBoxA</span>(
+        <span class="nu">NULL</span>,             <span class="cm">// 1º arg: janela pai</span>
+        <span class="str">"Olá, Mundo!"</span>,   <span class="cm">// 2º arg: texto da mensagem</span>
+        <span class="str">"Meu Programa"</span>,  <span class="cm">// 3º arg: título da janela</span>
+        <span class="nu">MB_OK</span>             <span class="cm">// 4º arg: botões</span>
+    );
+    <span class="kw">return</span> <span class="nu">0</span>;
+}
+
+<span class="cm">// MessageBoxA está em user32.dll — já compilada pela Microsoft.</span>
+<span class="cm">// Ela PRECISA encontrar os args exatamente onde a convenção diz.</span></div>
+    </div>
+
+    <div class="info-box">
+      <div class="icon">💡</div>
+      <p>A <strong>convenção de chamadas</strong> define: <strong>(1)</strong> onde ficam os argumentos (registradores ou pilha), <strong>(2)</strong> onde vai o valor de retorno, <strong>(3)</strong> quem limpa a pilha depois, e <strong>(4)</strong> quais registradores devem ser preservados. O Windows tem <em>duas principais</em> convenções que você precisa conhecer.</p>
+    </div>
+  </div>
+
+  <!-- 02 — x64 ABI -->
+  <div class="section-title fade-in">02 — Convenção 1: Microsoft x64 ABI (Windows 64-bit moderno)</div>
+
+  <div class="card blue fade-in">
+    <h2>Todo programa 64-bit no Windows usa esta convenção</h2>
+    <p>Todo <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">.exe</code> e <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">.dll</code> de 64-bit no Windows — incluindo <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">kernel32.dll</code>, <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">user32.dll</code> e toda a WinAPI moderna — segue esta convenção. O compilador MSVC a aplica automaticamente.</p>
+
+    <div class="mem-label">Registradores e seus papéis fixos (x64)</div>
+    <div class="reg-slots">
+      <div class="reg-slot arg-slot"><div class="rname">RCX</div><div class="rrole">1º argumento</div><div class="rbadge">argumento</div></div>
+      <div class="reg-slot arg-slot"><div class="rname">RDX</div><div class="rrole">2º argumento</div><div class="rbadge">argumento</div></div>
+      <div class="reg-slot arg-slot"><div class="rname">R8</div><div class="rrole">3º argumento</div><div class="rbadge">argumento</div></div>
+      <div class="reg-slot arg-slot"><div class="rname">R9</div><div class="rrole">4º argumento</div><div class="rbadge">argumento</div></div>
+      <div class="reg-slot ret-slot"><div class="rname">RAX</div><div class="rrole">valor de retorno</div><div class="rbadge">retorno</div></div>
+      <div class="reg-slot vol-slot"><div class="rname">RCX RDX R8 R9 R10 R11</div><div class="rrole">voláteis</div><div class="rbadge">caller-saved</div></div>
+      <div class="reg-slot nvol-slot"><div class="rname">RBX RBP RDI RSI R12–R15</div><div class="rrole">não-voláteis</div><div class="rbadge">callee-saved</div></div>
+      <div class="reg-slot sp-slot"><div class="rname">RSP</div><div class="rrole">stack pointer</div><div class="rbadge">especial</div></div>
+    </div>
+
+    <div class="win-box">
+      <div class="icon">🪟</div>
+      <p><strong>Shadow Space (Home Space):</strong> Mesmo que os 4 primeiros args vão em registradores, o caller <em>sempre</em> reserva <strong>32 bytes extras</strong> na pilha antes do CALL. São 4 slots de 8 bytes onde a função chamada pode "salvar" seus registradores de arg se precisar. Obrigatório mesmo que a função não use a área.</p>
+    </div>
+
+    <div class="mem-label" style="margin-top:24px">Exemplo: MessageBoxA em Assembly x64</div>
+    <div class="win-window">
+      <div class="win-titlebar">
+        <div class="win-controls"><span class="win-btn close"></span><span class="win-btn min"></span><span class="win-btn max"></span></div>
+        <div class="win-title">Assembly gerado pelo MSVC — x64</div>
+      </div>
+      <div class="win-body"><span class="cm">; MessageBoxA(NULL, "Olá", "Título", MB_OK)</span>
+<span class="fn">main</span>:
+    <span class="kw">sub</span>    <span class="reg">rsp</span>, <span class="nu">40</span>         <span class="cm">; reserva shadow space (32B) + alinha pilha em 16B</span>
+
+    <span class="kw">mov</span>    <span class="reg">ecx</span>, <span class="nu">0</span>          <span class="cm">; 1º arg: hWnd = NULL  → RCX</span>
+    <span class="kw">lea</span>    <span class="reg">rdx</span>, <span class="str">msg</span>        <span class="cm">; 2º arg: lpText       → RDX</span>
+    <span class="kw">lea</span>    <span class="reg">r8</span>,  <span class="str">titulo</span>     <span class="cm">; 3º arg: lpCaption    → R8</span>
+    <span class="kw">mov</span>    <span class="reg">r9d</span>, <span class="nu">0</span>          <span class="cm">; 4º arg: uType=MB_OK  → R9</span>
+
+    <span class="kw">call</span>   <span class="win">MessageBoxA</span>    <span class="cm">; chama user32.dll</span>
+    <span class="cm">; retorno (IDOK = 1) estará em EAX / RAX</span>
+
+    <span class="kw">add</span>    <span class="reg">rsp</span>, <span class="nu">40</span>         <span class="cm">; CALLER limpa a pilha (desfaz o SUB)</span>
+    <span class="kw">xor</span>    <span class="reg">eax</span>, <span class="reg">eax</span>
+    <span class="kw">ret</span></div>
+    </div>
+
+    <div class="mem-label">Estado da pilha durante MessageBoxA (x64)</div>
+    <div class="stack-vis">
+      <div class="stack-row sr-main">
+        <div class="sr-addr">RSP+40</div>
+        <div class="sr-content"><div class="sr-dot" style="background:var(--green)"></div><span class="sr-label">frame de main() — variáveis e área de trabalho</span></div>
+      </div>
+      <div class="stack-row sr-shadow">
+        <div class="sr-addr">RSP+8</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent2)"></div>
+          <span class="sr-label">shadow space — 32 bytes para a MessageBoxA usar se quiser</span>
+          <span class="sr-tag" style="background:rgba(255,107,53,0.15);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">obrigatório!</span>
+        </div>
+      </div>
+      <div class="stack-row sr-ret">
+        <div class="sr-addr">RSP+0</div>
+        <div class="sr-content"><div class="sr-dot" style="background:var(--accent)"></div><span class="sr-label">endereço de retorno — empurrado pelo CALL automaticamente</span></div>
+        <div class="sr-sp">← RSP após CALL</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,229,255,0.2);border:1px solid var(--accent)"></div>args em registradores (RCX, RDX, R8, R9)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,107,53,0.2);border:1px solid var(--accent2)"></div>shadow space (32 bytes fixos)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3)"></div>endereço de retorno</div>
+    </div>
+
+    <div class="warn-box">
+      <div class="icon">⚠️</div>
+      <p>Se a função tem <strong>mais de 4 argumentos</strong>, o 5º em diante vai na pilha <em>acima</em> do shadow space, em ordem direta. Veja o exemplo com <code style="font-family:'Space Mono',monospace;color:var(--accent)">CreateFileW</code> (7 args) na seção 05.</p>
+    </div>
+  </div>
+
+  <!-- 03 — __stdcall -->
+  <div class="section-title fade-in">03 — Convenção 2: __stdcall (WinAPI 32-bit legada)</div>
+
+  <div class="card orange fade-in">
+    <h2>A convenção clássica de toda a WinAPI 32-bit</h2>
+    <p>Antes do Windows 64-bit, <strong>toda</strong> a WinAPI usava <code style="font-family:'Space Mono',monospace;color:var(--accent2)">__stdcall</code>. Até hoje você a encontra em programas 32-bit: jogos antigos, aplicações legadas, muitos drivers e ferramentas de segurança. A grande diferença: <strong>tudo passa pela pilha</strong>, não por registradores.</p>
+
+    <div class="compare-grid" style="margin-bottom:20px">
+      <div class="conv-box">
+        <h3 style="color:var(--accent2)">__stdcall — regras</h3>
+        <div class="conv-badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">Win32 / x86 32-bit</div>
+        <ul style="list-style:none;font-size:0.83rem;color:var(--muted);line-height:2.1">
+          <li>📌 Args vão <strong>na pilha</strong>, ordem inversa (último primeiro)</li>
+          <li>📌 <strong>Callee</strong> limpa a pilha usando <code style="font-family:'Space Mono',monospace;color:var(--accent)">RET N</code></li>
+          <li>📌 Retorno inteiro em <strong>EAX</strong></li>
+          <li>📌 <strong>EBX, ESI, EDI, EBP</strong> devem ser preservados</li>
+          <li>📌 Nome decorado: <code style="font-family:'Space Mono',monospace;color:var(--accent2)">_FuncName@NBytes</code></li>
+        </ul>
+      </div>
+      <div class="conv-box">
+        <h3 style="color:var(--win-blue-light)">Microsoft x64 ABI — regras</h3>
+        <div class="conv-badge" style="background:rgba(47,168,255,0.12);color:var(--win-blue-light);border:1px solid rgba(47,168,255,0.3)">Windows 64-bit moderno</div>
+        <ul style="list-style:none;font-size:0.83rem;color:var(--muted);line-height:2.1">
+          <li>📌 4 primeiros args em <strong>RCX, RDX, R8, R9</strong></li>
+          <li>📌 <strong>Caller</strong> limpa a pilha com <code style="font-family:'Space Mono',monospace;color:var(--accent)">ADD RSP, N</code></li>
+          <li>📌 Retorno inteiro em <strong>RAX</strong></li>
+          <li>📌 Shadow space de <strong>32 bytes sempre obrigatório</strong></li>
+          <li>📌 Sem decoração de nome</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mem-label">Exemplo: MessageBoxA em Assembly __stdcall (x86 32-bit)</div>
+    <div class="win-window">
+      <div class="win-titlebar">
+        <div class="win-controls"><span class="win-btn close"></span><span class="win-btn min"></span><span class="win-btn max"></span></div>
+        <div class="win-title">Assembly 32-bit — __stdcall (user32.dll)</div>
+      </div>
+      <div class="win-body"><span class="cm">; MessageBoxA(NULL, "Olá", "Título", MB_OK) — x86 32-bit</span>
+<span class="cm">; Protótipo: int __stdcall MessageBoxA(HWND, LPCSTR, LPCSTR, UINT);</span>
+<span class="fn">main</span>:
+    <span class="cm">; Argumentos empurrados em ordem INVERSA (último → primeiro)</span>
+    <span class="kw">push</span>   <span class="nu">0</span>              <span class="cm">; 4º arg: MB_OK = 0        (empurra por último)</span>
+    <span class="kw">push</span>   <span class="kw">offset</span> <span class="str">titulo</span>  <span class="cm">; 3º arg: lpCaption</span>
+    <span class="kw">push</span>   <span class="kw">offset</span> <span class="str">msg</span>     <span class="cm">; 2º arg: lpText</span>
+    <span class="kw">push</span>   <span class="nu">0</span>              <span class="cm">; 1º arg: hWnd = NULL      (empurra por primeiro)</span>
+
+    <span class="kw">call</span>   <span class="win">MessageBoxA</span>    <span class="cm">; ← user32.dll / __stdcall</span>
+
+    <span class="cm">; A MessageBoxA termina com "RET 16" internamente —</span>
+    <span class="cm">; ela mesma retira os 16 bytes (4 args × 4B) da pilha!</span>
+    <span class="cm">; O caller NÃO precisa fazer nada depois.</span>
+
+    <span class="cm">; resultado (IDOK=1) em EAX</span>
+    <span class="kw">xor</span>    <span class="reg">eax</span>, <span class="reg">eax</span>
+    <span class="kw">ret</span></div>
+    </div>
+
+    <div class="mem-label" style="margin-top:20px">Estado da pilha durante MessageBoxA (__stdcall)</div>
+    <div class="stack-vis">
+      <div class="stack-row sr-main">
+        <div class="sr-addr">ESP+20</div>
+        <div class="sr-content"><div class="sr-dot" style="background:var(--green)"></div><span class="sr-label">frame de main()</span></div>
+      </div>
+      <div class="stack-row sr-shadow" style="background:rgba(255,107,53,0.07)">
+        <div class="sr-addr">ESP+16</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent2)"></div>
+          <span class="sr-label">PUSH 0 — 4º arg: MB_OK (empurrado por último)</span>
+          <span class="sr-tag" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">4º arg</span>
+        </div>
+      </div>
+      <div class="stack-row sr-shadow" style="background:rgba(255,107,53,0.05)">
+        <div class="sr-addr">ESP+12</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent2)"></div>
+          <span class="sr-label">PUSH offset titulo — 3º arg: lpCaption</span>
+          <span class="sr-tag" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">3º arg</span>
+        </div>
+      </div>
+      <div class="stack-row sr-shadow" style="background:rgba(255,107,53,0.05)">
+        <div class="sr-addr">ESP+8</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent2)"></div>
+          <span class="sr-label">PUSH offset msg — 2º arg: lpText</span>
+          <span class="sr-tag" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">2º arg</span>
+        </div>
+      </div>
+      <div class="stack-row sr-shadow" style="background:rgba(255,107,53,0.05)">
+        <div class="sr-addr">ESP+4</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent2)"></div>
+          <span class="sr-label">PUSH 0 — 1º arg: hWnd = NULL (empurrado primeiro)</span>
+          <span class="sr-tag" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">1º arg</span>
+        </div>
+      </div>
+      <div class="stack-row sr-ret">
+        <div class="sr-addr">ESP+0</div>
+        <div class="sr-content"><div class="sr-dot" style="background:var(--accent)"></div><span class="sr-label">endereço de retorno — empurrado pelo CALL</span></div>
+        <div class="sr-sp">← ESP após CALL</div>
+      </div>
+    </div>
+
+    <div class="win-box" style="margin-top:16px">
+      <div class="icon">🧹</div>
+      <p><strong>Quem limpa a pilha no __stdcall?</strong> A <em>callee</em>. Internamente, <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">MessageBoxA</code> termina com <code style="font-family:'Space Mono',monospace;color:var(--win-blue-light)">RET 16</code> — isso faz o processador retirar o endereço de retorno <em>e</em> mais 16 bytes (os 4 args) da pilha de uma vez. O caller não precisa fazer nada depois do CALL.</p>
+    </div>
+  </div>
+
+  <!-- 04 — COMPARAÇÃO -->
+  <div class="section-title fade-in">04 — Comparação direta: __stdcall vs Microsoft x64</div>
+
+  <div class="card purple fade-in">
+    <h2>Os dois contratos lado a lado</h2>
+    <p>Mesma chamada, duas convenções, resultados completamente diferentes no Assembly. Entender isso é essencial para ler código gerado pelo compilador ou depurar com o WinDbg.</p>
+
+    <table class="diff-table">
+      <tr>
+        <th style="width:150px">Característica</th>
+        <th style="color:var(--accent2)">__stdcall (x86 32-bit)</th>
+        <th style="color:var(--win-blue-light)">Microsoft x64 ABI (64-bit)</th>
+      </tr>
+      <tr>
+        <td>Passagem de args</td>
+        <td>Todos na <strong>pilha</strong>, ordem inversa</td>
+        <td>4 primeiros em <strong>RCX, RDX, R8, R9</strong>; resto na pilha</td>
+      </tr>
+      <tr>
+        <td>Limpeza da pilha</td>
+        <td><strong>Callee</strong> — usa <code style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent)">RET N</code></td>
+        <td><strong>Caller</strong> — usa <code style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent)">ADD RSP, N</code></td>
+      </tr>
+      <tr>
+        <td>Valor de retorno</td>
+        <td><strong>EAX</strong> (32-bit)</td>
+        <td><strong>RAX</strong> (64-bit)</td>
+      </tr>
+      <tr>
+        <td>Shadow space</td>
+        <td>❌ Não existe</td>
+        <td>✅ Sempre 32 bytes obrigatórios</td>
+      </tr>
+      <tr>
+        <td>Callee-saved</td>
+        <td><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">EBX</span><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">ESI</span><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">EDI</span><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">EBP</span></td>
+        <td><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RBX</span><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RBP</span><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RDI</span><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RSI</span><span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">R12–R15</span></td>
+      </tr>
+      <tr>
+        <td>Decoração de nome</td>
+        <td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent2)">_MessageBoxA@16</code></td>
+        <td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--win-blue-light)">MessageBoxA</code> (sem decoração)</td>
+      </tr>
+      <tr>
+        <td>Usado em</td>
+        <td>WinAPI 32-bit, COM 32-bit, DLLs legadas</td>
+        <td>Toda WinAPI 64-bit, drivers, DLLs modernas</td>
+      </tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="icon">⚠️</div>
+      <p>Misturar as convenções causa <strong>stack corruption</strong> — um bug clássico difícil de depurar. Se você chamar uma <code style="font-family:'Space Mono',monospace;color:var(--accent2)">__stdcall</code> como se fosse <code style="font-family:'Space Mono',monospace;color:var(--accent2)">__cdecl</code> (onde o caller limpa), a pilha fica desalinhada e o programa trava ou produz comportamento aleatório.</p>
+    </div>
+  </div>
+
+  <!-- 05 — CreateFileW (7 args) -->
+  <div class="section-title fade-in">05 — Exemplo avançado: CreateFileW com 7 argumentos (x64)</div>
+
+  <div class="card green fade-in">
+    <h2>Quando há mais de 4 args, o resto vai na pilha</h2>
+    <p><code style="font-family:'Space Mono',monospace;color:var(--accent)">CreateFileW</code> tem <strong>7 argumentos</strong>. Os 4 primeiros vão em registradores, os outros 3 na pilha — acima do shadow space obrigatório.</p>
+
+    <div class="win-window">
+      <div class="win-titlebar">
+        <div class="win-controls"><span class="win-btn close"></span><span class="win-btn min"></span><span class="win-btn max"></span></div>
+        <div class="win-title">CreateFileW — 7 argumentos em x64 (kernel32.dll)</div>
+      </div>
+      <div class="win-body"><span class="cm">; HANDLE CreateFileW(</span>
+<span class="cm">;   LPCWSTR lpFileName,          ← RCX       (1º)</span>
+<span class="cm">;   DWORD   dwDesiredAccess,     ← RDX       (2º)</span>
+<span class="cm">;   DWORD   dwShareMode,         ← R8        (3º)</span>
+<span class="cm">;   LPSECURITY_ATTRIBUTES lpSA,  ← R9        (4º)</span>
+<span class="cm">;   DWORD   dwCreationDisposition ← [RSP+32] (5º — na pilha!)</span>
+<span class="cm">;   DWORD   dwFlagsAndAttributes,  ← [RSP+40] (6º — na pilha!)</span>
+<span class="cm">;   HANDLE  hTemplateFile           ← [RSP+48] (7º — na pilha!)</span>
+<span class="cm">; );</span>
+
+<span class="fn">abre_arquivo</span>:
+    <span class="kw">sub</span>   <span class="reg">rsp</span>, <span class="nu">72</span>              <span class="cm">; 8B retorno + 32B shadow + 24B args5-7 + 8B align = 72</span>
+
+    <span class="cm">; 5º, 6º, 7º args → escrito na pilha ANTES do CALL</span>
+    <span class="kw">mov</span>   <span class="kw">dword ptr</span> [<span class="reg">rsp</span>+<span class="nu">32</span>], <span class="nu">3</span>   <span class="cm">; OPEN_EXISTING</span>
+    <span class="kw">mov</span>   <span class="kw">dword ptr</span> [<span class="reg">rsp</span>+<span class="nu">40</span>], <span class="nu">128</span>  <span class="cm">; FILE_ATTRIBUTE_NORMAL</span>
+    <span class="kw">mov</span>   <span class="kw">qword ptr</span> [<span class="reg">rsp</span>+<span class="nu">48</span>], <span class="nu">0</span>   <span class="cm">; hTemplateFile = NULL</span>
+
+    <span class="cm">; 1º–4º args → registradores</span>
+    <span class="kw">lea</span>   <span class="reg">rcx</span>, <span class="str">nome_arquivo</span>    <span class="cm">; L"C:\teste.txt"</span>
+    <span class="kw">mov</span>   <span class="reg">edx</span>, <span class="nu">0x80000000</span>      <span class="cm">; GENERIC_READ</span>
+    <span class="kw">mov</span>   <span class="reg">r8d</span>, <span class="nu">1</span>               <span class="cm">; FILE_SHARE_READ</span>
+    <span class="kw">xor</span>   <span class="reg">r9d</span>, <span class="reg">r9d</span>            <span class="cm">; NULL (sem atributos de segurança)</span>
+
+    <span class="kw">call</span>  <span class="win">CreateFileW</span>          <span class="cm">; kernel32.dll</span>
+    <span class="cm">; HANDLE retornado em RAX</span>
+
+    <span class="kw">add</span>   <span class="reg">rsp</span>, <span class="nu">72</span>              <span class="cm">; CALLER limpa tudo</span>
+    <span class="kw">ret</span></div>
+    </div>
+
+    <div class="mem-label" style="margin-top:20px">Mapa completo da pilha durante CreateFileW</div>
+    <div class="stack-vis">
+      <div class="stack-row sr-main">
+        <div class="sr-addr">RSP+72</div>
+        <div class="sr-content"><div class="sr-dot" style="background:var(--green)"></div><span class="sr-label">frame do caller (abre_arquivo)</span></div>
+      </div>
+      <div class="stack-row sr-local">
+        <div class="sr-addr">RSP+48</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent3)"></div>
+          <span class="sr-label">[RSP+48] — 7º arg: hTemplateFile = NULL</span>
+          <span class="sr-tag" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">7º arg</span>
+        </div>
+      </div>
+      <div class="stack-row sr-local">
+        <div class="sr-addr">RSP+40</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent3)"></div>
+          <span class="sr-label">[RSP+40] — 6º arg: FILE_ATTRIBUTE_NORMAL (128)</span>
+          <span class="sr-tag" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">6º arg</span>
+        </div>
+      </div>
+      <div class="stack-row sr-local">
+        <div class="sr-addr">RSP+32</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent3)"></div>
+          <span class="sr-label">[RSP+32] — 5º arg: OPEN_EXISTING (3)</span>
+          <span class="sr-tag" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">5º arg</span>
+        </div>
+      </div>
+      <div class="stack-row sr-shadow">
+        <div class="sr-addr">RSP+8</div>
+        <div class="sr-content">
+          <div class="sr-dot" style="background:var(--accent2)"></div>
+          <span class="sr-label">shadow space — 32 bytes (RSP+8 a RSP+31) para CreateFileW</span>
+          <span class="sr-tag" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">obrigatório</span>
+        </div>
+      </div>
+      <div class="stack-row sr-ret">
+        <div class="sr-addr">RSP+0</div>
+        <div class="sr-content"><div class="sr-dot" style="background:var(--accent)"></div><span class="sr-label">endereço de retorno — empurrado pelo CALL</span></div>
+        <div class="sr-sp">← RSP após CALL</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,229,255,0.2);border:1px solid var(--accent)"></div>args 1–4 nos registradores (RCX, RDX, R8, R9)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(167,139,250,0.2);border:1px solid var(--accent3)"></div>args 5–7 na pilha (acima do shadow)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,107,53,0.2);border:1px solid var(--accent2)"></div>shadow space (32 bytes fixos)</div>
+    </div>
+
+    <div class="green-box">
+      <div class="icon">🏆</div>
+      <p>Regra de ouro Windows x64: <strong>RCX → RDX → R8 → R9</strong> para os 4 primeiros, depois pilha. Shadow space de <strong>32 bytes sempre</strong>. Quem limpa é o <strong>caller</strong> com <code style="font-family:'Space Mono',monospace;color:var(--green)">ADD RSP, N</code>.</p>
+    </div>
+  </div>
+
+  <!-- 06 — CALLER vs CALLEE SAVED -->
+  <div class="section-title fade-in">06 — Quem salva os registradores? (Windows x64)</div>
+
+  <div class="card red fade-in">
+    <h2>Voláteis vs. Não-voláteis — o que a WinAPI pode destruir</h2>
+    <p>Quando você chama <code style="font-family:'Space Mono',monospace;color:var(--accent)">MessageBoxA</code>, ela pode sobrescrever alguns registradores livremente. Se você tiver um valor importante neles, precisa salvá-los <em>antes</em> do CALL.</p>
+
+    <div class="compare-grid">
+      <div class="conv-box">
+        <h3 style="color:var(--accent2)">🔴 Voláteis — Caller-saved</h3>
+        <div class="conv-badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">a WinAPI pode destruir</div>
+        <div style="margin-bottom:10px">
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">RAX</span>
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">RCX</span>
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">RDX</span>
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">R8</span>
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">R9</span>
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">R10</span>
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">R11</span>
+          <span class="badge" style="background:rgba(255,107,53,0.12);color:var(--accent2);border:1px solid rgba(255,107,53,0.3)">XMM0–5</span>
+        </div>
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;margin:0">Se você precisar do valor de R10 depois de chamar uma WinAPI, salve com <code style="font-family:'Space Mono',monospace;color:var(--accent)">PUSH R10</code> antes do CALL.</p>
+      </div>
+      <div class="conv-box">
+        <h3 style="color:var(--accent3)">🟣 Não-voláteis — Callee-saved</h3>
+        <div class="conv-badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">a WinAPI deve preservar</div>
+        <div style="margin-bottom:10px">
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RBX</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RBP</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RDI</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">RSI</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">R12</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">R13</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">R14</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">R15</span>
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--accent3);border:1px solid rgba(167,139,250,0.3)">XMM6–15</span>
+        </div>
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;margin:0">Depois de chamar qualquer WinAPI, <em>você garante</em> que RBX/R12–R15 têm os mesmos valores que antes. Mas se a <em>sua</em> função usar eles, ela precisa salvar e restaurar.</p>
+      </div>
+    </div>
+
+    <div class="mem-label" style="margin-top:24px">Usando RBX corretamente entre chamadas de WinAPI</div>
+    <div class="win-window">
+      <div class="win-titlebar">
+        <div class="win-controls"><span class="win-btn close"></span><span class="win-btn min"></span><span class="win-btn max"></span></div>
+        <div class="win-title">Preservando RBX entre chamadas à WinAPI — x64</div>
+      </div>
+      <div class="win-body"><span class="cm">; Nossa função usa RBX para guardar um handle entre chamadas</span>
+<span class="fn">processar_arquivo</span>:
+    <span class="kw">push</span>  <span class="reg">rbx</span>               <span class="cm">; ← SALVA RBX (obrigatório, é callee-saved)</span>
+    <span class="kw">sub</span>   <span class="reg">rsp</span>, <span class="nu">40</span>          <span class="cm">; shadow space + alinhamento</span>
+
+    <span class="cm">; Abre o arquivo e guarda o HANDLE em RBX</span>
+    <span class="kw">lea</span>   <span class="reg">rcx</span>, <span class="str">nome_arquivo</span>
+    <span class="kw">mov</span>   <span class="reg">edx</span>, <span class="nu">0x80000000</span>   <span class="cm">; GENERIC_READ</span>
+    <span class="kw">mov</span>   <span class="reg">r8d</span>, <span class="nu">1</span>
+    <span class="kw">xor</span>   <span class="reg">r9d</span>, <span class="reg">r9d</span>
+    <span class="kw">mov</span>   <span class="kw">dword ptr</span>[<span class="reg">rsp</span>+<span class="nu">32</span>], <span class="nu">3</span>
+    <span class="kw">mov</span>   <span class="kw">dword ptr</span>[<span class="reg">rsp</span>+<span class="nu">40</span>], <span class="nu">128</span>
+    <span class="kw">mov</span>   <span class="kw">qword ptr</span>[<span class="reg">rsp</span>+<span class="nu">48</span>], <span class="nu">0</span>
+    <span class="kw">call</span>  <span class="win">CreateFileW</span>
+    <span class="kw">mov</span>   <span class="reg">rbx</span>, <span class="reg">rax</span>           <span class="cm">; guarda HANDLE em RBX</span>
+
+    <span class="cm">; Chama MessageBoxA — pode destruir RAX, RCX, RDX, R8, R9...</span>
+    <span class="cm">; mas NÃO toca em RBX (é callee-saved na x64 ABI)</span>
+    <span class="kw">xor</span>   <span class="reg">ecx</span>, <span class="reg">ecx</span>
+    <span class="kw">lea</span>   <span class="reg">rdx</span>, <span class="str">ok_msg</span>
+    <span class="kw">lea</span>   <span class="reg">r8</span>,  <span class="str">titulo</span>
+    <span class="kw">xor</span>   <span class="reg">r9d</span>, <span class="reg">r9d</span>
+    <span class="kw">call</span>  <span class="win">MessageBoxA</span>
+
+    <span class="cm">; RBX ainda tem o HANDLE original!</span>
+    <span class="kw">mov</span>   <span class="reg">rcx</span>, <span class="reg">rbx</span>           <span class="cm">; usa o HANDLE guardado</span>
+    <span class="kw">call</span>  <span class="win">CloseHandle</span>        <span class="cm">; fecha o arquivo</span>
+
+    <span class="kw">add</span>   <span class="reg">rsp</span>, <span class="nu">40</span>
+    <span class="kw">pop</span>   <span class="reg">rbx</span>               <span class="cm">; ← RESTAURA RBX antes de sair</span>
+    <span class="kw">ret</span></div>
+    </div>
+
+    <div class="info-box">
+      <div class="icon">💡</div>
+      <p>Use <strong>RBX, R12–R15</strong> para guardar valores que precisam sobreviver a chamadas de WinAPI — eles são callee-saved e <em>nenhuma</em> função do Windows vai sobrescrevê-los. Só lembre de salvá-los no início e restaurá-los no final da <em>sua</em> função.</p>
+    </div>
+  </div>
+
+  <footer class="fade-in">
+    <p>CONVENÇÃO DE CHAMADAS · WINDOWS · ARQUITETURA DE COMPUTADORES</p>
+  </footer>
+</div>
+</body>
+</html>
