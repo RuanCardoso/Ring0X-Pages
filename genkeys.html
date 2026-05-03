@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Chaves de Autenticacao</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121a31;
+      --card-soft: #1b2646;
+      --text: #e9eeff;
+      --muted: #9caad2;
+      --ok: #2dd4bf;
+      --warn: #f59e0b;
+      --danger: #f87171;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --border: #2c3966;
+      --shadow: 0 20px 40px rgba(4, 8, 20, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 500px at -20% -20%, rgba(99, 102, 241, 0.25), transparent 60%),
+        radial-gradient(700px 400px at 120% 0%, rgba(45, 212, 191, 0.17), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 18%), var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.05rem;
+    }
+
+    .hint {
+      margin: 0 0 14px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      letter-spacing: 0.2px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-soft);
+      color: var(--text);
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 12px;
+      cursor: pointer;
+      color: #fff;
+      background: var(--primary);
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      transition: transform 80ms ease, background 140ms ease, opacity 120ms ease;
+    }
+
+    .button:hover {
+      background: var(--primary-hover);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button.secondary {
+      background: #0ea5e9;
+    }
+
+    .button.secondary:hover {
+      background: #0284c7;
+    }
+
+    .button.warn {
+      background: #d97706;
+    }
+
+    .button.warn:hover {
+      background: #b45309;
+    }
+
+    .button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .top-card {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      margin-bottom: 12px;
+    }
+
+    .result {
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(19, 28, 52, 0.9);
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      min-height: 44px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+    }
+
+    .status {
+      display: inline-block;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      padding: 5px 9px;
+      margin-left: 6px;
+      vertical-align: middle;
+      border: 1px solid transparent;
+    }
+
+    .status.ok {
+      color: #9ff6ea;
+      border-color: rgba(45, 212, 191, 0.45);
+      background: rgba(45, 212, 191, 0.15);
+    }
+
+    .status.fail {
+      color: #fecaca;
+      border-color: rgba(248, 113, 113, 0.45);
+      background: rgba(248, 113, 113, 0.12);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div>
+        <h1 class="title">Painel de Chaves de Autenticacao</h1>
+        <div class="subtitle">Criar, validar, ativar e revogar keys de autenticacao com chamadas HTTP diretas.</div>
+      </div>
+    </header>
+
+    <section class="card top-card">
+      <div class="field">
+        <label for="baseUrl">Base URL da API</label>
+        <input id="baseUrl" type="text" value="http://localhost:8080" placeholder="http://localhost:8080" />
+      </div>
+      <div class="field">
+        <label for="token">Token admin (opcional, Bearer)</label>
+        <input id="token" type="text" placeholder="Cole aqui o token admin, se necessario" />
+      </div>
+      <div class="hint">Se sua autenticacao usa cookie de sessao, deixe token em branco. O painel envia requests com <strong>credentials: include</strong>.</div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Criar key</h2>
+        <p class="hint">Cria uma nova key com duracao em dias (o prazo final eh calculado ao ativar).</p>
+        <div class="field">
+          <label for="createKeyValue">Key</label>
+          <input id="createKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
+        </div>
+        <div class="field">
+          <label for="createDurationDays">Duracao (dias)</label>
+          <input id="createDurationDays" type="number" min="1" value="30" />
+        </div>
+        <button id="btnCreate" class="button">Criar key</button>
+      </section>
+
+      <section class="card">
+        <h2>Validar key</h2>
+        <p class="hint">Verifica se a key esta ativa e dentro do periodo de validade.</p>
+        <div class="field">
+          <label for="validateKeyValue">Key</label>
+          <input id="validateKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
+        </div>
+        <button id="btnValidate" class="button secondary">Validar key</button>
+      </section>
+
+      <section class="card">
+        <h2>Ativar key</h2>
+        <p class="hint">Define data de ativacao atual e data final com base na duracao da key.</p>
+        <div class="field">
+          <label for="activateKeyValue">Key</label>
+          <input id="activateKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
+        </div>
+        <button id="btnActivate" class="button">Ativar key</button>
+      </section>
+
+      <section class="card">
+        <h2>Revogar key</h2>
+        <p class="hint">Desativa imediatamente uma key ativa.</p>
+        <div class="field">
+          <label for="revokeKeyValue">Key</label>
+          <input id="revokeKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
+        </div>
+        <button id="btnRevoke" class="button warn">Revogar key</button>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Resultado da operacao</h2>
+      <div id="result" class="result">Pronto para executar operacoes.</div>
+    </section>
+
+    <div class="footer-note">Painel standalone em HTML + CSS + JS puro.</div>
+  </div>
+
+  <script>
+    const resultEl = document.getElementById("result");
+    const baseUrlEl = document.getElementById("baseUrl");
+    const tokenEl = document.getElementById("token");
+
+    function writeResult(title, data, ok) {
+      const badge = `<span class="status ${ok ? "ok" : "fail"}">${ok ? "SUCESSO" : "ERRO"}</span>`;
+      const rendered = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+      resultEl.innerHTML = `${title} ${badge}\n\n${rendered}`;
+    }
+
+    function getBaseUrl() {
+      return (baseUrlEl.value || "").trim().replace(/\/+$/, "");
+    }
+
+    function getHeaders() {
+      const headers = { "Content-Type": "application/json" };
+      const token = (tokenEl.value || "").trim();
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      return headers;
+    }
+
+    async function callApi(path, body) {
+      const baseUrl = getBaseUrl();
+      if (!baseUrl) {
+        throw new Error("Informe a Base URL da API.");
+      }
+
+      const response = await fetch(`${baseUrl}${path}`, {
+        method: "POST",
+        headers: getHeaders(),
+        credentials: "include",
+        body: JSON.stringify(body)
+      });
+
+      const contentType = response.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await response.json()
+        : await response.text();
+
+      if (!response.ok) {
+        const detail = typeof data === "string" ? data : data?.StatusMessage || JSON.stringify(data);
+        throw new Error(`HTTP ${response.status}: ${detail}`);
+      }
+
+      return data;
+    }
+
+    function withButtonLoading(button, fn) {
+      return async () => {
+        const original = button.textContent;
+        button.disabled = true;
+        button.textContent = "Processando...";
+        try {
+          await fn();
+        } finally {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      };
+    }
+
+    const btnCreate = document.getElementById("btnCreate");
+    const btnValidate = document.getElementById("btnValidate");
+    const btnActivate = document.getElementById("btnActivate");
+    const btnRevoke = document.getElementById("btnRevoke");
+
+    btnCreate.addEventListener("click", withButtonLoading(btnCreate, async () => {
+      try {
+        const keyValue = document.getElementById("createKeyValue").value.trim();
+        const durationDays = Number(document.getElementById("createDurationDays").value);
+
+        if (!keyValue) throw new Error("Informe a key para criar.");
+        if (!Number.isFinite(durationDays) || durationDays <= 0) throw new Error("Duracao deve ser maior que 0.");
+
+        const data = await callApi("/admin/auth-keys/create", { keyValue, durationDays: String(durationDays) });
+        writeResult("Criar key", data, true);
+      } catch (error) {
+        writeResult("Criar key", error.message, false);
+      }
+    }));
+
+    btnValidate.addEventListener("click", withButtonLoading(btnValidate, async () => {
+      try {
+        const keyValue = document.getElementById("validateKeyValue").value.trim();
+        if (!keyValue) throw new Error("Informe a key para validar.");
+
+        const data = await callApi("/admin/auth-keys/validate", { keyValue });
+        writeResult("Validar key", data, true);
+      } catch (error) {
+        writeResult("Validar key", error.message, false);
+      }
+    }));
+
+    btnActivate.addEventListener("click", withButtonLoading(btnActivate, async () => {
+      try {
+        const keyValue = document.getElementById("activateKeyValue").value.trim();
+        if (!keyValue) throw new Error("Informe a key para ativar.");
+
+        const data = await callApi("/admin/auth-keys/activate", { keyValue });
+        writeResult("Ativar key", data, true);
+      } catch (error) {
+        writeResult("Ativar key", error.message, false);
+      }
+    }));
+
+    btnRevoke.addEventListener("click", withButtonLoading(btnRevoke, async () => {
+      try {
+        const keyValue = document.getElementById("revokeKeyValue").value.trim();
+        if (!keyValue) throw new Error("Informe a key para revogar.");
+
+        const data = await callApi("/admin/auth-keys/revoke", { keyValue });
+        writeResult("Revogar key", data, true);
+      } catch (error) {
+        writeResult("Revogar key", error.message, false);
+      }
+    }));
+  </script>
+</body>
+</html>
