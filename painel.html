@@ -621,6 +621,38 @@
       border-color: rgba(234,179,8,0.25);
     }
 
+    .btn-token-save {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(232,255,89,0.25);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .btn-token-save:hover { opacity: 0.8; }
+
+    .btn-token-clear {
+      background: transparent;
+      color: var(--hint);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .btn-token-clear:hover { color: var(--danger); border-color: var(--danger-border); }
+
     .tabs { grid-template-columns: repeat(2, 1fr); }
   </style>
 </head>
@@ -671,7 +703,12 @@
           </div>
           <div class="field">
             <label>Token admin (opcional)</label>
-            <input id="token" type="text" placeholder="Bearer token" />
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="token" type="password" placeholder="Bearer token" style="flex:1" oninput="onTokenInput()" />
+              <button id="btnSaveToken" class="btn-token-save" onclick="saveToken()" title="Salvar token no navegador">Salvar</button>
+              <button id="btnClearToken" class="btn-token-clear" onclick="clearToken()" title="Remover token salvo" style="display:none">Limpar</button>
+            </div>
+            <div id="tokenHint" style="font-size:11px;color:var(--hint);margin-top:5px"></div>
           </div>
         </div>
       </div>
@@ -801,7 +838,6 @@
 
   <script>
     const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
-    let _generatedKey = '';
     let _selectedKey = '';
     let _configOpen = false;
 
@@ -841,24 +877,44 @@
       return o;
     }
 
-    function san(v, fb) {
-      return (v || '').toUpperCase().replace(/[^A-Z0-9]/g, '') || fb;
+    /* ── Token persistence ── */
+    const TOKEN_KEY = 'ring_admin_token';
+
+    function loadToken() {
+      const saved = localStorage.getItem(TOKEN_KEY);
+      if (saved) {
+        document.getElementById('token').value = saved;
+        document.getElementById('btnClearToken').style.display = 'inline-block';
+        document.getElementById('tokenHint').textContent = 'Token carregado do armazenamento local.';
+      }
     }
 
-    function genKey() {
-      const p = san(document.getElementById('keyPrefix').value, 'RING0X');
-      const t = san(document.getElementById('keyTag').value, 'CLIENTE');
-      _generatedKey = `${p}-${t}-${rnd(6)}-${rnd(6)}-${rnd(6)}-${new Date().getFullYear()}`;
-      const el = document.getElementById('generatedKey');
-      el.textContent = _generatedKey;
-      el.classList.remove('empty');
+    function onTokenInput() {
+      const val = document.getElementById('token').value.trim();
+      const saved = localStorage.getItem(TOKEN_KEY);
+      document.getElementById('btnClearToken').style.display = saved ? 'inline-block' : 'none';
+      if (saved && val !== saved) {
+        document.getElementById('tokenHint').textContent = 'Token alterado — clique em Salvar para atualizar.';
+      } else if (!saved) {
+        document.getElementById('tokenHint').textContent = '';
+      }
     }
 
-    function useKey() {
-      if (!_generatedKey) genKey();
-      document.getElementById('createKey').value = _generatedKey;
-      document.getElementById('activateKey').value = _generatedKey;
-      switchTab('admin');
+    function saveToken() {
+      const val = document.getElementById('token').value.trim();
+      if (!val) { document.getElementById('tokenHint').textContent = 'Digite um token antes de salvar.'; return; }
+      localStorage.setItem(TOKEN_KEY, val);
+      document.getElementById('btnClearToken').style.display = 'inline-block';
+      document.getElementById('tokenHint').textContent = 'Token salvo com sucesso.';
+      setTimeout(() => { document.getElementById('tokenHint').textContent = 'Token carregado do armazenamento local.'; }, 2000);
+    }
+
+    function clearToken() {
+      localStorage.removeItem(TOKEN_KEY);
+      document.getElementById('token').value = '';
+      document.getElementById('btnClearToken').style.display = 'none';
+      document.getElementById('tokenHint').textContent = 'Token removido.';
+      setTimeout(() => { document.getElementById('tokenHint').textContent = ''; }, 2000);
     }
 
     /* ── API ── */
@@ -929,10 +985,13 @@
 
     async function doCreate() {
       const qty = Math.max(1, Math.min(100, Number(document.getElementById('createQty').value) || 1));
-      const baseKey = document.getElementById('createKey').value.trim();
+      let baseKey = document.getElementById('createKey').value.trim();
       const d = Number(document.getElementById('createDays').value);
 
-      if (!baseKey) { showResult('res-create', 'badge-create', 'body-create', 'Informe a key.', false); return; }
+      if (!baseKey) {
+        baseKey = `RING0X-KEY-${rnd(6)}-${rnd(6)}-${new Date().getFullYear()}`;
+        document.getElementById('createKey').value = baseKey;
+      }
       if (!d || d < 1) { showResult('res-create', 'badge-create', 'body-create', 'Duração deve ser maior que 0.', false); return; }
 
       document.getElementById('kpiDays').textContent = d + ' dias';
@@ -1071,6 +1130,8 @@
       document.getElementById('revokeKey').value = _selectedKey;
       switchTab('admin');
     }
+
+    loadToken();
   </script>
 </body>
 </html>
