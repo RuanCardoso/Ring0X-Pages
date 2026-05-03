@@ -3,588 +3,992 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel de Chaves de Autenticacao</title>
+  <title>Painel de Chaves de Autenticação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --background: #09090b;
-      --foreground: #fafafa;
-      --card: #09090b;
-      --card-soft: #111113;
-      --muted: #a1a1aa;
-      --border: #27272a;
-      --primary: #fafafa;
-      --primary-foreground: #09090b;
-      --secondary: #18181b;
-      --secondary-hover: #27272a;
-      --danger-bg: #3f1d1d;
-      --danger-border: #7f1d1d;
-      --danger-text: #fecaca;
-      --success-bg: rgba(34, 197, 94, 0.14);
-      --success-border: rgba(34, 197, 94, 0.45);
-      --danger-soft-bg: rgba(239, 68, 68, 0.12);
-      --danger-soft-border: rgba(239, 68, 68, 0.45);
-      --ring: rgba(250, 250, 250, 0.24);
+      --bg: #0d0d0f;
+      --surface: #141416;
+      --surface2: #1a1a1e;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --text: #f0f0f0;
+      --muted: #7a7a85;
+      --hint: #4a4a55;
+      --accent: #e8ff59;
+      --accent-dim: rgba(232,255,89,0.12);
+      --accent-text: #0d0d0f;
+      --danger: #ff5a5a;
+      --danger-dim: rgba(255,90,90,0.1);
+      --danger-border: rgba(255,90,90,0.25);
+      --success: #4cdc8a;
+      --success-dim: rgba(76,220,138,0.1);
+      --success-border: rgba(76,220,138,0.25);
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --radius: 10px;
+      --radius-lg: 14px;
     }
 
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
-      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--foreground);
-      background:
-        radial-gradient(900px 380px at 50% -5%, rgba(255, 255, 255, 0.05), transparent 60%),
-        var(--background);
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 28px 16px;
+      padding: 2rem 1rem 4rem;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header { margin-bottom: 16px; }
-    .title { margin: 0; font-size: clamp(1.5rem, 3vw, 2.1rem); }
-    .subtitle { margin: 8px 0 0; color: var(--muted); }
+    .container { max-width: 800px; margin: 0 auto; }
 
-    .layout {
+    /* ── Header ── */
+    .header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left h1 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .header-left p {
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    /* ── Metrics ── */
+    .metrics {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 16px;
-      margin-top: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 1.25rem;
     }
 
-    .stack { display: grid; gap: 16px; }
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+    }
 
+    .metric-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 5px;
+    }
+
+    .metric-value {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .metric-value.mono {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding-top: 2px;
+    }
+
+    /* ── Config ── */
+    .config-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .config-bar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .config-bar-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .config-bar-arrow {
+      font-size: 11px;
+      color: var(--hint);
+      transition: transform 0.2s;
+    }
+
+    .config-bar-arrow.open { transform: rotate(180deg); }
+
+    .config-body {
+      display: none;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    .config-body.open { display: block; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      margin-bottom: 1.25rem;
+    }
+
+    .tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 8px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .tab:hover { color: var(--text); }
+
+    .tab.active {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+
+    /* ── Panels ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Cards ── */
     .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 24%), var(--card-soft);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
     }
 
-    .card h2 { margin: 0 0 6px; font-size: 1.02rem; }
-    .hint { margin: 0 0 12px; color: var(--muted); font-size: .9rem; line-height: 1.42; }
+    .card:last-child { margin-bottom: 0; }
 
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(120px, 1fr));
-      gap: 10px;
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
 
-    .kpi {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: #0f0f12;
-      padding: 10px 12px;
+    .card-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      line-height: 1.55;
     }
 
-    .kpi-title { color: var(--muted); font-size: .78rem; }
-    .kpi-value { font-size: 1.05rem; font-weight: 700; margin-top: 4px; }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1rem 0;
+    }
 
-    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-    label { color: var(--muted); font-size: .82rem; }
-    input, select {
+    /* ── Form ── */
+    .field { margin-bottom: 12px; }
+    .field:last-of-type { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
       width: 100%;
-      padding: 11px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0f0f12;
-      color: var(--foreground);
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
       outline: none;
-      transition: border-color 120ms ease, box-shadow 120ms ease;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
     }
 
     input:focus, select:focus {
-      border-color: #3f3f46;
-      box-shadow: 0 0 0 3px var(--ring);
+      border-color: rgba(255,255,255,0.28);
     }
 
-    .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    input::placeholder { color: var(--hint); }
 
-    .button {
-      border: none;
-      border-radius: 10px;
-      padding: 11px 12px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: transform 80ms ease, opacity 120ms ease, background 120ms ease;
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
-    .button.primary { background: var(--primary); color: var(--primary-foreground); width: 100%; }
-    .button.secondary { background: var(--secondary); color: var(--foreground); width: 100%; }
-    .button.secondary:hover { background: var(--secondary-hover); }
-    .button.warn { background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); width: 100%; }
-    .button:active { transform: translateY(1px); }
-    .button:disabled { opacity: .6; cursor: not-allowed; }
-
-    .segmented {
+    /* ── Segmented ── */
+    .seg {
       display: inline-flex;
-      gap: 6px;
-      padding: 5px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      background: #0f0f12;
+      gap: 3px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 3px;
     }
 
-    .segmented button {
-      border: 1px solid transparent;
+    .seg button {
       background: transparent;
+      border: none;
       color: var(--muted);
-      border-radius: 8px;
-      padding: 7px 12px;
-      font-size: .84rem;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .seg button.active {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-text);
+      border: none;
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      font-family: var(--sans);
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
+      width: 100%;
+      transition: opacity 0.15s;
     }
 
-    .segmented button.active {
-      background: var(--primary);
-      color: var(--primary-foreground);
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.15s;
     }
 
-    .key-preview {
-      font-family: Consolas, Monaco, monospace;
-      border: 1px dashed #3f3f46;
-      border-radius: 10px;
-      background: #0f0f12;
+    .btn-secondary:hover { background: rgba(255,255,255,0.06); }
+    .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-danger {
+      background: var(--danger-dim);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.15s;
+    }
+
+    .btn-danger:hover { opacity: 0.82; }
+    .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* ── Key preview ── */
+    .key-box {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg);
+      border: 1px dashed var(--border2);
+      border-radius: var(--radius);
       padding: 10px 12px;
-      letter-spacing: .6px;
       word-break: break-all;
-      margin-bottom: 10px;
-      min-height: 42px;
+      min-height: 40px;
+      color: var(--accent);
+      line-height: 1.5;
+    }
+
+    .key-box.empty { color: var(--hint); }
+
+    /* ── Steps ── */
+    .steps { margin-bottom: 1rem; }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .step-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
       display: flex;
       align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 1px;
     }
 
-    .result {
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0f0f12;
-      padding: 10px 12px;
-      font-size: .9rem;
-      min-height: 220px;
-      line-height: 1.35;
+    /* ── Result ── */
+    .result-wrap {
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .result-wrap.visible { display: block; }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .result-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 99px;
+      padding: 3px 9px;
+      border: 1px solid transparent;
+    }
+
+    .badge-ok {
+      background: var(--success-dim);
+      color: var(--success);
+      border-color: var(--success-border);
+    }
+
+    .badge-err {
+      background: var(--danger-dim);
+      color: var(--danger);
+      border-color: var(--danger-border);
+    }
+
+    .result-body {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text);
       white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
+    /* ── Table ── */
     .table-wrap {
-      max-height: 280px;
-      overflow: auto;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #0f0f12;
+      border-radius: var(--radius);
+      overflow: auto;
+      max-height: 280px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: .84rem;
+      font-size: 12px;
     }
 
     th, td {
-      padding: 10px 8px;
-      border-bottom: 1px solid #1f1f23;
+      padding: 9px 12px;
       text-align: left;
-      vertical-align: top;
+      border-bottom: 1px solid var(--border);
     }
 
     th {
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       position: sticky;
       top: 0;
-      background: #141419;
-      color: #d4d4d8;
       z-index: 1;
     }
 
-    .mono { font-family: Consolas, Monaco, monospace; font-size: .8rem; }
+    tr:last-child td { border-bottom: none; }
 
-    .status {
+    tr[data-key] { cursor: pointer; transition: background 0.12s; }
+    tr[data-key]:hover td { background: rgba(255,255,255,0.03); }
+    tr[data-key].selected td { background: rgba(232,255,89,0.06); }
+
+    .pill {
       display: inline-block;
-      font-size: .78rem;
-      border-radius: 999px;
-      padding: 5px 9px;
-      margin-left: 6px;
-      border: 1px solid transparent;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 99px;
+      padding: 2px 8px;
     }
 
-    .status.ok { color: #bbf7d0; border-color: var(--success-border); background: var(--success-bg); }
-    .status.fail { color: #fecaca; border-color: var(--danger-soft-border); background: var(--danger-soft-bg); }
-    .footer-note { margin-top: 14px; color: var(--muted); font-size: .82rem; text-align: center; }
-
-    @media (max-width: 940px) {
-      .layout { grid-template-columns: 1fr; }
-      .kpis { grid-template-columns: 1fr; }
-      .button-row { grid-template-columns: 1fr; }
+    .pill-ok {
+      background: var(--success-dim);
+      color: var(--success);
     }
+
+    .pill-off {
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+    }
+
+    td.mono-cell {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Copy hint ── */
+    .copy-hint {
+      font-size: 11.5px;
+      color: var(--hint);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .tabs { grid-template-columns: 1fr 1fr 1fr; }
+      .row { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr; }
+      .btn-row { grid-template-columns: 1fr; }
+    }
+
+    /* ── Client simulation ── */
+    .client-sim-wrap {
+      max-width: 800px;
+      margin: 2.5rem auto 0;
+      padding: 0 1rem 4rem;
+    }
+
+    .client-sim-inner {
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .client-sim-header {
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px dashed rgba(255,255,255,0.12);
+      padding: 12px 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .client-sim-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 99px;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+
+    .client-sim-hint {
+      font-size: 12px;
+      color: var(--hint);
+      line-height: 1.5;
+    }
+
+    .client-sim-body {
+      padding: 1.25rem;
+    }
+
+    .btn-activate {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.15s;
+    }
+
+    .btn-activate:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.22);
+    }
+
+    .btn-activate:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   </style>
 </head>
 <body>
   <div class="container">
+
     <header class="header">
-      <div>
-        <h1 class="title">Painel de Chaves de Autenticacao</h1>
-        <div class="subtitle">Criar, ativar e revogar keys de autenticacao com chamadas HTTP diretas.</div>
+      <div class="header-left">
+        <h1>Chaves de Autenticação</h1>
+        <p>Gerar, criar, ativar e revogar keys via HTTP direto.</p>
       </div>
     </header>
 
-    <div class="layout">
-      <div class="stack">
-        <section class="card">
-          <h2>Config da API</h2>
-          <p class="hint">Padrao do projeto: localhost em dev e dominio RingAPI em producao.</p>
-          <div class="field">
-            <label>Ambiente</label>
-            <div class="segmented">
-              <button id="envDev" type="button">Dev</button>
-              <button id="envProd" class="active" type="button">Producao</button>
-            </div>
-          </div>
-          <div class="field">
-            <label for="baseUrl">Base URL</label>
-            <input id="baseUrl" type="text" value="https://ringapi.guaranihub.com" placeholder="https://ringapi.guaranihub.com" />
-          </div>
-          <div class="field">
-            <label for="token">Token admin (opcional)</label>
-            <input id="token" type="text" placeholder="Bearer token para rotas admin, se necessario" />
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Gerador de key</h2>
-          <p class="hint">Gere uma key com formato padrao, copie e use no card de criacao.</p>
-          <div class="field">
-            <label for="keyPrefix">Prefixo</label>
-            <input id="keyPrefix" type="text" value="RING0X" />
-          </div>
-          <div class="field">
-            <label for="keyTag">Tag cliente/produto</label>
-            <input id="keyTag" type="text" value="CLIENTE" />
-          </div>
-          <div class="field">
-            <label>Preview da key</label>
-            <div id="generatedKey" class="key-preview">Clique em "Gerar key".</div>
-          </div>
-          <div class="button-row">
-            <button id="btnGenerate" class="button secondary">Gerar key</button>
-            <button id="btnUseGenerated" class="button primary">Usar na criacao</button>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Criar key (Admin)</h2>
-          <p class="hint">Cria uma key com duracao em dias. A validade real comeca quando o cliente ativa.</p>
-          <div class="field">
-            <label for="createKeyValue">Key</label>
-            <input id="createKeyValue" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" />
-          </div>
-          <div class="field">
-            <label for="createDurationDays">Duracao (dias)</label>
-            <input id="createDurationDays" type="number" min="1" value="30" />
-          </div>
-          <button id="btnCreate" class="button primary">Criar key</button>
-        </section>
+    <!-- Métricas -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Ambiente</div>
+        <div class="metric-value" id="kpiEnv">Prod</div>
       </div>
-
-      <div class="stack">
-        <section class="card">
-          <h2>Paineis rapidos</h2>
-          <div class="kpis">
-            <div class="kpi">
-              <div class="kpi-title">Ambiente</div>
-              <div id="kpiEnv" class="kpi-value">PROD</div>
-            </div>
-            <div class="kpi">
-              <div class="kpi-title">Duracao padrao</div>
-              <div id="kpiDays" class="kpi-value">30 dias</div>
-            </div>
-            <div class="kpi">
-              <div class="kpi-title">Formato</div>
-              <div class="kpi-value">PREFIX-TAG-XXXX-XXXX-ANO</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Ativar key (Cliente)</h2>
-          <p class="hint">Ativacao unica: se ja tiver sido ativada antes, o backend bloqueia reutilizacao.</p>
-          <div class="field">
-            <label for="activateKeyValue">Key</label>
-            <input id="activateKeyValue" type="text" placeholder="Cole a key recebida" />
-          </div>
-          <button id="btnActivate" class="button primary">Ativar key</button>
-        </section>
-
-        <section class="card">
-          <h2>Revogar key (Admin)</h2>
-          <p class="hint">Revoga uma key existente.</p>
-          <div class="field">
-            <label for="revokeKeyValue">Key</label>
-            <input id="revokeKeyValue" type="text" placeholder="Cole a key a revogar" />
-          </div>
-          <button id="btnRevoke" class="button warn">Revogar key</button>
-        </section>
-
-        <section class="card">
-          <h2>Keys cadastradas</h2>
-          <p class="hint">Lista completa das keys no banco (somente admin).</p>
-          <div class="button-row" style="margin-bottom:10px;">
-            <button id="btnListKeys" class="button secondary">Listar keys</button>
-            <button id="btnFillRevokeFromTable" class="button secondary">Copiar selecionada</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Key</th>
-                  <th>Status</th>
-                  <th>Dias</th>
-                  <th>Ativada em</th>
-                  <th>Termina em</th>
-                </tr>
-              </thead>
-              <tbody id="keysTableBody">
-                <tr><td colspan="5" class="hint">Sem dados carregados.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Resultado da operacao</h2>
-          <div id="result" class="result">Pronto para executar operacoes.</div>
-        </section>
+      <div class="metric">
+        <div class="metric-label">Base URL</div>
+        <div class="metric-value mono" id="kpiUrl">ringapi.guaranihub.com</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Duração padrão</div>
+        <div class="metric-value" id="kpiDays">30 dias</div>
       </div>
     </div>
 
-    <div class="footer-note">Painel standalone em HTML + CSS + JS puro.</div>
+    <!-- Config colapsável -->
+    <div class="config-bar">
+      <div class="config-bar-header" onclick="toggleConfig()">
+        <span class="config-bar-title">Configuração da API</span>
+        <span class="config-bar-arrow" id="configArrow">▼</span>
+      </div>
+      <div class="config-body" id="configBody">
+        <div style="margin-bottom:12px">
+          <label>Ambiente</label>
+          <div class="seg">
+            <button id="envDev" onclick="setEnv('dev')">Dev</button>
+            <button id="envProd" class="active" onclick="setEnv('prod')">Produção</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Base URL</label>
+            <input id="baseUrl" type="text" value="https://ringapi.guaranihub.com" />
+          </div>
+          <div class="field">
+            <label>Token admin (opcional)</label>
+            <input id="token" type="text" placeholder="Bearer token" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('gen')">Gerar key</button>
+      <button class="tab" onclick="switchTab('admin')">Admin</button>
+      <button class="tab" onclick="switchTab('list')">Listar</button>
+    </div>
+
+    <!-- Panel: Gerar -->
+    <div id="panel-gen" class="panel active">
+      <div class="card">
+        <div class="card-title">Gerar nova key</div>
+        <p class="card-hint">Monte a key no formato padrão — PREFIXO-TAG-XXXX-XXXX-ANO.</p>
+        <div class="row" style="margin-bottom:12px">
+          <div class="field">
+            <label>Prefixo</label>
+            <input id="keyPrefix" type="text" value="RING0X" />
+          </div>
+          <div class="field">
+            <label>Tag cliente</label>
+            <input id="keyTag" type="text" value="CLIENTE" />
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Key gerada</label>
+          <div id="generatedKey" class="key-box empty">Clique em "Gerar" para criar.</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="genKey()">Gerar key</button>
+          <button class="btn-primary" onclick="useKey()">Usar esta key →</button>
+        </div>
+        <p class="copy-hint">Ao clicar em "Usar esta key", a key é preenchida nos painéis de criação e ativação automaticamente.</p>
+      </div>
+    </div>
+
+    <!-- Panel: Admin -->
+    <div id="panel-admin" class="panel">
+      <div class="card">
+        <div class="card-title">Criar key</div>
+        <p class="card-hint">Define a key e a duração em dias. A validade começa a contar quando o cliente ativa.</p>
+        <div class="field">
+          <label>Key</label>
+          <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" />
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Duração (dias)</label>
+          <input id="createDays" type="number" min="1" value="30" style="max-width:140px" />
+        </div>
+        <button class="btn-primary" id="btnCreate" onclick="doCreate()">Criar key</button>
+        <div class="result-wrap" id="res-create">
+          <div class="result-header">
+            <span class="result-label">Resultado — criar</span>
+            <span class="badge" id="badge-create"></span>
+          </div>
+          <div class="result-body" id="body-create"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Revogar key</div>
+        <p class="card-hint">A key é invalidada imediatamente. Ação irreversível.</p>
+        <div class="field" style="margin-bottom:14px">
+          <label>Key</label>
+          <input id="revokeKey" type="text" placeholder="Cole a key a revogar" />
+        </div>
+        <button class="btn-danger" id="btnRevoke" onclick="doRevoke()">Revogar key</button>
+        <div class="result-wrap" id="res-revoke">
+          <div class="result-header">
+            <span class="result-label">Resultado — revogar</span>
+            <span class="badge" id="badge-revoke"></span>
+          </div>
+          <div class="result-body" id="body-revoke"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Listar -->
+    <div id="panel-list" class="panel">
+      <div class="card">
+        <div class="card-title">Keys cadastradas</div>
+        <p class="card-hint">Lista completa (somente admin). Clique em uma linha para selecioná-la — use "Mover para Revogar" para levá-la ao painel admin.</p>
+        <div class="btn-row" style="margin-bottom:14px">
+          <button class="btn-secondary" id="btnList" onclick="doList()">Carregar lista</button>
+          <button class="btn-secondary" onclick="copySelected()">Mover selecionada para Revogar →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Status</th>
+                <th>Dias</th>
+                <th>Ativada em</th>
+                <th>Termina em</th>
+              </tr>
+            </thead>
+            <tbody id="keysBody">
+              <tr>
+                <td colspan="5" style="color:var(--hint);padding:16px 12px;font-size:12px">
+                  Sem dados. Clique em "Carregar lista".
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="result-wrap" id="res-list">
+          <div class="result-header">
+            <span class="result-label">Resultado — listar</span>
+            <span class="badge" id="badge-list"></span>
+          </div>
+          <div class="result-body" id="body-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Simulação do cliente — fora do fluxo admin -->
+  <div class="client-sim-wrap">
+    <div class="client-sim-inner">
+      <div class="client-sim-header">
+        <div class="client-sim-badge">Simulação de cliente</div>
+        <p class="client-sim-hint">Esta área simula a perspectiva do cliente que recebeu uma key. Não faz parte do fluxo admin.</p>
+      </div>
+      <div class="client-sim-body">
+        <div class="field" style="margin-bottom:12px">
+          <label>Key recebida</label>
+          <input id="activateKey" type="text" placeholder="Cole a key para testar a ativação" />
+        </div>
+        <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
+        <div class="result-wrap" id="res-activate">
+          <div class="result-header">
+            <span class="result-label">Resposta da API</span>
+            <span class="badge" id="badge-activate"></span>
+          </div>
+          <div class="result-body" id="body-activate"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const resultEl = document.getElementById("result");
-    const baseUrlEl = document.getElementById("baseUrl");
-    const tokenEl = document.getElementById("token");
-    const envDevBtn = document.getElementById("envDev");
-    const envProdBtn = document.getElementById("envProd");
-    const kpiEnvEl = document.getElementById("kpiEnv");
-    const kpiDaysEl = document.getElementById("kpiDays");
-    const keyPrefixEl = document.getElementById("keyPrefix");
-    const keyTagEl = document.getElementById("keyTag");
-    const generatedKeyEl = document.getElementById("generatedKey");
-    const keysTableBodyEl = document.getElementById("keysTableBody");
+    const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
+    let _generatedKey = '';
+    let _selectedKey = '';
+    let _configOpen = false;
 
-    const ENV_URLS = {
-      dev: "http://localhost:8443",
-      prod: "https://ringapi.guaranihub.com"
-    };
-
-    let generatedKey = "";
-    let selectedKeyFromTable = "";
-
-    function writeResult(title, data, ok) {
-      const badge = `<span class="status ${ok ? "ok" : "fail"}">${ok ? "SUCESSO" : "ERRO"}</span>`;
-      const rendered = typeof data === "string" ? data : JSON.stringify(data, null, 2);
-      resultEl.innerHTML = `${title} ${badge}\n\n${rendered}`;
+    /* ── Config toggle ── */
+    function toggleConfig() {
+      _configOpen = !_configOpen;
+      document.getElementById('configBody').classList.toggle('open', _configOpen);
+      document.getElementById('configArrow').classList.toggle('open', _configOpen);
     }
 
-    function getBaseUrl() {
-      return (baseUrlEl.value || "").trim().replace(/\/+$/, "");
+    /* ── Environment ── */
+    function setEnv(e) {
+      document.getElementById('baseUrl').value = ENV[e];
+      document.getElementById('envDev').classList.toggle('active', e === 'dev');
+      document.getElementById('envProd').classList.toggle('active', e === 'prod');
+      document.getElementById('kpiEnv').textContent = e === 'dev' ? 'Dev' : 'Prod';
+      document.getElementById('kpiUrl').textContent = ENV[e].replace(/https?:\/\//, '');
     }
 
+    /* ── Tabs ── */
+    const TAB_IDS = ['gen', 'admin', 'list'];
+
+    function switchTab(t) {
+      document.querySelectorAll('.tab').forEach((b, i) => {
+        b.classList.toggle('active', TAB_IDS[i] === t);
+      });
+      TAB_IDS.forEach(id => {
+        document.getElementById('panel-' + id).classList.toggle('active', id === t);
+      });
+    }
+
+    /* ── Key generator ── */
+    function rnd(n) {
+      const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let o = '';
+      for (let i = 0; i < n; i++) o += c[Math.floor(Math.random() * c.length)];
+      return o;
+    }
+
+    function san(v, fb) {
+      return (v || '').toUpperCase().replace(/[^A-Z0-9]/g, '') || fb;
+    }
+
+    function genKey() {
+      const p = san(document.getElementById('keyPrefix').value, 'RING0X');
+      const t = san(document.getElementById('keyTag').value, 'CLIENTE');
+      _generatedKey = `${p}-${t}-${rnd(6)}-${rnd(6)}-${rnd(6)}-${new Date().getFullYear()}`;
+      const el = document.getElementById('generatedKey');
+      el.textContent = _generatedKey;
+      el.classList.remove('empty');
+    }
+
+    function useKey() {
+      if (!_generatedKey) genKey();
+      document.getElementById('createKey').value = _generatedKey;
+      document.getElementById('activateKey').value = _generatedKey;
+      switchTab('admin');
+    }
+
+    /* ── API ── */
     function getHeaders() {
-      const headers = { "Content-Type": "application/json" };
-      const token = (tokenEl.value || "").trim();
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      return headers;
+      const h = { 'Content-Type': 'application/json' };
+      const t = (document.getElementById('token').value || '').trim();
+      if (t) h['Authorization'] = 'Bearer ' + t;
+      return h;
     }
 
-    function setEnvironment(env) {
-      const isDev = env === "dev";
-      baseUrlEl.value = isDev ? ENV_URLS.dev : ENV_URLS.prod;
-      envDevBtn.classList.toggle("active", isDev);
-      envProdBtn.classList.toggle("active", !isDev);
-      kpiEnvEl.textContent = isDev ? "DEV" : "PROD";
+    function getBase() {
+      return (document.getElementById('baseUrl').value || '').trim().replace(/\/+$/, '');
     }
 
-    function formatDate(value) {
-      if (!value) return "-";
-      const d = new Date(value);
-      if (Number.isNaN(d.getTime())) return String(value);
-      return d.toLocaleString("pt-BR");
+    async function api(path, body) {
+      const r = await fetch(getBase() + path, {
+        method: 'POST',
+        headers: getHeaders(),
+        credentials: 'include',
+        body: JSON.stringify(body)
+      });
+      const ct = r.headers.get('content-type') || '';
+      const d = ct.includes('application/json') ? await r.json() : await r.text();
+      if (!r.ok) {
+        const m = typeof d === 'string' ? d : d?.StatusMessage || JSON.stringify(d);
+        throw new Error(`HTTP ${r.status}: ${m}`);
+      }
+      return d;
     }
 
-    function renderKeysTable(items) {
-      if (!Array.isArray(items) || items.length === 0) {
-        keysTableBodyEl.innerHTML = `<tr><td colspan="5" class="hint">Nenhuma key encontrada.</td></tr>`;
-        selectedKeyFromTable = "";
+    /* ── Loading helper ── */
+    function setLoading(id, on) {
+      const b = document.getElementById(id);
+      if (!b) return;
+      b.disabled = on;
+      if (on) b.setAttribute('data-orig', b.textContent);
+      else b.textContent = b.getAttribute('data-orig') || b.textContent;
+      if (on) b.textContent = 'Processando…';
+    }
+
+    /* ── Result helper ── */
+    function showResult(wrapId, badgeId, bodyId, data, ok) {
+      const wrap = document.getElementById(wrapId);
+      const badge = document.getElementById(badgeId);
+      const body = document.getElementById(bodyId);
+      const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      badge.textContent = ok ? 'Sucesso' : 'Erro';
+      badge.className = 'badge ' + (ok ? 'badge-ok' : 'badge-err');
+      body.textContent = text;
+      wrap.classList.add('visible');
+    }
+
+    /* ── Actions ── */
+    async function doCreate() {
+      setLoading('btnCreate', true);
+      try {
+        const k = document.getElementById('createKey').value.trim();
+        const d = Number(document.getElementById('createDays').value);
+        if (!k) throw new Error('Informe a key.');
+        if (!d || d < 1) throw new Error('Duração deve ser maior que 0.');
+        document.getElementById('kpiDays').textContent = d + ' dias';
+        const r = await api('/admin/auth-keys/create', { keyValue: k, durationDays: String(d) });
+        showResult('res-create', 'badge-create', 'body-create', r, true);
+      } catch (e) {
+        showResult('res-create', 'badge-create', 'body-create', e.message, false);
+      }
+      setLoading('btnCreate', false);
+    }
+
+    async function doRevoke() {
+      setLoading('btnRevoke', true);
+      try {
+        const k = document.getElementById('revokeKey').value.trim();
+        if (!k) throw new Error('Informe a key.');
+        const r = await api('/admin/auth-keys/revoke', { keyValue: k });
+        showResult('res-revoke', 'badge-revoke', 'body-revoke', r, true);
+      } catch (e) {
+        showResult('res-revoke', 'badge-revoke', 'body-revoke', e.message, false);
+      }
+      setLoading('btnRevoke', false);
+    }
+
+    async function doActivate() {
+      setLoading('btnActivate', true);
+      try {
+        const k = document.getElementById('activateKey').value.trim();
+        if (!k) throw new Error('Informe a key.');
+        const r = await api('/user/auth-keys/activate', { keyValue: k });
+        showResult('res-activate', 'badge-activate', 'body-activate', r, true);
+      } catch (e) {
+        showResult('res-activate', 'badge-activate', 'body-activate', e.message, false);
+      }
+      setLoading('btnActivate', false);
+    }
+
+    async function doList() {
+      setLoading('btnList', true);
+      try {
+        const d = await api('/admin/auth-keys/list', {});
+        const items = d?.Result || d?.result || [];
+        renderTable(items);
+        showResult('res-list', 'badge-list', 'body-list', d, true);
+      } catch (e) {
+        showResult('res-list', 'badge-list', 'body-list', e.message, false);
+      }
+      setLoading('btnList', false);
+    }
+
+    function fmtDate(v) {
+      if (!v) return '—';
+      const d = new Date(v);
+      return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR');
+    }
+
+    function renderTable(items) {
+      const body = document.getElementById('keysBody');
+      if (!Array.isArray(items) || !items.length) {
+        body.innerHTML = '<tr><td colspan="5" style="color:var(--hint);padding:16px 12px;font-size:12px">Nenhuma key encontrada.</td></tr>';
         return;
       }
-
-      keysTableBodyEl.innerHTML = items.map((item, index) => {
-        const key = item.key_value || item.KeyValue || "";
-        const isActive = Boolean(item.is_active ?? item.IsActive);
-        const days = item.duration_days ?? item.DurationDays ?? "-";
-        const activated = item.activated_at ?? item.ActivatedAt;
-        const endsAt = item.ends_at ?? item.EndsAt;
-        const escapedKey = String(key).replace(/"/g, "&quot;");
-        return `<tr data-key="${escapedKey}" style="cursor:pointer;" title="Clique para selecionar esta key">
-          <td class="mono">${key}</td>
-          <td>${isActive ? "Ativa" : "Inativa"}</td>
+      body.innerHTML = items.map(i => {
+        const k = i.key_value || i.KeyValue || '';
+        const ok = Boolean(i.is_active ?? i.IsActive);
+        const days = i.duration_days ?? i.DurationDays ?? '—';
+        const act = fmtDate(i.activated_at ?? i.ActivatedAt);
+        const end = fmtDate(i.ends_at ?? i.EndsAt);
+        return `<tr data-key="${k.replace(/"/g, '&quot;')}">
+          <td class="mono-cell">${k}</td>
+          <td><span class="pill ${ok ? 'pill-ok' : 'pill-off'}">${ok ? 'Ativa' : 'Inativa'}</span></td>
           <td>${days}</td>
-          <td>${formatDate(activated)}</td>
-          <td>${formatDate(endsAt)}</td>
+          <td>${act}</td>
+          <td>${end}</td>
         </tr>`;
-      }).join("");
+      }).join('');
 
-      Array.from(keysTableBodyEl.querySelectorAll("tr[data-key]")).forEach((row) => {
-        row.addEventListener("click", () => {
-          selectedKeyFromTable = row.getAttribute("data-key") || "";
-          Array.from(keysTableBodyEl.querySelectorAll("tr[data-key]")).forEach(r => r.style.background = "transparent");
-          row.style.background = "#1a1a21";
-          document.getElementById("revokeKeyValue").value = selectedKeyFromTable;
+      body.querySelectorAll('tr[data-key]').forEach(row => {
+        row.addEventListener('click', () => {
+          body.querySelectorAll('tr[data-key]').forEach(r => r.classList.remove('selected'));
+          row.classList.add('selected');
+          _selectedKey = row.getAttribute('data-key');
         });
       });
     }
 
-    function randomBlock(size) {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      let out = "";
-      for (let i = 0; i < size; i++) out += chars[Math.floor(Math.random() * chars.length)];
-      return out;
+    function copySelected() {
+      if (!_selectedKey) { alert('Selecione uma linha na tabela primeiro.'); return; }
+      document.getElementById('revokeKey').value = _selectedKey;
+      switchTab('admin');
     }
-
-    function sanitizeTag(input, fallback) {
-      const val = (input || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-      return val || fallback;
-    }
-
-    function makeAuthKey() {
-      const prefix = sanitizeTag(keyPrefixEl.value, "RING0X");
-      const tag = sanitizeTag(keyTagEl.value, "CLIENTE");
-      const year = new Date().getFullYear();
-      generatedKey = `${prefix}-${tag}-${randomBlock(4)}-${randomBlock(4)}-${year}`;
-      generatedKeyEl.textContent = generatedKey;
-      return generatedKey;
-    }
-
-    async function callApi(path, body) {
-      const baseUrl = getBaseUrl();
-      if (!baseUrl) {
-        throw new Error("Informe a Base URL da API.");
-      }
-
-      const response = await fetch(`${baseUrl}${path}`, {
-        method: "POST",
-        headers: getHeaders(),
-        credentials: "include",
-        body: JSON.stringify(body)
-      });
-
-      const contentType = response.headers.get("content-type") || "";
-      const data = contentType.includes("application/json")
-        ? await response.json()
-        : await response.text();
-
-      if (!response.ok) {
-        const detail = typeof data === "string" ? data : data?.StatusMessage || JSON.stringify(data);
-        throw new Error(`HTTP ${response.status}: ${detail}`);
-      }
-
-      return data;
-    }
-
-    function withButtonLoading(button, fn) {
-      return async () => {
-        const original = button.textContent;
-        button.disabled = true;
-        button.textContent = "Processando...";
-        try {
-          await fn();
-        } finally {
-          button.disabled = false;
-          button.textContent = original;
-        }
-      };
-    }
-
-    const btnGenerate = document.getElementById("btnGenerate");
-    const btnUseGenerated = document.getElementById("btnUseGenerated");
-    const btnCreate = document.getElementById("btnCreate");
-    const btnActivate = document.getElementById("btnActivate");
-    const btnRevoke = document.getElementById("btnRevoke");
-    const btnListKeys = document.getElementById("btnListKeys");
-    const btnFillRevokeFromTable = document.getElementById("btnFillRevokeFromTable");
-
-    envDevBtn.addEventListener("click", () => setEnvironment("dev"));
-    envProdBtn.addEventListener("click", () => setEnvironment("prod"));
-    btnGenerate.addEventListener("click", () => {
-      const key = makeAuthKey();
-      writeResult("Gerador de key", `Key gerada com sucesso:\n${key}`, true);
-    });
-
-    btnUseGenerated.addEventListener("click", () => {
-      const key = generatedKey || makeAuthKey();
-      document.getElementById("createKeyValue").value = key;
-      document.getElementById("activateKeyValue").value = key;
-      writeResult("Gerador de key", "Key aplicada nos paineis de criacao e ativacao.", true);
-    });
-
-    btnListKeys.addEventListener("click", withButtonLoading(btnListKeys, async () => {
-      try {
-        const data = await callApi("/admin/auth-keys/list", {});
-        const result = data?.Result || data?.result || [];
-        renderKeysTable(result);
-        writeResult("Listar keys", data, true);
-      } catch (error) {
-        writeResult("Listar keys", error.message, false);
-      }
-    }));
-
-    btnFillRevokeFromTable.addEventListener("click", () => {
-      if (!selectedKeyFromTable) {
-        writeResult("Selecionar key", "Clique em uma linha da tabela primeiro.", false);
-        return;
-      }
-      document.getElementById("revokeKeyValue").value = selectedKeyFromTable;
-      writeResult("Selecionar key", `Key selecionada para revogacao:\n${selectedKeyFromTable}`, true);
-    });
-
-    btnCreate.addEventListener("click", withButtonLoading(btnCreate, async () => {
-      try {
-        const keyValue = document.getElementById("createKeyValue").value.trim();
-        const durationDays = Number(document.getElementById("createDurationDays").value);
-
-        if (!keyValue) throw new Error("Informe a key para criar.");
-        if (!Number.isFinite(durationDays) || durationDays <= 0) throw new Error("Duracao deve ser maior que 0.");
-
-        const data = await callApi("/admin/auth-keys/create", { keyValue, durationDays: String(durationDays) });
-        kpiDaysEl.textContent = `${durationDays} dias`;
-        writeResult("Criar key", data, true);
-      } catch (error) {
-        writeResult("Criar key", error.message, false);
-      }
-    }));
-
-    btnActivate.addEventListener("click", withButtonLoading(btnActivate, async () => {
-      try {
-        const keyValue = document.getElementById("activateKeyValue").value.trim();
-        if (!keyValue) throw new Error("Informe a key para ativar.");
-
-        const data = await callApi("/user/auth-keys/activate", { keyValue });
-        writeResult("Ativar key", data, true);
-      } catch (error) {
-        writeResult("Ativar key", error.message, false);
-      }
-    }));
-
-    btnRevoke.addEventListener("click", withButtonLoading(btnRevoke, async () => {
-      try {
-        const keyValue = document.getElementById("revokeKeyValue").value.trim();
-        if (!keyValue) throw new Error("Informe a key para revogar.");
-
-        const data = await callApi("/admin/auth-keys/revoke", { keyValue });
-        writeResult("Revogar key", data, true);
-      } catch (error) {
-        writeResult("Revogar key", error.message, false);
-      }
-    }));
   </script>
 </body>
 </html>
