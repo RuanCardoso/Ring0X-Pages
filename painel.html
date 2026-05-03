@@ -6,221 +6,117 @@
   <title>Painel de Chaves de Autenticacao</title>
   <style>
     :root {
-      --bg: #09090b;
-      --card: #111113;
-      --card-soft: #18181b;
-      --text: #fafafa;
+      --background: #09090b;
+      --foreground: #fafafa;
+      --card: #09090b;
+      --card-soft: #111113;
       --muted: #a1a1aa;
-      --ok: #22c55e;
-      --danger: #ef4444;
-      --primary: #fafafa;
-      --primary-text: #09090b;
-      --secondary: #27272a;
-      --secondary-hover: #3f3f46;
       --border: #27272a;
+      --primary: #fafafa;
+      --primary-foreground: #09090b;
+      --secondary: #18181b;
+      --secondary-hover: #27272a;
+      --danger-bg: #3f1d1d;
+      --danger-border: #7f1d1d;
+      --danger-text: #fecaca;
+      --success-bg: rgba(34, 197, 94, 0.14);
+      --success-border: rgba(34, 197, 94, 0.45);
+      --danger-soft-bg: rgba(239, 68, 68, 0.12);
+      --danger-soft-border: rgba(239, 68, 68, 0.45);
       --ring: rgba(250, 250, 250, 0.24);
-      --shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--text);
+      color: var(--foreground);
       background:
-        radial-gradient(1000px 420px at 50% -10%, rgba(255, 255, 255, 0.05), transparent 60%),
-        var(--bg);
+        radial-gradient(900px 380px at 50% -5%, rgba(255, 255, 255, 0.05), transparent 60%),
+        var(--background);
       min-height: 100vh;
-      padding: 32px 16px;
+      padding: 28px 16px;
     }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 16px; }
+    .title { margin: 0; font-size: clamp(1.5rem, 3vw, 2.1rem); }
+    .subtitle { margin: 8px 0 0; color: var(--muted); }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .title {
-      margin: 0;
-      font-size: clamp(1.4rem, 3vw, 2rem);
-      letter-spacing: 0.2px;
-    }
-
-    .subtitle {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .grid {
+    .layout {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: 1.1fr 0.9fr;
       gap: 16px;
-      margin-top: 20px;
+      margin-top: 16px;
     }
+
+    .stack { display: grid; gap: 16px; }
 
     .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 24%), var(--card);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 24%), var(--card-soft);
       border: 1px solid var(--border);
       border-radius: 14px;
-      box-shadow: var(--shadow);
-      padding: 18px;
+      padding: 16px;
     }
 
-    .card h2 {
-      margin: 0 0 8px 0;
-      font-size: 1.05rem;
+    .card h2 { margin: 0 0 6px; font-size: 1.02rem; }
+    .hint { margin: 0 0 12px; color: var(--muted); font-size: .9rem; line-height: 1.42; }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 10px;
     }
 
-    .hint {
-      margin: 0 0 14px 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.4;
+    .kpi {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #0f0f12;
+      padding: 10px 12px;
     }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
+    .kpi-title { color: var(--muted); font-size: .78rem; }
+    .kpi-value { font-size: 1.05rem; font-weight: 700; margin-top: 4px; }
 
-    label {
-      font-size: 0.82rem;
-      color: var(--muted);
-      letter-spacing: 0.2px;
-    }
-
-    input {
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    label { color: var(--muted); font-size: .82rem; }
+    input, select {
       width: 100%;
       padding: 11px 12px;
       border-radius: 10px;
       border: 1px solid var(--border);
-      background: var(--card-soft);
-      color: var(--text);
+      background: #0f0f12;
+      color: var(--foreground);
       outline: none;
       transition: border-color 120ms ease, box-shadow 120ms ease;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: #3f3f46;
       box-shadow: 0 0 0 3px var(--ring);
     }
 
+    .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
     .button {
-      width: 100%;
       border: none;
       border-radius: 10px;
       padding: 11px 12px;
       cursor: pointer;
-      color: var(--primary-text);
-      background: var(--primary);
       font-weight: 600;
-      letter-spacing: 0.2px;
-      transition: transform 80ms ease, background 140ms ease, opacity 120ms ease;
+      transition: transform 80ms ease, opacity 120ms ease, background 120ms ease;
     }
 
-    .button:hover {
-      background: #e5e5e5;
-    }
-
-    .button:active {
-      transform: translateY(1px);
-    }
-
-    .button.secondary {
-      background: var(--secondary);
-      color: var(--text);
-    }
-
-    .button.secondary:hover {
-      background: var(--secondary-hover);
-    }
-
-    .button.warn {
-      background: #3f1d1d;
-      color: #fecaca;
-      border: 1px solid #7f1d1d;
-    }
-
-    .button.warn:hover {
-      background: #5b2323;
-    }
-
-    .button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .top-card {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: 1fr;
-      margin-bottom: 12px;
-    }
-
-    .result {
-      margin-top: 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0f0f12;
-      padding: 10px 12px;
-      font-size: 0.9rem;
-      min-height: 44px;
-      line-height: 1.35;
-      white-space: pre-wrap;
-    }
-
-    .status {
-      display: inline-block;
-      font-size: 0.78rem;
-      border-radius: 999px;
-      padding: 5px 9px;
-      margin-left: 6px;
-      vertical-align: middle;
-      border: 1px solid transparent;
-    }
-
-    .status.ok {
-      color: #bbf7d0;
-      border-color: rgba(34, 197, 94, 0.45);
-      background: rgba(34, 197, 94, 0.14);
-    }
-
-    .status.fail {
-      color: #fecaca;
-      border-color: rgba(239, 68, 68, 0.45);
-      background: rgba(239, 68, 68, 0.12);
-    }
-
-    .footer-note {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 0.82rem;
-      text-align: center;
-    }
-
-    .env-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 2px;
-    }
+    .button.primary { background: var(--primary); color: var(--primary-foreground); width: 100%; }
+    .button.secondary { background: var(--secondary); color: var(--foreground); width: 100%; }
+    .button.secondary:hover { background: var(--secondary-hover); }
+    .button.warn { background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); width: 100%; }
+    .button:active { transform: translateY(1px); }
+    .button:disabled { opacity: .6; cursor: not-allowed; }
 
     .segmented {
       display: inline-flex;
-      width: fit-content;
       gap: 6px;
       padding: 5px;
       border: 1px solid var(--border);
@@ -234,15 +130,89 @@
       color: var(--muted);
       border-radius: 8px;
       padding: 7px 12px;
-      font-size: 0.84rem;
+      font-size: .84rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 120ms ease;
     }
 
     .segmented button.active {
       background: var(--primary);
-      color: var(--primary-text);
+      color: var(--primary-foreground);
+    }
+
+    .key-preview {
+      font-family: Consolas, Monaco, monospace;
+      border: 1px dashed #3f3f46;
+      border-radius: 10px;
+      background: #0f0f12;
+      padding: 10px 12px;
+      letter-spacing: .6px;
+      word-break: break-all;
+      margin-bottom: 10px;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+    }
+
+    .result {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f0f12;
+      padding: 10px 12px;
+      font-size: .9rem;
+      min-height: 220px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+    }
+
+    .table-wrap {
+      max-height: 280px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0f0f12;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .84rem;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #1f1f23;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #141419;
+      color: #d4d4d8;
+      z-index: 1;
+    }
+
+    .mono { font-family: Consolas, Monaco, monospace; font-size: .8rem; }
+
+    .status {
+      display: inline-block;
+      font-size: .78rem;
+      border-radius: 999px;
+      padding: 5px 9px;
+      margin-left: 6px;
+      border: 1px solid transparent;
+    }
+
+    .status.ok { color: #bbf7d0; border-color: var(--success-border); background: var(--success-bg); }
+    .status.fail { color: #fecaca; border-color: var(--danger-soft-border); background: var(--danger-soft-bg); }
+    .footer-note { margin-top: 14px; color: var(--muted); font-size: .82rem; text-align: center; }
+
+    @media (max-width: 940px) {
+      .layout { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr; }
+      .button-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -255,65 +225,134 @@
       </div>
     </header>
 
-    <section class="card top-card">
-      <div class="env-wrapper">
-        <label>Ambiente</label>
-        <div class="segmented">
-          <button id="envDev" class="active" type="button">Dev</button>
-          <button id="envProd" type="button">Producao</button>
-        </div>
-      </div>
-      <div class="field">
-        <label for="baseUrl">Base URL da API</label>
-        <input id="baseUrl" type="text" value="http://localhost:8443" placeholder="http://localhost:8443" />
-      </div>
-      <div class="field">
-        <label for="token">Token admin (opcional, Bearer)</label>
-        <input id="token" type="text" placeholder="Cole aqui o token admin, se necessario" />
-      </div>
-      <div class="hint">Padrao do projeto: <strong>http://localhost:8443</strong> (dev) e <strong>https://ringapi.guaranihub.com</strong> (producao). Se sua autenticacao usa cookie de sessao, deixe token em branco. O painel envia requests com <strong>credentials: include</strong>.</div>
-    </section>
+    <div class="layout">
+      <div class="stack">
+        <section class="card">
+          <h2>Config da API</h2>
+          <p class="hint">Padrao do projeto: localhost em dev e dominio RingAPI em producao.</p>
+          <div class="field">
+            <label>Ambiente</label>
+            <div class="segmented">
+              <button id="envDev" class="active" type="button">Dev</button>
+              <button id="envProd" type="button">Producao</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="baseUrl">Base URL</label>
+            <input id="baseUrl" type="text" value="http://localhost:8443" placeholder="http://localhost:8443" />
+          </div>
+          <div class="field">
+            <label for="token">Token admin (opcional)</label>
+            <input id="token" type="text" placeholder="Bearer token para rotas admin, se necessario" />
+          </div>
+        </section>
 
-    <div class="grid">
-      <section class="card">
-        <h2>Criar key</h2>
-        <p class="hint">Cria uma nova key com duracao em dias (o prazo final eh calculado ao ativar).</p>
-        <div class="field">
-          <label for="createKeyValue">Key</label>
-          <input id="createKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
-        </div>
-        <div class="field">
-          <label for="createDurationDays">Duracao (dias)</label>
-          <input id="createDurationDays" type="number" min="1" value="30" />
-        </div>
-        <button id="btnCreate" class="button">Criar key</button>
-      </section>
+        <section class="card">
+          <h2>Gerador de key</h2>
+          <p class="hint">Gere uma key com formato padrao, copie e use no card de criacao.</p>
+          <div class="field">
+            <label for="keyPrefix">Prefixo</label>
+            <input id="keyPrefix" type="text" value="RING0X" />
+          </div>
+          <div class="field">
+            <label for="keyTag">Tag cliente/produto</label>
+            <input id="keyTag" type="text" value="CLIENTE" />
+          </div>
+          <div class="field">
+            <label>Preview da key</label>
+            <div id="generatedKey" class="key-preview">Clique em "Gerar key".</div>
+          </div>
+          <div class="button-row">
+            <button id="btnGenerate" class="button secondary">Gerar key</button>
+            <button id="btnUseGenerated" class="button primary">Usar na criacao</button>
+          </div>
+        </section>
 
-      <section class="card">
-        <h2>Ativar key</h2>
-        <p class="hint">Define data de ativacao atual e data final com base na duracao da key.</p>
-        <div class="field">
-          <label for="activateKeyValue">Key</label>
-          <input id="activateKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
-        </div>
-        <button id="btnActivate" class="button">Ativar key</button>
-      </section>
+        <section class="card">
+          <h2>Criar key (Admin)</h2>
+          <p class="hint">Cria uma key com duracao em dias. A validade real comeca quando o cliente ativa.</p>
+          <div class="field">
+            <label for="createKeyValue">Key</label>
+            <input id="createKeyValue" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" />
+          </div>
+          <div class="field">
+            <label for="createDurationDays">Duracao (dias)</label>
+            <input id="createDurationDays" type="number" min="1" value="30" />
+          </div>
+          <button id="btnCreate" class="button primary">Criar key</button>
+        </section>
+      </div>
 
-      <section class="card">
-        <h2>Revogar key</h2>
-        <p class="hint">Desativa imediatamente uma key ativa.</p>
-        <div class="field">
-          <label for="revokeKeyValue">Key</label>
-          <input id="revokeKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
-        </div>
-        <button id="btnRevoke" class="button warn">Revogar key</button>
-      </section>
+      <div class="stack">
+        <section class="card">
+          <h2>Paineis rapidos</h2>
+          <div class="kpis">
+            <div class="kpi">
+              <div class="kpi-title">Ambiente</div>
+              <div id="kpiEnv" class="kpi-value">DEV</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Duracao padrao</div>
+              <div id="kpiDays" class="kpi-value">30 dias</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Formato</div>
+              <div class="kpi-value">PREFIX-TAG-XXXX-XXXX-ANO</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Ativar key (Cliente)</h2>
+          <p class="hint">Ativacao unica: se ja tiver sido ativada antes, o backend bloqueia reutilizacao.</p>
+          <div class="field">
+            <label for="activateKeyValue">Key</label>
+            <input id="activateKeyValue" type="text" placeholder="Cole a key recebida" />
+          </div>
+          <button id="btnActivate" class="button primary">Ativar key</button>
+        </section>
+
+        <section class="card">
+          <h2>Revogar key (Admin)</h2>
+          <p class="hint">Revoga uma key existente.</p>
+          <div class="field">
+            <label for="revokeKeyValue">Key</label>
+            <input id="revokeKeyValue" type="text" placeholder="Cole a key a revogar" />
+          </div>
+          <button id="btnRevoke" class="button warn">Revogar key</button>
+        </section>
+
+        <section class="card">
+          <h2>Keys cadastradas</h2>
+          <p class="hint">Lista completa das keys no banco (somente admin).</p>
+          <div class="button-row" style="margin-bottom:10px;">
+            <button id="btnListKeys" class="button secondary">Listar keys</button>
+            <button id="btnFillRevokeFromTable" class="button secondary">Copiar selecionada</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Status</th>
+                  <th>Dias</th>
+                  <th>Ativada em</th>
+                  <th>Termina em</th>
+                </tr>
+              </thead>
+              <tbody id="keysTableBody">
+                <tr><td colspan="5" class="hint">Sem dados carregados.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Resultado da operacao</h2>
+          <div id="result" class="result">Pronto para executar operacoes.</div>
+        </section>
+      </div>
     </div>
-
-    <section class="card" style="margin-top:16px;">
-      <h2>Resultado da operacao</h2>
-      <div id="result" class="result">Pronto para executar operacoes.</div>
-    </section>
 
     <div class="footer-note">Painel standalone em HTML + CSS + JS puro.</div>
   </div>
@@ -324,11 +363,20 @@
     const tokenEl = document.getElementById("token");
     const envDevBtn = document.getElementById("envDev");
     const envProdBtn = document.getElementById("envProd");
+    const kpiEnvEl = document.getElementById("kpiEnv");
+    const kpiDaysEl = document.getElementById("kpiDays");
+    const keyPrefixEl = document.getElementById("keyPrefix");
+    const keyTagEl = document.getElementById("keyTag");
+    const generatedKeyEl = document.getElementById("generatedKey");
+    const keysTableBodyEl = document.getElementById("keysTableBody");
 
     const ENV_URLS = {
       dev: "http://localhost:8443",
       prod: "https://ringapi.guaranihub.com"
     };
+
+    let generatedKey = "";
+    let selectedKeyFromTable = "";
 
     function writeResult(title, data, ok) {
       const badge = `<span class="status ${ok ? "ok" : "fail"}">${ok ? "SUCESSO" : "ERRO"}</span>`;
@@ -352,6 +400,68 @@
       baseUrlEl.value = isDev ? ENV_URLS.dev : ENV_URLS.prod;
       envDevBtn.classList.toggle("active", isDev);
       envProdBtn.classList.toggle("active", !isDev);
+      kpiEnvEl.textContent = isDev ? "DEV" : "PROD";
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleString("pt-BR");
+    }
+
+    function renderKeysTable(items) {
+      if (!Array.isArray(items) || items.length === 0) {
+        keysTableBodyEl.innerHTML = `<tr><td colspan="5" class="hint">Nenhuma key encontrada.</td></tr>`;
+        selectedKeyFromTable = "";
+        return;
+      }
+
+      keysTableBodyEl.innerHTML = items.map((item, index) => {
+        const key = item.key_value || item.KeyValue || "";
+        const isActive = Boolean(item.is_active ?? item.IsActive);
+        const days = item.duration_days ?? item.DurationDays ?? "-";
+        const activated = item.activated_at ?? item.ActivatedAt;
+        const endsAt = item.ends_at ?? item.EndsAt;
+        const escapedKey = String(key).replace(/"/g, "&quot;");
+        return `<tr data-key="${escapedKey}" style="cursor:pointer;" title="Clique para selecionar esta key">
+          <td class="mono">${key}</td>
+          <td>${isActive ? "Ativa" : "Inativa"}</td>
+          <td>${days}</td>
+          <td>${formatDate(activated)}</td>
+          <td>${formatDate(endsAt)}</td>
+        </tr>`;
+      }).join("");
+
+      Array.from(keysTableBodyEl.querySelectorAll("tr[data-key]")).forEach((row) => {
+        row.addEventListener("click", () => {
+          selectedKeyFromTable = row.getAttribute("data-key") || "";
+          Array.from(keysTableBodyEl.querySelectorAll("tr[data-key]")).forEach(r => r.style.background = "transparent");
+          row.style.background = "#1a1a21";
+          document.getElementById("revokeKeyValue").value = selectedKeyFromTable;
+        });
+      });
+    }
+
+    function randomBlock(size) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let out = "";
+      for (let i = 0; i < size; i++) out += chars[Math.floor(Math.random() * chars.length)];
+      return out;
+    }
+
+    function sanitizeTag(input, fallback) {
+      const val = (input || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+      return val || fallback;
+    }
+
+    function makeAuthKey() {
+      const prefix = sanitizeTag(keyPrefixEl.value, "RING0X");
+      const tag = sanitizeTag(keyTagEl.value, "CLIENTE");
+      const year = new Date().getFullYear();
+      generatedKey = `${prefix}-${tag}-${randomBlock(4)}-${randomBlock(4)}-${year}`;
+      generatedKeyEl.textContent = generatedKey;
+      return generatedKey;
     }
 
     async function callApi(path, body) {
@@ -394,11 +504,47 @@
       };
     }
 
+    const btnGenerate = document.getElementById("btnGenerate");
+    const btnUseGenerated = document.getElementById("btnUseGenerated");
     const btnCreate = document.getElementById("btnCreate");
     const btnActivate = document.getElementById("btnActivate");
     const btnRevoke = document.getElementById("btnRevoke");
+    const btnListKeys = document.getElementById("btnListKeys");
+    const btnFillRevokeFromTable = document.getElementById("btnFillRevokeFromTable");
+
     envDevBtn.addEventListener("click", () => setEnvironment("dev"));
     envProdBtn.addEventListener("click", () => setEnvironment("prod"));
+    btnGenerate.addEventListener("click", () => {
+      const key = makeAuthKey();
+      writeResult("Gerador de key", `Key gerada com sucesso:\n${key}`, true);
+    });
+
+    btnUseGenerated.addEventListener("click", () => {
+      const key = generatedKey || makeAuthKey();
+      document.getElementById("createKeyValue").value = key;
+      document.getElementById("activateKeyValue").value = key;
+      writeResult("Gerador de key", "Key aplicada nos paineis de criacao e ativacao.", true);
+    });
+
+    btnListKeys.addEventListener("click", withButtonLoading(btnListKeys, async () => {
+      try {
+        const data = await callApi("/admin/auth-keys/list", {});
+        const result = data?.Result || data?.result || [];
+        renderKeysTable(result);
+        writeResult("Listar keys", data, true);
+      } catch (error) {
+        writeResult("Listar keys", error.message, false);
+      }
+    }));
+
+    btnFillRevokeFromTable.addEventListener("click", () => {
+      if (!selectedKeyFromTable) {
+        writeResult("Selecionar key", "Clique em uma linha da tabela primeiro.", false);
+        return;
+      }
+      document.getElementById("revokeKeyValue").value = selectedKeyFromTable;
+      writeResult("Selecionar key", `Key selecionada para revogacao:\n${selectedKeyFromTable}`, true);
+    });
 
     btnCreate.addEventListener("click", withButtonLoading(btnCreate, async () => {
       try {
@@ -409,6 +555,7 @@
         if (!Number.isFinite(durationDays) || durationDays <= 0) throw new Error("Duracao deve ser maior que 0.");
 
         const data = await callApi("/admin/auth-keys/create", { keyValue, durationDays: String(durationDays) });
+        kpiDaysEl.textContent = `${durationDays} dias`;
         writeResult("Criar key", data, true);
       } catch (error) {
         writeResult("Criar key", error.message, false);
