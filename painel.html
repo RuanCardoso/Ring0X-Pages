@@ -509,6 +509,37 @@
       line-height: 1.5;
     }
 
+    /* ── Batch progress ── */
+    .batch-progress {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .batch-bar-wrap {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .batch-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .batch-counter {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 560px) {
       .tabs { grid-template-columns: 1fr 1fr 1fr; }
@@ -584,7 +615,13 @@
 
     .btn-activate:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .tabs { grid-template-columns: repeat(3, 1fr); }
+    .badge-warn {
+      background: rgba(234,179,8,0.1);
+      color: #ca8a04;
+      border-color: rgba(234,179,8,0.25);
+    }
+
+    .tabs { grid-template-columns: repeat(2, 1fr); }
   </style>
 </head>
 <body>
@@ -593,7 +630,7 @@
     <header class="header">
       <div class="header-left">
         <h1>Chaves de Autenticação</h1>
-        <p>Gerar, criar, ativar e revogar keys via HTTP direto.</p>
+        <p>Criar, revogar e listar keys de autenticação via HTTP direto.</p>
       </div>
     </header>
 
@@ -642,56 +679,38 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('gen')">Gerar key</button>
-      <button class="tab" onclick="switchTab('admin')">Admin</button>
+      <button class="tab active" onclick="switchTab('admin')">Admin</button>
       <button class="tab" onclick="switchTab('list')">Listar</button>
     </div>
 
-    <!-- Panel: Gerar -->
-    <div id="panel-gen" class="panel active">
-      <div class="card">
-        <div class="card-title">Gerar nova key</div>
-        <p class="card-hint">Monte a key no formato padrão — PREFIXO-TAG-XXXX-XXXX-ANO.</p>
-        <div class="row" style="margin-bottom:12px">
-          <div class="field">
-            <label>Prefixo</label>
-            <input id="keyPrefix" type="text" value="RING0X" />
-          </div>
-          <div class="field">
-            <label>Tag cliente</label>
-            <input id="keyTag" type="text" value="CLIENTE" />
-          </div>
-        </div>
-        <div class="field" style="margin-bottom:12px">
-          <label>Key gerada</label>
-          <div id="generatedKey" class="key-box empty">Clique em "Gerar" para criar.</div>
-        </div>
-        <div class="btn-row">
-          <button class="btn-secondary" onclick="genKey()">Gerar key</button>
-          <button class="btn-primary" onclick="useKey()">Usar esta key →</button>
-        </div>
-        <p class="copy-hint">Ao clicar em "Usar esta key", a key é preenchida nos painéis de criação e ativação automaticamente.</p>
-      </div>
-    </div>
-
     <!-- Panel: Admin -->
-    <div id="panel-admin" class="panel">
+    <div id="panel-admin" class="panel active">
       <div class="card">
         <div class="card-title">Criar key</div>
         <p class="card-hint">Define a key e a duração em dias. A validade começa a contar quando o cliente ativa.</p>
         <div class="field">
-          <label>Key</label>
+          <label>Key <span id="createKeyNote" style="color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0">(prefixo — sufixo aleatório por key ao criar múltiplas)</span></label>
           <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" />
         </div>
-        <div class="field" style="margin-bottom:14px">
-          <label>Duração (dias)</label>
-          <input id="createDays" type="number" min="1" value="30" style="max-width:140px" />
+        <div class="row" style="margin-bottom:14px">
+          <div class="field" style="margin-bottom:0">
+            <label>Duração (dias)</label>
+            <input id="createDays" type="number" min="1" value="30" />
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Quantidade de keys</label>
+            <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" />
+          </div>
         </div>
         <button class="btn-primary" id="btnCreate" onclick="doCreate()">Criar key</button>
         <div class="result-wrap" id="res-create">
           <div class="result-header">
-            <span class="result-label">Resultado — criar</span>
+            <span class="result-label" id="label-create">Resultado — criar</span>
             <span class="badge" id="badge-create"></span>
+          </div>
+          <div class="batch-progress" id="batch-progress" style="display:none">
+            <div class="batch-bar-wrap"><div class="batch-bar" id="batch-bar"></div></div>
+            <span class="batch-counter" id="batch-counter"></span>
           </div>
           <div class="result-body" id="body-create"></div>
         </div>
@@ -803,7 +822,7 @@
     }
 
     /* ── Tabs ── */
-    const TAB_IDS = ['gen', 'admin', 'list'];
+    const TAB_IDS = ['admin', 'list'];
 
     function switchTab(t) {
       document.querySelectorAll('.tab').forEach((b, i) => {
@@ -893,19 +912,82 @@
     }
 
     /* ── Actions ── */
-    async function doCreate() {
-      setLoading('btnCreate', true);
-      try {
-        const k = document.getElementById('createKey').value.trim();
-        const d = Number(document.getElementById('createDays').value);
-        if (!k) throw new Error('Informe a key.');
-        if (!d || d < 1) throw new Error('Duração deve ser maior que 0.');
-        document.getElementById('kpiDays').textContent = d + ' dias';
-        const r = await api('/admin/auth-keys/create', { keyValue: k, durationDays: String(d) });
-        showResult('res-create', 'badge-create', 'body-create', r, true);
-      } catch (e) {
-        showResult('res-create', 'badge-create', 'body-create', e.message, false);
+    function onQtyChange() {
+      const qty = Number(document.getElementById('createQty').value);
+      const note = document.getElementById('createKeyNote');
+      const btn = document.getElementById('btnCreate');
+      if (qty > 1) {
+        note.style.display = 'inline';
+        btn.setAttribute('data-orig', `Criar ${qty} keys`);
+        btn.textContent = `Criar ${qty} keys`;
+      } else {
+        note.style.display = 'none';
+        btn.setAttribute('data-orig', 'Criar key');
+        btn.textContent = 'Criar key';
       }
+    }
+
+    async function doCreate() {
+      const qty = Math.max(1, Math.min(100, Number(document.getElementById('createQty').value) || 1));
+      const baseKey = document.getElementById('createKey').value.trim();
+      const d = Number(document.getElementById('createDays').value);
+
+      if (!baseKey) { showResult('res-create', 'badge-create', 'body-create', 'Informe a key.', false); return; }
+      if (!d || d < 1) { showResult('res-create', 'badge-create', 'body-create', 'Duração deve ser maior que 0.', false); return; }
+
+      document.getElementById('kpiDays').textContent = d + ' dias';
+      setLoading('btnCreate', true);
+
+      const wrap = document.getElementById('res-create');
+      const progress = document.getElementById('batch-progress');
+      const bar = document.getElementById('batch-bar');
+      const counter = document.getElementById('batch-counter');
+      const bodyEl = document.getElementById('body-create');
+      const badgeEl = document.getElementById('badge-create');
+      const labelEl = document.getElementById('label-create');
+
+      wrap.classList.add('visible');
+      progress.style.display = qty > 1 ? 'flex' : 'none';
+      bodyEl.textContent = '';
+      badgeEl.textContent = '';
+      badgeEl.className = 'badge';
+      labelEl.textContent = qty > 1 ? `Resultado — ${qty} keys` : 'Resultado — criar';
+
+      let ok = 0, fail = 0;
+      const lines = [];
+
+      for (let i = 0; i < qty; i++) {
+        const keyValue = qty > 1
+          ? `${baseKey}-${rnd(4)}${rnd(4)}`
+          : baseKey;
+
+        if (qty > 1) {
+          bar.style.width = (((i) / qty) * 100) + '%';
+          counter.textContent = `${i}/${qty}`;
+        }
+
+        try {
+          const r = await api('/admin/auth-keys/create', { keyValue, durationDays: String(d) });
+          ok++;
+          const msg = typeof r === 'string' ? r : r?.StatusMessage || JSON.stringify(r);
+          lines.push(`✓ ${keyValue}\n  ${msg}`);
+        } catch (e) {
+          fail++;
+          lines.push(`✗ ${keyValue}\n  ${e.message}`);
+        }
+
+        bodyEl.textContent = lines.join('\n\n');
+      }
+
+      bar.style.width = '100%';
+      counter.textContent = `${qty}/${qty}`;
+
+      const allOk = fail === 0;
+      badgeEl.textContent = qty > 1
+        ? `${ok} ok${fail > 0 ? ` · ${fail} erro${fail > 1 ? 's' : ''}` : ''}`
+        : (allOk ? 'Sucesso' : 'Erro');
+      badgeEl.className = 'badge ' + (allOk ? 'badge-ok' : (ok > 0 ? 'badge-warn' : 'badge-err'));
+
       setLoading('btnCreate', false);
     }
 
