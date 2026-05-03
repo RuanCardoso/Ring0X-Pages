@@ -6,18 +6,20 @@
   <title>Painel de Chaves de Autenticacao</title>
   <style>
     :root {
-      --bg: #0b1020;
-      --card: #121a31;
-      --card-soft: #1b2646;
-      --text: #e9eeff;
-      --muted: #9caad2;
-      --ok: #2dd4bf;
-      --warn: #f59e0b;
-      --danger: #f87171;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --border: #2c3966;
-      --shadow: 0 20px 40px rgba(4, 8, 20, 0.45);
+      --bg: #09090b;
+      --card: #111113;
+      --card-soft: #18181b;
+      --text: #fafafa;
+      --muted: #a1a1aa;
+      --ok: #22c55e;
+      --danger: #ef4444;
+      --primary: #fafafa;
+      --primary-text: #09090b;
+      --secondary: #27272a;
+      --secondary-hover: #3f3f46;
+      --border: #27272a;
+      --ring: rgba(250, 250, 250, 0.24);
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
     }
 
     * {
@@ -29,8 +31,7 @@
       font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(1200px 500px at -20% -20%, rgba(99, 102, 241, 0.25), transparent 60%),
-        radial-gradient(700px 400px at 120% 0%, rgba(45, 212, 191, 0.17), transparent 60%),
+        radial-gradient(1000px 420px at 50% -10%, rgba(255, 255, 255, 0.05), transparent 60%),
         var(--bg);
       min-height: 100vh;
       padding: 32px 16px;
@@ -69,9 +70,9 @@
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 18%), var(--card);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 24%), var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 14px;
       box-shadow: var(--shadow);
       padding: 18px;
     }
@@ -113,8 +114,8 @@
     }
 
     input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      border-color: #3f3f46;
+      box-shadow: 0 0 0 3px var(--ring);
     }
 
     .button {
@@ -123,7 +124,7 @@
       border-radius: 10px;
       padding: 11px 12px;
       cursor: pointer;
-      color: #fff;
+      color: var(--primary-text);
       background: var(--primary);
       font-weight: 600;
       letter-spacing: 0.2px;
@@ -131,7 +132,7 @@
     }
 
     .button:hover {
-      background: var(--primary-hover);
+      background: #e5e5e5;
     }
 
     .button:active {
@@ -139,19 +140,22 @@
     }
 
     .button.secondary {
-      background: #0ea5e9;
+      background: var(--secondary);
+      color: var(--text);
     }
 
     .button.secondary:hover {
-      background: #0284c7;
+      background: var(--secondary-hover);
     }
 
     .button.warn {
-      background: #d97706;
+      background: #3f1d1d;
+      color: #fecaca;
+      border: 1px solid #7f1d1d;
     }
 
     .button.warn:hover {
-      background: #b45309;
+      background: #5b2323;
     }
 
     .button:disabled {
@@ -170,7 +174,7 @@
       margin-top: 10px;
       border-radius: 10px;
       border: 1px solid var(--border);
-      background: rgba(19, 28, 52, 0.9);
+      background: #0f0f12;
       padding: 10px 12px;
       font-size: 0.9rem;
       min-height: 44px;
@@ -189,15 +193,15 @@
     }
 
     .status.ok {
-      color: #9ff6ea;
-      border-color: rgba(45, 212, 191, 0.45);
-      background: rgba(45, 212, 191, 0.15);
+      color: #bbf7d0;
+      border-color: rgba(34, 197, 94, 0.45);
+      background: rgba(34, 197, 94, 0.14);
     }
 
     .status.fail {
       color: #fecaca;
-      border-color: rgba(248, 113, 113, 0.45);
-      background: rgba(248, 113, 113, 0.12);
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.12);
     }
 
     .footer-note {
@@ -206,6 +210,40 @@
       font-size: 0.82rem;
       text-align: center;
     }
+
+    .env-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+
+    .segmented {
+      display: inline-flex;
+      width: fit-content;
+      gap: 6px;
+      padding: 5px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #0f0f12;
+    }
+
+    .segmented button {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .segmented button.active {
+      background: var(--primary);
+      color: var(--primary-text);
+    }
   </style>
 </head>
 <body>
@@ -213,20 +251,27 @@
     <header class="header">
       <div>
         <h1 class="title">Painel de Chaves de Autenticacao</h1>
-        <div class="subtitle">Criar, validar, ativar e revogar keys de autenticacao com chamadas HTTP diretas.</div>
+        <div class="subtitle">Criar, ativar e revogar keys de autenticacao com chamadas HTTP diretas.</div>
       </div>
     </header>
 
     <section class="card top-card">
+      <div class="env-wrapper">
+        <label>Ambiente</label>
+        <div class="segmented">
+          <button id="envDev" class="active" type="button">Dev</button>
+          <button id="envProd" type="button">Producao</button>
+        </div>
+      </div>
       <div class="field">
         <label for="baseUrl">Base URL da API</label>
-        <input id="baseUrl" type="text" value="http://localhost:8080" placeholder="http://localhost:8080" />
+        <input id="baseUrl" type="text" value="http://localhost:8443" placeholder="http://localhost:8443" />
       </div>
       <div class="field">
         <label for="token">Token admin (opcional, Bearer)</label>
         <input id="token" type="text" placeholder="Cole aqui o token admin, se necessario" />
       </div>
-      <div class="hint">Se sua autenticacao usa cookie de sessao, deixe token em branco. O painel envia requests com <strong>credentials: include</strong>.</div>
+      <div class="hint">Padrao do projeto: <strong>http://localhost:8443</strong> (dev) e <strong>https://ringapi.guaranihub.com</strong> (producao). Se sua autenticacao usa cookie de sessao, deixe token em branco. O painel envia requests com <strong>credentials: include</strong>.</div>
     </section>
 
     <div class="grid">
@@ -242,16 +287,6 @@
           <input id="createDurationDays" type="number" min="1" value="30" />
         </div>
         <button id="btnCreate" class="button">Criar key</button>
-      </section>
-
-      <section class="card">
-        <h2>Validar key</h2>
-        <p class="hint">Verifica se a key esta ativa e dentro do periodo de validade.</p>
-        <div class="field">
-          <label for="validateKeyValue">Key</label>
-          <input id="validateKeyValue" type="text" placeholder="ex: CLIENTE-ABC-2026" />
-        </div>
-        <button id="btnValidate" class="button secondary">Validar key</button>
       </section>
 
       <section class="card">
@@ -287,6 +322,13 @@
     const resultEl = document.getElementById("result");
     const baseUrlEl = document.getElementById("baseUrl");
     const tokenEl = document.getElementById("token");
+    const envDevBtn = document.getElementById("envDev");
+    const envProdBtn = document.getElementById("envProd");
+
+    const ENV_URLS = {
+      dev: "http://localhost:8443",
+      prod: "https://ringapi.guaranihub.com"
+    };
 
     function writeResult(title, data, ok) {
       const badge = `<span class="status ${ok ? "ok" : "fail"}">${ok ? "SUCESSO" : "ERRO"}</span>`;
@@ -303,6 +345,13 @@
       const token = (tokenEl.value || "").trim();
       if (token) headers["Authorization"] = `Bearer ${token}`;
       return headers;
+    }
+
+    function setEnvironment(env) {
+      const isDev = env === "dev";
+      baseUrlEl.value = isDev ? ENV_URLS.dev : ENV_URLS.prod;
+      envDevBtn.classList.toggle("active", isDev);
+      envProdBtn.classList.toggle("active", !isDev);
     }
 
     async function callApi(path, body) {
@@ -346,9 +395,10 @@
     }
 
     const btnCreate = document.getElementById("btnCreate");
-    const btnValidate = document.getElementById("btnValidate");
     const btnActivate = document.getElementById("btnActivate");
     const btnRevoke = document.getElementById("btnRevoke");
+    envDevBtn.addEventListener("click", () => setEnvironment("dev"));
+    envProdBtn.addEventListener("click", () => setEnvironment("prod"));
 
     btnCreate.addEventListener("click", withButtonLoading(btnCreate, async () => {
       try {
@@ -365,24 +415,12 @@
       }
     }));
 
-    btnValidate.addEventListener("click", withButtonLoading(btnValidate, async () => {
-      try {
-        const keyValue = document.getElementById("validateKeyValue").value.trim();
-        if (!keyValue) throw new Error("Informe a key para validar.");
-
-        const data = await callApi("/admin/auth-keys/validate", { keyValue });
-        writeResult("Validar key", data, true);
-      } catch (error) {
-        writeResult("Validar key", error.message, false);
-      }
-    }));
-
     btnActivate.addEventListener("click", withButtonLoading(btnActivate, async () => {
       try {
         const keyValue = document.getElementById("activateKeyValue").value.trim();
         if (!keyValue) throw new Error("Informe a key para ativar.");
 
-        const data = await callApi("/admin/auth-keys/activate", { keyValue });
+        const data = await callApi("/user/auth-keys/activate", { keyValue });
         writeResult("Ativar key", data, true);
       } catch (error) {
         writeResult("Ativar key", error.message, false);
