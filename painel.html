@@ -621,37 +621,66 @@
       border-color: rgba(234,179,8,0.25);
     }
 
-    .btn-token-save {
+    .token-group {
+      display: flex;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .token-group input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 9px 12px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .token-group input::placeholder { color: var(--hint); }
+
+    .token-group:focus-within {
+      border-color: rgba(255,255,255,0.28);
+    }
+
+    .token-btn {
+      flex-shrink: 0;
+      border: none;
+      border-left: 1px solid var(--border2);
+      padding: 0 14px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .token-btn-save {
       background: var(--accent-dim);
       color: var(--accent);
-      border: 1px solid rgba(232,255,89,0.25);
-      border-radius: var(--radius);
-      padding: 8px 12px;
-      font-family: var(--sans);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.15s;
     }
 
-    .btn-token-save:hover { opacity: 0.8; }
+    .token-btn-save:hover { background: rgba(232,255,89,0.2); }
 
-    .btn-token-clear {
+    .token-btn-clear {
       background: transparent;
       color: var(--hint);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius);
-      padding: 8px 12px;
-      font-family: var(--sans);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s;
     }
 
-    .btn-token-clear:hover { color: var(--danger); border-color: var(--danger-border); }
+    .token-btn-clear:hover { background: var(--danger-dim); color: var(--danger); }
+
+    .token-hint {
+      font-size: 11px;
+      color: var(--hint);
+      margin-top: 5px;
+      min-height: 16px;
+    }
 
     .tabs { grid-template-columns: repeat(2, 1fr); }
   </style>
@@ -703,12 +732,12 @@
           </div>
           <div class="field">
             <label>Token admin (opcional)</label>
-            <div style="display:flex;gap:6px;align-items:center">
-              <input id="token" type="password" placeholder="Bearer token" style="flex:1" oninput="onTokenInput()" />
-              <button id="btnSaveToken" class="btn-token-save" onclick="saveToken()" title="Salvar token no navegador">Salvar</button>
-              <button id="btnClearToken" class="btn-token-clear" onclick="clearToken()" title="Remover token salvo" style="display:none">Limpar</button>
+            <div class="token-group">
+              <input id="token" type="password" placeholder="Bearer token" oninput="onTokenInput()" />
+              <button id="btnSaveToken" class="token-btn token-btn-save" onclick="saveToken()">Salvar</button>
+              <button id="btnClearToken" class="token-btn token-btn-clear" onclick="clearToken()" style="display:none">Limpar</button>
             </div>
-            <div id="tokenHint" style="font-size:11px;color:var(--hint);margin-top:5px"></div>
+            <div id="tokenHint" class="token-hint"></div>
           </div>
         </div>
       </div>
