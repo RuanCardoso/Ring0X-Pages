@@ -1203,7 +1203,7 @@
 
       setLoading('btnPayDebt', true);
       try {
-        const res = await api('/api/gateway/pay-debt', { paymentMethod: _payMethod, customerDocument: doc });
+        const res = await api('/api/gateway/pay-debt', { paymentMethod: _payMethod, cpf: doc });
         const type = res?.Result?.type || res?.Result?.Type;
         const raw = res?.Result?.raw || res?.Result?.Raw;
 
