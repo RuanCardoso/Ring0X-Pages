@@ -980,6 +980,7 @@
                     <th>Key</th>
                     <th>Status</th>
                     <th>Dias</th>
+                    <th>HWID</th>
                     <th>Ativada em</th>
                     <th>Termina em</th>
                     <th style="text-align: right">Ação</th>
@@ -1372,7 +1373,8 @@
       try {
         const k = document.getElementById('activateKey').value.trim();
         if (!k) throw new Error('Informe a key.');
-        const r = await api('/user/auth-keys/activate', { keyValue: k });
+        const testHwid = 'TEST-HWID-SIMULATED-PC-' + navigator.userAgent.length;
+        const r = await api('/user/auth-keys/activate', { keyValue: k, hwid: testHwid });
         showResult('res-activate', 'badge-activate', 'body-activate', r, true);
       } catch (e) {
         showResult('res-activate', 'badge-activate', 'body-activate', e.message, false);
@@ -1425,10 +1427,17 @@
           statusHtml = `<span class="pill pill-off">Inativa</span>`;
         }
 
+        const hwid = i.hwid || i.Hwid || '';
+        const hwidCell = hwid
+          ? `<span class="mono-cell" style="font-size:10px;max-width:110px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle" title="${hwid}">${hwid}</span>`
+          : `<span style="color:var(--hint);font-size:10px">—</span>`;
+
         return `<tr data-key="${k.replace(/"/g, '&quot;')}">
           <td class="mono-cell">${k}</td>
           <td>${statusHtml}</td>
-          <td>${days}</td><td>${act}</td><td>${end}</td>
+          <td>${days}</td>
+          <td>${hwidCell}</td>
+          <td>${act}</td><td>${end}</td>
           <td style="text-align: right">${actionBtn}</td>
         </tr>`;
       }).join('');
