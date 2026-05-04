@@ -906,11 +906,13 @@
 
       <main class="main">
 
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('admin')">Admin</button>
-          <button class="tab" onclick="switchTab('list')">Listar</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div class="tabs" style="margin-bottom: 0;">
+            <button class="tab active" onclick="switchTab('admin')">Admin</button>
+            <button class="tab" onclick="switchTab('list')">Listar</button>
+          </div>
           
-          <button class="btn-secondary" style="margin-left:auto; width:auto; padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:6px" onclick="doFreeze('ALL', true)">
+          <button class="btn-secondary" style="width:auto; padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:6px" onclick="doFreeze('ALL', true)">
             <span style="font-size:14px">❄️</span> Congelar Todas Ativas
           </button>
         </div>
