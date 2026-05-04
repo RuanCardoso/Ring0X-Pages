@@ -821,6 +821,20 @@
 
       <hr class="sidebar-divider" />
 
+      <!-- Saldo Devedor -->
+      <div>
+        <div class="sidebar-section-label">Meu Saldo Devedor</div>
+        <div class="calc-block" style="margin-top:7px">
+          <div class="calc-top" style="margin-bottom:0">
+            <span class="calc-top-label" id="debtStatusLabel" style="font-size:12px">Aguardando...</span>
+            <span class="calc-qty-val" id="debtValue" style="color:var(--danger)">R$ 0,00</span>
+          </div>
+          <button class="btn-primary" id="btnPayDebt" style="margin-top:12px; padding: 7px 12px; font-size:11px;" onclick="doPayDebt()" disabled>Pagar Saldo (PIX)</button>
+        </div>
+      </div>
+
+      <hr class="sidebar-divider" />
+
       <!-- Configuração da API -->
       <div>
         <div class="sidebar-section-label">Configuração da API</div>
@@ -1043,6 +1057,7 @@
         document.getElementById('token').value = saved;
         document.getElementById('btnClearToken').style.display = 'inline-block';
         document.getElementById('tokenHint').textContent = 'Token salvo localmente.';
+        loadDebtBalance();
       }
     }
 
@@ -1061,6 +1076,7 @@
       document.getElementById('btnClearToken').style.display = 'inline-block';
       document.getElementById('tokenHint').textContent = 'Salvo.';
       setTimeout(() => { document.getElementById('tokenHint').textContent = 'Token salvo localmente.'; }, 1800);
+      loadDebtBalance();
     }
 
     function clearToken() {
@@ -1069,6 +1085,7 @@
       document.getElementById('btnClearToken').style.display = 'none';
       document.getElementById('tokenHint').textContent = 'Removido.';
       setTimeout(() => { document.getElementById('tokenHint').textContent = ''; }, 1800);
+      loadDebtBalance();
     }
 
     /* ── API ── */
@@ -1097,6 +1114,60 @@
         throw new Error(`HTTP ${r.status}: ${m}`);
       }
       return d;
+    }
+
+    async function loadDebtBalance() {
+      const btn = document.getElementById('btnPayDebt');
+      const val = document.getElementById('debtValue');
+      const lbl = document.getElementById('debtStatusLabel');
+      
+      if (!btn || !val || !lbl) return;
+
+      if (!document.getElementById('token').value.trim()) {
+        lbl.textContent = 'Sem token';
+        val.textContent = 'R$ 0,00';
+        btn.disabled = true;
+        return;
+      }
+
+      try {
+        lbl.textContent = 'Consultando...';
+        val.style.color = 'var(--muted)';
+        const res = await api('/admin/auth-keys/debt-balance', {});
+        const debt = parseFloat(res.Result) || 0;
+        
+        val.textContent = fmt(debt);
+        
+        if (debt > 0) {
+          lbl.textContent = 'Você deve';
+          val.style.color = 'var(--danger)';
+          btn.disabled = false;
+        } else {
+          lbl.textContent = 'Tudo pago!';
+          val.style.color = 'var(--success)';
+          btn.disabled = true;
+        }
+      } catch (e) {
+        lbl.textContent = 'Erro ao ler';
+        val.textContent = 'R$ 0,00';
+        val.style.color = 'var(--danger)';
+        btn.disabled = true;
+      }
+    }
+
+    async function doPayDebt() {
+      setLoading('btnPayDebt', true);
+      try {
+        const res = await api('/api/gateway/pay-debt', { paymentMethod: 'pix', customerDocument: '' });
+        if (res.Result && res.Result.raw) {
+           window.open(res.Result.raw, '_blank');
+           alert("Sessão de pagamento PIX criada! Pague o QR Code na aba que se abriu.");
+           loadDebtBalance(); // Atualiza (embora dependa do webhook pra zerar no banco)
+        }
+      } catch (e) {
+        alert("Erro ao gerar pagamento: " + e.message);
+      }
+      setLoading('btnPayDebt', false);
     }
 
     /* ── Helpers ── */
