@@ -25,6 +25,9 @@
       --success: #4cdc8a;
       --success-dim: rgba(76,220,138,0.1);
       --success-border: rgba(76,220,138,0.25);
+      --gold: #f5c842;
+      --gold-dim: rgba(245,200,66,0.10);
+      --gold-border: rgba(245,200,66,0.22);
       --mono: 'IBM Plex Mono', monospace;
       --sans: 'DM Sans', sans-serif;
       --radius: 10px;
@@ -103,6 +106,187 @@
       padding-top: 2px;
     }
 
+    /* ── Pricing banner ── */
+    .pricing-banner {
+      background: linear-gradient(135deg, rgba(245,200,66,0.07) 0%, rgba(232,255,89,0.05) 100%);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--gold);
+      border-radius: 0;
+    }
+
+    .pricing-banner-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .pricing-banner-icon {
+      font-size: 14px;
+    }
+
+    .pricing-banner-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .pricing-banner-subtitle {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .pricing-plan {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      position: relative;
+      transition: border-color 0.15s;
+    }
+
+    .pricing-plan:hover {
+      border-color: rgba(245,200,66,0.3);
+    }
+
+    .pricing-plan-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 6px;
+    }
+
+    .pricing-plan-price {
+      font-family: var(--mono);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .pricing-plan-price span {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--sans);
+      font-weight: 400;
+    }
+
+    .pricing-plan-sub {
+      font-size: 11px;
+      color: var(--hint);
+      margin-top: 5px;
+    }
+
+    .pricing-plan-badge {
+      position: absolute;
+      top: -1px; right: 8px;
+      background: var(--gold);
+      color: #0d0d0f;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 0 0 6px 6px;
+    }
+
+    /* qty calculator */
+    .pricing-calc {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pricing-calc-label {
+      font-size: 11.5px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .pricing-calc-qty {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .calc-btn {
+      width: 24px; height: 24px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.12s;
+      flex-shrink: 0;
+      line-height: 1;
+      padding-bottom: 1px;
+    }
+
+    .calc-btn:hover { background: rgba(255,255,255,0.12); }
+
+    .calc-qty-val {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      min-width: 28px;
+      text-align: center;
+    }
+
+    .pricing-calc-results {
+      display: flex;
+      gap: 16px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+
+    .calc-result {
+      text-align: right;
+    }
+
+    .calc-result-plan {
+      font-size: 10px;
+      color: var(--hint);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .calc-result-val {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
     /* ── Config ── */
     .config-bar {
       background: var(--surface);
@@ -146,7 +330,7 @@
     /* ── Tabs ── */
     .tabs {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 4px;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -542,10 +726,12 @@
 
     /* ── Responsive ── */
     @media (max-width: 560px) {
-      .tabs { grid-template-columns: 1fr 1fr 1fr; }
+      .tabs { grid-template-columns: 1fr 1fr; }
       .row { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: 1fr; }
       .btn-row { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .pricing-calc-results { margin-left: 0; }
     }
 
     /* ── Client simulation ── */
@@ -681,8 +867,6 @@
       margin-top: 5px;
       min-height: 16px;
     }
-
-    .tabs { grid-template-columns: repeat(2, 1fr); }
   </style>
 </head>
 <body>
@@ -708,6 +892,58 @@
       <div class="metric">
         <div class="metric-label">Duração padrão</div>
         <div class="metric-value" id="kpiDays">30 dias</div>
+      </div>
+    </div>
+
+    <!-- ── Tabela de preços de revenda ── -->
+    <div class="pricing-banner">
+      <div class="pricing-banner-header">
+        <span class="pricing-banner-icon">💰</span>
+        <span class="pricing-banner-title">Preços de Revenda</span>
+        <span class="pricing-banner-subtitle">por key · valores em R$</span>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-plan">
+          <div class="pricing-plan-label">Diária</div>
+          <div class="pricing-plan-price">R$&nbsp;8<span>,00</span></div>
+          <div class="pricing-plan-sub">1 dia por key</div>
+        </div>
+        <div class="pricing-plan">
+          <div class="pricing-plan-badge">Popular</div>
+          <div class="pricing-plan-label">Semanal</div>
+          <div class="pricing-plan-price">R$&nbsp;35<span>,00</span></div>
+          <div class="pricing-plan-sub">7 dias por key</div>
+        </div>
+        <div class="pricing-plan">
+          <div class="pricing-plan-label">Mensal</div>
+          <div class="pricing-plan-price">R$&nbsp;65<span>,00</span></div>
+          <div class="pricing-plan-sub">30 dias por key</div>
+        </div>
+      </div>
+
+      <!-- Calculadora de quantidade -->
+      <div class="pricing-calc">
+        <span class="pricing-calc-label">Calcular para</span>
+        <div class="pricing-calc-qty">
+          <button class="calc-btn" onclick="changeQty(-1)">−</button>
+          <span class="calc-qty-val" id="calcQtyVal">1</span>
+          <button class="calc-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <span class="pricing-calc-label">key(s)</span>
+        <div class="pricing-calc-results">
+          <div class="calc-result">
+            <div class="calc-result-plan">Diária</div>
+            <div class="calc-result-val" id="calcDiaria">R$ 8,00</div>
+          </div>
+          <div class="calc-result">
+            <div class="calc-result-plan">Semanal</div>
+            <div class="calc-result-val" id="calcSemanal">R$ 35,00</div>
+          </div>
+          <div class="calc-result">
+            <div class="calc-result-plan">Mensal</div>
+            <div class="calc-result-val" id="calcMensal">R$ 65,00</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -869,6 +1105,26 @@
     const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
     let _selectedKey = '';
     let _configOpen = false;
+
+    /* ── Pricing calculator ── */
+    const PRICES = { diaria: 8, semanal: 35, mensal: 65 };
+    let _calcQty = 1;
+
+    function fmt(val) {
+      return 'R$ ' + (val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateCalc() {
+      document.getElementById('calcQtyVal').textContent = _calcQty;
+      document.getElementById('calcDiaria').textContent = fmt(PRICES.diaria * _calcQty);
+      document.getElementById('calcSemanal').textContent = fmt(PRICES.semanal * _calcQty);
+      document.getElementById('calcMensal').textContent = fmt(PRICES.mensal * _calcQty);
+    }
+
+    function changeQty(delta) {
+      _calcQty = Math.max(1, Math.min(999, _calcQty + delta));
+      updateCalc();
+    }
 
     /* ── Config toggle ── */
     function toggleConfig() {
@@ -1161,6 +1417,7 @@
     }
 
     loadToken();
+    updateCalc();
   </script>
 </body>
 </html>
