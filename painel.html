@@ -8,242 +8,266 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0d0d0f;
-      --surface: #141416;
-      --surface2: #1a1a1e;
-      --border: rgba(255,255,255,0.07);
-      --border2: rgba(255,255,255,0.13);
-      --text: #f0f0f0;
-      --muted: #7a7a85;
-      --hint: #4a4a55;
+      --bg: #0c0c0e;
+      --sidebar-bg: #101012;
+      --surface: #161618;
+      --surface2: #1d1d20;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.11);
+      --text: #efefef;
+      --muted: #75757f;
+      --hint: #42424c;
       --accent: #e8ff59;
-      --accent-dim: rgba(232,255,89,0.12);
-      --accent-text: #0d0d0f;
+      --accent-dim: rgba(232,255,89,0.11);
+      --accent-text: #0c0c0e;
       --danger: #ff5a5a;
-      --danger-dim: rgba(255,90,90,0.1);
-      --danger-border: rgba(255,90,90,0.25);
+      --danger-dim: rgba(255,90,90,0.09);
+      --danger-border: rgba(255,90,90,0.22);
       --success: #4cdc8a;
-      --success-dim: rgba(76,220,138,0.1);
-      --success-border: rgba(76,220,138,0.25);
-      --gold: #f5c842;
-      --gold-dim: rgba(245,200,66,0.10);
-      --gold-border: rgba(245,200,66,0.22);
+      --success-dim: rgba(76,220,138,0.09);
+      --success-border: rgba(76,220,138,0.22);
+      --gold: #f0c040;
+      --gold-dim: rgba(240,192,64,0.09);
+      --gold-border: rgba(240,192,64,0.2);
       --mono: 'IBM Plex Mono', monospace;
       --sans: 'DM Sans', sans-serif;
-      --radius: 10px;
-      --radius-lg: 14px;
+      --radius: 9px;
+      --radius-lg: 13px;
+      --sidebar-w: 252px;
+      --header-h: 49px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
 
     body {
       font-family: var(--sans);
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
-      padding: 2rem 1rem 4rem;
       font-size: 14px;
       line-height: 1.5;
+      display: flex;
+      flex-direction: column;
     }
 
-    .container { max-width: 800px; margin: 0 auto; }
-
-    /* ── Header ── */
-    .header {
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
+    /* ────────────────────────────────
+       PAGE HEADER
+    ──────────────────────────────── */
+    .page-header {
+      height: var(--header-h);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .header-left h1 {
-      font-size: 1.35rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-
-    .header-left p {
-      color: var(--muted);
-      margin-top: 4px;
-      font-size: 13px;
-    }
-
-    /* ── Metrics ── */
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 1.25rem;
-    }
-
-    .metric {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-    }
-
-    .metric-label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 5px;
-    }
-
-    .metric-value {
-      font-size: 15px;
-      font-weight: 500;
-    }
-
-    .metric-value.mono {
-      font-family: var(--mono);
-      font-size: 11px;
-      padding-top: 2px;
-    }
-
-    /* ── Pricing banner ── */
-    .pricing-banner {
-      background: linear-gradient(135deg, rgba(245,200,66,0.07) 0%, rgba(232,255,89,0.05) 100%);
-      border: 1px solid var(--gold-border);
-      border-radius: var(--radius-lg);
-      padding: 1.1rem 1.25rem;
-      margin-bottom: 1.25rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .pricing-banner::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px; height: 100%;
-      background: var(--gold);
-      border-radius: 0;
-    }
-
-    .pricing-banner-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .pricing-banner-icon {
-      font-size: 14px;
-    }
-
-    .pricing-banner-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gold);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-    }
-
-    .pricing-banner-subtitle {
-      font-size: 11.5px;
-      color: var(--muted);
-      margin-left: auto;
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .pricing-plan {
-      background: rgba(0,0,0,0.25);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      position: relative;
-      transition: border-color 0.15s;
-    }
-
-    .pricing-plan:hover {
-      border-color: rgba(245,200,66,0.3);
-    }
-
-    .pricing-plan-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 6px;
-    }
-
-    .pricing-plan-price {
-      font-family: var(--mono);
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--gold);
-      line-height: 1;
-      margin-bottom: 2px;
-    }
-
-    .pricing-plan-price span {
-      font-size: 11px;
-      color: var(--muted);
-      font-family: var(--sans);
-      font-weight: 400;
-    }
-
-    .pricing-plan-sub {
-      font-size: 11px;
-      color: var(--hint);
-      margin-top: 5px;
-    }
-
-    .pricing-plan-badge {
-      position: absolute;
-      top: -1px; right: 8px;
-      background: var(--gold);
-      color: #0d0d0f;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 0 0 6px 6px;
-    }
-
-    /* qty calculator */
-    .pricing-calc {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 0 1.5rem;
       display: flex;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
     }
 
-    .pricing-calc-label {
-      font-size: 11.5px;
+    .page-header-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(232,255,89,0.55);
+    }
+
+    .page-header h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .page-header-sep {
+      width: 1px; height: 14px;
+      background: var(--border2);
+    }
+
+    .page-header p {
+      font-size: 12px;
       color: var(--muted);
+    }
+
+    /* ────────────────────────────────
+       BODY LAYOUT
+    ──────────────────────────────── */
+    .body-wrap {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ────────────────────────────────
+       SIDEBAR
+    ──────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 1.1rem 1rem;
+      position: sticky;
+      top: var(--header-h);
+      height: calc(100vh - var(--header-h));
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--hint); border-radius: 99px; }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--hint);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 7px;
+    }
+
+    /* ── Metrics ── */
+    .metrics-vert { display: flex; flex-direction: column; gap: 1px; }
+
+    .metric-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 9px;
+      border-radius: 7px;
+      transition: background 0.12s;
+    }
+
+    .metric-row:hover { background: rgba(255,255,255,0.025); }
+
+    .metric-row-label { font-size: 11px; color: var(--muted); }
+
+    .metric-row-value { font-size: 12px; font-weight: 500; }
+
+    .metric-row-value.mono {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      max-width: 130px;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .pricing-calc-qty {
+    /* ── Env seg ── */
+    .seg {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      gap: 3px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 3px;
+      width: 100%;
     }
 
-    .calc-btn {
-      width: 24px; height: 24px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border2);
+    .seg button {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 8px;
       border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .seg button.active { background: var(--surface2); color: var(--text); }
+
+    /* ── Pricing plans ── */
+    .pricing-plans { display: flex; flex-direction: column; gap: 4px; }
+
+    .plan-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.15s;
+      cursor: default;
+    }
+
+    .plan-row:hover { border-color: var(--gold-border); }
+
+    .plan-row::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: transparent;
+      transition: background 0.15s;
+    }
+
+    .plan-row:hover::before { background: var(--gold); }
+
+    .plan-row-info { display: flex; flex-direction: column; }
+    .plan-row-name { font-size: 12px; color: var(--text); font-weight: 500; }
+    .plan-row-days { font-size: 10px; color: var(--hint); margin-top: 1px; }
+
+    .plan-row-price {
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .plan-tag {
+      position: absolute;
+      top: 3px; right: 4px;
+      background: var(--gold);
+      color: #0c0c0e;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* ── Calc ── */
+    .calc-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 10px;
+    }
+
+    .calc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .calc-top-label { font-size: 11px; color: var(--muted); }
+
+    .calc-qty-row { display: flex; align-items: center; gap: 5px; }
+
+    .calc-btn {
+      width: 20px; height: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 5px;
       color: var(--text);
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.12s;
@@ -252,105 +276,141 @@
       padding-bottom: 1px;
     }
 
-    .calc-btn:hover { background: rgba(255,255,255,0.12); }
+    .calc-btn:hover { background: rgba(255,255,255,0.1); }
 
     .calc-qty-val {
       font-family: var(--mono);
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text);
-      min-width: 28px;
+      min-width: 22px;
       text-align: center;
     }
 
-    .pricing-calc-results {
-      display: flex;
-      gap: 16px;
-      margin-left: auto;
-      flex-wrap: wrap;
-    }
+    .calc-results { display: flex; flex-direction: column; gap: 3px; }
 
-    .calc-result {
-      text-align: right;
-    }
-
-    .calc-result-plan {
-      font-size: 10px;
-      color: var(--hint);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .calc-result-val {
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--gold);
-      font-weight: 500;
-    }
-
-    /* ── Config ── */
-    .config-bar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .config-bar-header {
+    .calc-result-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      cursor: pointer;
-      user-select: none;
     }
 
-    .config-bar-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-    }
+    .calc-result-plan { font-size: 11px; color: var(--hint); }
+    .calc-result-val { font-family: var(--mono); font-size: 11px; color: var(--gold); }
 
-    .config-bar-arrow {
-      font-size: 11px;
+    /* ── Config ── */
+    .config-field { margin-bottom: 7px; }
+    .config-field:last-child { margin-bottom: 0; }
+
+    .config-label {
+      font-size: 10px;
+      font-weight: 600;
       color: var(--hint);
-      transition: transform 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 4px;
+      display: block;
     }
 
-    .config-bar-arrow.open { transform: rotate(180deg); }
-
-    .config-body {
-      display: none;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      margin-top: 1rem;
+    .sidebar input[type="text"],
+    .sidebar input[type="password"] {
+      width: 100%;
+      padding: 7px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 11.5px;
+      outline: none;
+      transition: border-color 0.15s;
     }
 
-    .config-body.open { display: block; }
+    .sidebar input:focus { border-color: rgba(255,255,255,0.24); }
+    .sidebar input::placeholder { color: var(--hint); }
+
+    .token-group {
+      display: flex;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .token-group input {
+      flex: 1;
+      min-width: 0;
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      font-size: 11px !important;
+      padding: 6px 9px !important;
+    }
+
+    .token-group:focus-within { border-color: rgba(255,255,255,0.24); }
+
+    .token-btn {
+      flex-shrink: 0;
+      border: none;
+      border-left: 1px solid var(--border2);
+      padding: 0 8px;
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .token-btn-save { background: var(--accent-dim); color: var(--accent); }
+    .token-btn-save:hover { background: rgba(232,255,89,0.18); }
+    .token-btn-clear { background: transparent; color: var(--hint); }
+    .token-btn-clear:hover { background: var(--danger-dim); color: var(--danger); }
+
+    .token-hint { font-size: 10px; color: var(--hint); margin-top: 4px; min-height: 14px; }
+
+    .sidebar-divider { border: none; border-top: 1px solid var(--border); }
+
+    /* ────────────────────────────────
+       SCROLL AREA (right of sidebar)
+    ──────────────────────────────── */
+    .scroll-area {
+      flex: 1;
+      min-width: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ────────────────────────────────
+       MAIN CONTENT
+    ──────────────────────────────── */
+    .main {
+      padding: 1.25rem 1.5rem;
+      flex: 1;
+    }
 
     /* ── Tabs ── */
     .tabs {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
+      display: inline-flex;
+      gap: 3px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 4px;
+      padding: 3px;
       margin-bottom: 1.25rem;
     }
 
     .tab {
       background: transparent;
-      border: none;
+      border: 1px solid transparent;
       color: var(--muted);
-      padding: 8px;
+      padding: 7px 20px;
       border-radius: var(--radius);
       cursor: pointer;
       font-family: var(--sans);
       font-size: 13px;
       font-weight: 500;
       transition: all 0.15s;
-      text-align: center;
     }
 
     .tab:hover { color: var(--text); }
@@ -358,7 +418,7 @@
     .tab.active {
       background: var(--surface2);
       color: var(--text);
-      border: 1px solid var(--border2);
+      border-color: var(--border2);
     }
 
     /* ── Panels ── */
@@ -376,23 +436,13 @@
 
     .card:last-child { margin-bottom: 0; }
 
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
+    .card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
 
     .card-hint {
       font-size: 12px;
       color: var(--muted);
       margin-bottom: 1rem;
       line-height: 1.55;
-    }
-
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 1rem 0;
     }
 
     /* ── Form ── */
@@ -409,9 +459,8 @@
       margin-bottom: 6px;
     }
 
-    input[type="text"],
-    input[type="number"],
-    select {
+    .main input[type="text"],
+    .main input[type="number"] {
       width: 100%;
       padding: 9px 12px;
       background: var(--bg);
@@ -425,44 +474,13 @@
       -webkit-appearance: none;
     }
 
-    input:focus, select:focus {
-      border-color: rgba(255,255,255,0.28);
-    }
-
-    input::placeholder { color: var(--hint); }
+    .main input:focus { border-color: rgba(255,255,255,0.26); }
+    .main input::placeholder { color: var(--hint); }
 
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-    }
-
-    /* ── Segmented ── */
-    .seg {
-      display: inline-flex;
-      gap: 3px;
-      background: var(--bg);
-      border: 1px solid var(--border2);
-      border-radius: var(--radius);
-      padding: 3px;
-    }
-
-    .seg button {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-family: var(--sans);
-      font-size: 12px;
-      font-weight: 500;
-      padding: 5px 14px;
-      border-radius: 7px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .seg button.active {
-      background: var(--surface2);
-      color: var(--text);
     }
 
     /* ── Buttons ── */
@@ -480,7 +498,7 @@
       transition: opacity 0.15s;
     }
 
-    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:hover { opacity: 0.87; }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-secondary {
@@ -497,7 +515,7 @@
       transition: background 0.15s;
     }
 
-    .btn-secondary:hover { background: rgba(255,255,255,0.06); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); }
     .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-danger {
@@ -514,7 +532,7 @@
       transition: opacity 0.15s;
     }
 
-    .btn-danger:hover { opacity: 0.82; }
+    .btn-danger:hover { opacity: 0.8; }
     .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-row {
@@ -523,54 +541,8 @@
       gap: 8px;
     }
 
-    /* ── Key preview ── */
-    .key-box {
-      font-family: var(--mono);
-      font-size: 12px;
-      background: var(--bg);
-      border: 1px dashed var(--border2);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      word-break: break-all;
-      min-height: 40px;
-      color: var(--accent);
-      line-height: 1.5;
-    }
-
-    .key-box.empty { color: var(--hint); }
-
-    /* ── Steps ── */
-    .steps { margin-bottom: 1rem; }
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 8px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .step-num {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 600;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
     /* ── Result ── */
-    .result-wrap {
-      margin-top: 1rem;
-      display: none;
-    }
-
+    .result-wrap { margin-top: 1rem; display: none; }
     .result-wrap.visible { display: block; }
 
     .result-header {
@@ -596,17 +568,9 @@
       border: 1px solid transparent;
     }
 
-    .badge-ok {
-      background: var(--success-dim);
-      color: var(--success);
-      border-color: var(--success-border);
-    }
-
-    .badge-err {
-      background: var(--danger-dim);
-      color: var(--danger);
-      border-color: var(--danger-border);
-    }
+    .badge-ok { background: var(--success-dim); color: var(--success); border-color: var(--success-border); }
+    .badge-err { background: var(--danger-dim); color: var(--danger); border-color: var(--danger-border); }
+    .badge-warn { background: rgba(234,179,8,0.09); color: #ca8a04; border-color: rgba(234,179,8,0.22); }
 
     .result-body {
       background: var(--bg);
@@ -623,25 +587,38 @@
       overflow-y: auto;
     }
 
+    /* ── Batch progress ── */
+    .batch-progress { margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+
+    .batch-bar-wrap {
+      flex: 1;
+      height: 3px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .batch-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .batch-counter { font-size: 11px; font-family: var(--mono); color: var(--muted); white-space: nowrap; }
+
     /* ── Table ── */
     .table-wrap {
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: auto;
-      max-height: 280px;
+      max-height: 300px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
 
-    th, td {
-      padding: 9px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
+    th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
 
     th {
       background: var(--surface2);
@@ -656,462 +633,368 @@
     }
 
     tr:last-child td { border-bottom: none; }
-
     tr[data-key] { cursor: pointer; transition: background 0.12s; }
-    tr[data-key]:hover td { background: rgba(255,255,255,0.03); }
-    tr[data-key].selected td { background: rgba(232,255,89,0.06); }
+    tr[data-key]:hover td { background: rgba(255,255,255,0.025); }
+    tr[data-key].selected td { background: rgba(232,255,89,0.05); }
 
-    .pill {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 500;
-      border-radius: 99px;
-      padding: 2px 8px;
-    }
+    .pill { display: inline-block; font-size: 11px; font-weight: 500; border-radius: 99px; padding: 2px 8px; }
+    .pill-ok { background: var(--success-dim); color: var(--success); }
+    .pill-off { background: rgba(255,255,255,0.04); color: var(--muted); }
 
-    .pill-ok {
-      background: var(--success-dim);
-      color: var(--success);
-    }
+    td.mono-cell { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
-    .pill-off {
-      background: rgba(255,255,255,0.05);
-      color: var(--muted);
-    }
-
-    td.mono-cell {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    /* ── Copy hint ── */
-    .copy-hint {
-      font-size: 11.5px;
-      color: var(--hint);
-      margin-top: 8px;
-      line-height: 1.5;
-    }
-
-    /* ── Batch progress ── */
-    .batch-progress {
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .batch-bar-wrap {
-      flex: 1;
-      height: 4px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .batch-bar {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 99px;
-      width: 0%;
-      transition: width 0.2s ease;
-    }
-
-    .batch-counter {
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 560px) {
-      .tabs { grid-template-columns: 1fr 1fr; }
-      .row { grid-template-columns: 1fr; }
-      .metrics { grid-template-columns: 1fr; }
-      .btn-row { grid-template-columns: 1fr; }
-      .pricing-grid { grid-template-columns: 1fr; }
-      .pricing-calc-results { margin-left: 0; }
-    }
-
-    /* ── Client simulation ── */
+    /* ────────────────────────────────
+       CLIENT SIMULATION
+    ──────────────────────────────── */
     .client-sim-wrap {
-      max-width: 800px;
-      margin: 2.5rem auto 0;
-      padding: 0 1rem 4rem;
-    }
-
-    .client-sim-inner {
-      border: 1px dashed rgba(255,255,255,0.12);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 1.5rem 2rem;
+      background: rgba(255,255,255,0.012);
     }
 
     .client-sim-header {
-      background: rgba(255,255,255,0.03);
-      border-bottom: 1px dashed rgba(255,255,255,0.12);
-      padding: 12px 1.25rem;
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 1rem;
     }
 
     .client-sim-badge {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
       color: var(--muted);
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border2);
       border-radius: 99px;
       padding: 3px 10px;
-      white-space: nowrap;
     }
 
-    .client-sim-hint {
-      font-size: 12px;
-      color: var(--hint);
-      line-height: 1.5;
-    }
+    .client-sim-hint { font-size: 12px; color: var(--hint); }
 
     .client-sim-body {
-      padding: 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: flex-start;
     }
 
-    .btn-activate {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius);
-      padding: 10px 16px;
-      font-family: var(--sans);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
+    .client-input {
       width: 100%;
-      transition: all 0.15s;
-    }
-
-    .btn-activate:hover {
-      color: var(--text);
-      border-color: rgba(255,255,255,0.22);
-    }
-
-    .btn-activate:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .badge-warn {
-      background: rgba(234,179,8,0.1);
-      color: #ca8a04;
-      border-color: rgba(234,179,8,0.25);
-    }
-
-    .token-group {
-      display: flex;
+      padding: 9px 12px;
+      background: var(--surface);
       border: 1px solid var(--border2);
       border-radius: var(--radius);
-      overflow: hidden;
-      background: var(--bg);
-    }
-
-    .token-group input {
-      flex: 1;
-      min-width: 0;
-      border: none;
-      border-radius: 0;
-      background: transparent;
-      padding: 9px 12px;
       color: var(--text);
       font-family: var(--sans);
       font-size: 13px;
       outline: none;
+      transition: border-color 0.15s;
     }
 
-    .token-group input::placeholder { color: var(--hint); }
+    .client-input:focus { border-color: rgba(255,255,255,0.22); }
+    .client-input::placeholder { color: var(--hint); }
 
-    .token-group:focus-within {
-      border-color: rgba(255,255,255,0.28);
-    }
-
-    .token-btn {
-      flex-shrink: 0;
-      border: none;
-      border-left: 1px solid var(--border2);
-      padding: 0 14px;
+    .btn-activate {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 9px 18px;
       font-family: var(--sans);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.15s;
       white-space: nowrap;
     }
 
-    .token-btn-save {
-      background: var(--accent-dim);
-      color: var(--accent);
-    }
+    .btn-activate:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .btn-activate:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .token-btn-save:hover { background: rgba(232,255,89,0.2); }
+    .client-sim-result { margin-top: 10px; }
 
-    .token-btn-clear {
-      background: transparent;
-      color: var(--hint);
-    }
-
-    .token-btn-clear:hover { background: var(--danger-dim); color: var(--danger); }
-
-    .token-hint {
-      font-size: 11px;
-      color: var(--hint);
-      margin-top: 5px;
-      min-height: 16px;
+    /* ────────────────────────────────
+       RESPONSIVE
+    ──────────────────────────────── */
+    @media (max-width: 700px) {
+      .body-wrap { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+      .client-sim-body { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+      .btn-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
 
-    <header class="header">
-      <div class="header-left">
-        <h1>Chaves de Autenticação</h1>
-        <p>Criar, revogar e listar keys de autenticação via HTTP direto.</p>
-      </div>
-    </header>
+  <!-- ── Page header ── -->
+  <header class="page-header">
+    <div class="page-header-dot"></div>
+    <h1>Chaves de Autenticação</h1>
+    <div class="page-header-sep"></div>
+    <p>Criar, revogar e listar keys via HTTP direto</p>
+  </header>
 
-    <!-- Métricas -->
-    <div class="metrics">
-      <div class="metric">
-        <div class="metric-label">Ambiente</div>
-        <div class="metric-value" id="kpiEnv">Prod</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Base URL</div>
-        <div class="metric-value mono" id="kpiUrl">ringapi.guaranihub.com</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Duração padrão</div>
-        <div class="metric-value" id="kpiDays">30 dias</div>
-      </div>
-    </div>
+  <div class="body-wrap">
 
-    <!-- ── Tabela de preços de revenda ── -->
-    <div class="pricing-banner">
-      <div class="pricing-banner-header">
-        <span class="pricing-banner-icon">💰</span>
-        <span class="pricing-banner-title">Preços de Revenda</span>
-        <span class="pricing-banner-subtitle">por key · valores em R$</span>
-      </div>
-      <div class="pricing-grid">
-        <div class="pricing-plan">
-          <div class="pricing-plan-label">Diária</div>
-          <div class="pricing-plan-price">R$&nbsp;8<span>,00</span></div>
-          <div class="pricing-plan-sub">1 dia por key</div>
-        </div>
-        <div class="pricing-plan">
-          <div class="pricing-plan-badge">Popular</div>
-          <div class="pricing-plan-label">Semanal</div>
-          <div class="pricing-plan-price">R$&nbsp;35<span>,00</span></div>
-          <div class="pricing-plan-sub">7 dias por key</div>
-        </div>
-        <div class="pricing-plan">
-          <div class="pricing-plan-label">Mensal</div>
-          <div class="pricing-plan-price">R$&nbsp;65<span>,00</span></div>
-          <div class="pricing-plan-sub">30 dias por key</div>
-        </div>
-      </div>
+    <!-- ════════════════════════════
+         SIDEBAR
+    ════════════════════════════ -->
+    <aside class="sidebar">
 
-      <!-- Calculadora de quantidade -->
-      <div class="pricing-calc">
-        <span class="pricing-calc-label">Calcular para</span>
-        <div class="pricing-calc-qty">
-          <button class="calc-btn" onclick="changeQty(-1)">−</button>
-          <span class="calc-qty-val" id="calcQtyVal">1</span>
-          <button class="calc-btn" onclick="changeQty(1)">+</button>
-        </div>
-        <span class="pricing-calc-label">key(s)</span>
-        <div class="pricing-calc-results">
-          <div class="calc-result">
-            <div class="calc-result-plan">Diária</div>
-            <div class="calc-result-val" id="calcDiaria">R$ 8,00</div>
+      <!-- Status -->
+      <div>
+        <div class="sidebar-section-label">Status</div>
+        <div class="metrics-vert">
+          <div class="metric-row">
+            <span class="metric-row-label">Ambiente</span>
+            <span class="metric-row-value" id="kpiEnv">Prod</span>
           </div>
-          <div class="calc-result">
-            <div class="calc-result-plan">Semanal</div>
-            <div class="calc-result-val" id="calcSemanal">R$ 35,00</div>
+          <div class="metric-row">
+            <span class="metric-row-label">Endpoint</span>
+            <span class="metric-row-value mono" id="kpiUrl">ringapi.guaranihub.com</span>
           </div>
-          <div class="calc-result">
-            <div class="calc-result-plan">Mensal</div>
-            <div class="calc-result-val" id="calcMensal">R$ 65,00</div>
+          <div class="metric-row">
+            <span class="metric-row-label">Duração padrão</span>
+            <span class="metric-row-value" id="kpiDays">30 dias</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Config colapsável -->
-    <div class="config-bar">
-      <div class="config-bar-header" onclick="toggleConfig()">
-        <span class="config-bar-title">Configuração da API</span>
-        <span class="config-bar-arrow" id="configArrow">▼</span>
+      <hr class="sidebar-divider" />
+
+      <!-- Preços de revenda -->
+      <div>
+        <div class="sidebar-section-label">Revenda · por key</div>
+        <div class="pricing-plans">
+          <div class="plan-row">
+            <div class="plan-row-info">
+              <div class="plan-row-name">Diária</div>
+              <div class="plan-row-days">1 dia</div>
+            </div>
+            <div class="plan-row-price">R$&nbsp;10</div>
+          </div>
+          <div class="plan-row">
+            <div class="plan-tag">Popular</div>
+            <div class="plan-row-info">
+              <div class="plan-row-name">Semanal</div>
+              <div class="plan-row-days">7 dias</div>
+            </div>
+            <div class="plan-row-price">R$&nbsp;35</div>
+          </div>
+          <div class="plan-row">
+            <div class="plan-row-info">
+              <div class="plan-row-name">Mensal</div>
+              <div class="plan-row-days">30 dias</div>
+            </div>
+            <div class="plan-row-price">R$&nbsp;65</div>
+          </div>
+        </div>
+
+        <div class="calc-block" style="margin-top:7px">
+          <div class="calc-top">
+            <span class="calc-top-label">Calcular para</span>
+            <div class="calc-qty-row">
+              <button class="calc-btn" onclick="changeQty(-1)">−</button>
+              <span class="calc-qty-val" id="calcQtyVal">1</span>
+              <button class="calc-btn" onclick="changeQty(1)">+</button>
+            </div>
+          </div>
+          <div class="calc-results">
+            <div class="calc-result-row">
+              <span class="calc-result-plan">Diária</span>
+              <span class="calc-result-val" id="calcDiaria">R$ 10,00</span>
+            </div>
+            <div class="calc-result-row">
+              <span class="calc-result-plan">Semanal</span>
+              <span class="calc-result-val" id="calcSemanal">R$ 35,00</span>
+            </div>
+            <div class="calc-result-row">
+              <span class="calc-result-plan">Mensal</span>
+              <span class="calc-result-val" id="calcMensal">R$ 65,00</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="config-body" id="configBody">
-        <div style="margin-bottom:12px">
-          <label>Ambiente</label>
+
+      <hr class="sidebar-divider" />
+
+      <!-- Configuração da API -->
+      <div>
+        <div class="sidebar-section-label">Configuração da API</div>
+
+        <div class="config-field">
+          <span class="config-label">Ambiente</span>
           <div class="seg">
             <button id="envDev" onclick="setEnv('dev')">Dev</button>
             <button id="envProd" class="active" onclick="setEnv('prod')">Produção</button>
           </div>
         </div>
-        <div class="row">
-          <div class="field">
-            <label>Base URL</label>
-            <input id="baseUrl" type="text" value="https://ringapi.guaranihub.com" />
+
+        <div class="config-field">
+          <span class="config-label">Base URL</span>
+          <input id="baseUrl" type="text" value="https://ringapi.guaranihub.com" />
+        </div>
+
+        <div class="config-field">
+          <span class="config-label">Token admin</span>
+          <div class="token-group">
+            <input id="token" type="password" placeholder="Bearer token" oninput="onTokenInput()" />
+            <button id="btnSaveToken" class="token-btn token-btn-save" onclick="saveToken()">Salvar</button>
+            <button id="btnClearToken" class="token-btn token-btn-clear" onclick="clearToken()" style="display:none">✕</button>
           </div>
-          <div class="field">
-            <label>Token admin (opcional)</label>
-            <div class="token-group">
-              <input id="token" type="password" placeholder="Bearer token" oninput="onTokenInput()" />
-              <button id="btnSaveToken" class="token-btn token-btn-save" onclick="saveToken()">Salvar</button>
-              <button id="btnClearToken" class="token-btn token-btn-clear" onclick="clearToken()" style="display:none">Limpar</button>
+          <div id="tokenHint" class="token-hint"></div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ════════════════════════════
+         RIGHT SCROLL AREA
+    ════════════════════════════ -->
+    <div class="scroll-area">
+
+      <main class="main">
+
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('admin')">Admin</button>
+          <button class="tab" onclick="switchTab('list')">Listar</button>
+        </div>
+
+        <!-- Panel: Admin -->
+        <div id="panel-admin" class="panel active">
+
+          <div class="card">
+            <div class="card-title">Criar key</div>
+            <p class="card-hint">Define a key e a duração em dias. A validade começa a contar quando o cliente ativa.</p>
+
+            <div class="field">
+              <label>Key <span id="createKeyNote" style="color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0">(prefixo — sufixo aleatório ao criar múltiplas)</span></label>
+              <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" />
             </div>
-            <div id="tokenHint" class="token-hint"></div>
+
+            <div class="row" style="margin-bottom:14px">
+              <div class="field" style="margin-bottom:0">
+                <label>Duração (dias)</label>
+                <input id="createDays" type="number" min="1" value="30" />
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Quantidade</label>
+                <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" />
+              </div>
+            </div>
+
+            <button class="btn-primary" id="btnCreate" onclick="doCreate()">Criar key</button>
+
+            <div class="result-wrap" id="res-create">
+              <div class="result-header">
+                <span class="result-label" id="label-create">Resultado — criar</span>
+                <span class="badge" id="badge-create"></span>
+              </div>
+              <div class="batch-progress" id="batch-progress" style="display:none">
+                <div class="batch-bar-wrap"><div class="batch-bar" id="batch-bar"></div></div>
+                <span class="batch-counter" id="batch-counter"></span>
+              </div>
+              <div class="result-body" id="body-create"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Revogar key</div>
+            <p class="card-hint">A key é invalidada imediatamente. Ação irreversível.</p>
+            <div class="field" style="margin-bottom:14px">
+              <label>Key</label>
+              <input id="revokeKey" type="text" placeholder="Cole a key a revogar" />
+            </div>
+            <button class="btn-danger" id="btnRevoke" onclick="doRevoke()">Revogar key</button>
+            <div class="result-wrap" id="res-revoke">
+              <div class="result-header">
+                <span class="result-label">Resultado — revogar</span>
+                <span class="badge" id="badge-revoke"></span>
+              </div>
+              <div class="result-body" id="body-revoke"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Panel: Listar -->
+        <div id="panel-list" class="panel">
+          <div class="card">
+            <div class="card-title">Keys cadastradas</div>
+            <p class="card-hint">Lista completa (somente admin). Clique em uma linha para selecioná-la.</p>
+            <div class="btn-row" style="margin-bottom:14px">
+              <button class="btn-secondary" id="btnList" onclick="doList()">Carregar lista</button>
+              <button class="btn-secondary" onclick="copySelected()">Mover selecionada para Revogar →</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Key</th>
+                    <th>Status</th>
+                    <th>Dias</th>
+                    <th>Ativada em</th>
+                    <th>Termina em</th>
+                  </tr>
+                </thead>
+                <tbody id="keysBody">
+                  <tr>
+                    <td colspan="5" style="color:var(--hint);padding:16px 12px;font-size:12px">
+                      Sem dados. Clique em "Carregar lista".
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="result-wrap" id="res-list">
+              <div class="result-header">
+                <span class="result-label">Resultado — listar</span>
+                <span class="badge" id="badge-list"></span>
+              </div>
+              <div class="result-body" id="body-list"></div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- ── Client simulation ── -->
+      <div class="client-sim-wrap">
+        <div class="client-sim-header">
+          <span class="client-sim-badge">Simulação de cliente</span>
+          <p class="client-sim-hint">Simula a perspectiva do cliente ao receber uma key. Não faz parte do fluxo admin.</p>
+        </div>
+        <div class="client-sim-body">
+          <input id="activateKey" class="client-input" type="text" placeholder="Cole a key para testar a ativação" />
+          <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
+        </div>
+        <div class="client-sim-result">
+          <div class="result-wrap" id="res-activate">
+            <div class="result-header">
+              <span class="result-label">Resposta da API</span>
+              <span class="badge" id="badge-activate"></span>
+            </div>
+            <div class="result-body" id="body-activate"></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('admin')">Admin</button>
-      <button class="tab" onclick="switchTab('list')">Listar</button>
-    </div>
-
-    <!-- Panel: Admin -->
-    <div id="panel-admin" class="panel active">
-      <div class="card">
-        <div class="card-title">Criar key</div>
-        <p class="card-hint">Define a key e a duração em dias. A validade começa a contar quando o cliente ativa.</p>
-        <div class="field">
-          <label>Key <span id="createKeyNote" style="color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0">(prefixo — sufixo aleatório por key ao criar múltiplas)</span></label>
-          <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" />
-        </div>
-        <div class="row" style="margin-bottom:14px">
-          <div class="field" style="margin-bottom:0">
-            <label>Duração (dias)</label>
-            <input id="createDays" type="number" min="1" value="30" />
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>Quantidade de keys</label>
-            <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" />
-          </div>
-        </div>
-        <button class="btn-primary" id="btnCreate" onclick="doCreate()">Criar key</button>
-        <div class="result-wrap" id="res-create">
-          <div class="result-header">
-            <span class="result-label" id="label-create">Resultado — criar</span>
-            <span class="badge" id="badge-create"></span>
-          </div>
-          <div class="batch-progress" id="batch-progress" style="display:none">
-            <div class="batch-bar-wrap"><div class="batch-bar" id="batch-bar"></div></div>
-            <span class="batch-counter" id="batch-counter"></span>
-          </div>
-          <div class="result-body" id="body-create"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Revogar key</div>
-        <p class="card-hint">A key é invalidada imediatamente. Ação irreversível.</p>
-        <div class="field" style="margin-bottom:14px">
-          <label>Key</label>
-          <input id="revokeKey" type="text" placeholder="Cole a key a revogar" />
-        </div>
-        <button class="btn-danger" id="btnRevoke" onclick="doRevoke()">Revogar key</button>
-        <div class="result-wrap" id="res-revoke">
-          <div class="result-header">
-            <span class="result-label">Resultado — revogar</span>
-            <span class="badge" id="badge-revoke"></span>
-          </div>
-          <div class="result-body" id="body-revoke"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Panel: Listar -->
-    <div id="panel-list" class="panel">
-      <div class="card">
-        <div class="card-title">Keys cadastradas</div>
-        <p class="card-hint">Lista completa (somente admin). Clique em uma linha para selecioná-la — use "Mover para Revogar" para levá-la ao painel admin.</p>
-        <div class="btn-row" style="margin-bottom:14px">
-          <button class="btn-secondary" id="btnList" onclick="doList()">Carregar lista</button>
-          <button class="btn-secondary" onclick="copySelected()">Mover selecionada para Revogar →</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Key</th>
-                <th>Status</th>
-                <th>Dias</th>
-                <th>Ativada em</th>
-                <th>Termina em</th>
-              </tr>
-            </thead>
-            <tbody id="keysBody">
-              <tr>
-                <td colspan="5" style="color:var(--hint);padding:16px 12px;font-size:12px">
-                  Sem dados. Clique em "Carregar lista".
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="result-wrap" id="res-list">
-          <div class="result-header">
-            <span class="result-label">Resultado — listar</span>
-            <span class="badge" id="badge-list"></span>
-          </div>
-          <div class="result-body" id="body-list"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Simulação do cliente — fora do fluxo admin -->
-  <div class="client-sim-wrap">
-    <div class="client-sim-inner">
-      <div class="client-sim-header">
-        <div class="client-sim-badge">Simulação de cliente</div>
-        <p class="client-sim-hint">Esta área simula a perspectiva do cliente que recebeu uma key. Não faz parte do fluxo admin.</p>
-      </div>
-      <div class="client-sim-body">
-        <div class="field" style="margin-bottom:12px">
-          <label>Key recebida</label>
-          <input id="activateKey" type="text" placeholder="Cole a key para testar a ativação" />
-        </div>
-        <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
-        <div class="result-wrap" id="res-activate">
-          <div class="result-header">
-            <span class="result-label">Resposta da API</span>
-            <span class="badge" id="badge-activate"></span>
-          </div>
-          <div class="result-body" id="body-activate"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+    </div><!-- /scroll-area -->
+  </div><!-- /body-wrap -->
 
   <script>
     const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
     let _selectedKey = '';
-    let _configOpen = false;
 
-    /* ── Pricing calculator ── */
-    const PRICES = { diaria: 8, semanal: 35, mensal: 65 };
+    /* ── Calc ── */
+    const PRICES = { diaria: 10, semanal: 35, mensal: 65 };
     let _calcQty = 1;
 
-    function fmt(val) {
-      return 'R$ ' + (val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    function fmt(v) {
+      return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function updateCalc() {
@@ -1121,19 +1004,12 @@
       document.getElementById('calcMensal').textContent = fmt(PRICES.mensal * _calcQty);
     }
 
-    function changeQty(delta) {
-      _calcQty = Math.max(1, Math.min(999, _calcQty + delta));
+    function changeQty(d) {
+      _calcQty = Math.max(1, Math.min(999, _calcQty + d));
       updateCalc();
     }
 
-    /* ── Config toggle ── */
-    function toggleConfig() {
-      _configOpen = !_configOpen;
-      document.getElementById('configBody').classList.toggle('open', _configOpen);
-      document.getElementById('configArrow').classList.toggle('open', _configOpen);
-    }
-
-    /* ── Environment ── */
+    /* ── Env ── */
     function setEnv(e) {
       document.getElementById('baseUrl').value = ENV[e];
       document.getElementById('envDev').classList.toggle('active', e === 'dev');
@@ -1146,15 +1022,11 @@
     const TAB_IDS = ['admin', 'list'];
 
     function switchTab(t) {
-      document.querySelectorAll('.tab').forEach((b, i) => {
-        b.classList.toggle('active', TAB_IDS[i] === t);
-      });
-      TAB_IDS.forEach(id => {
-        document.getElementById('panel-' + id).classList.toggle('active', id === t);
-      });
+      document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', TAB_IDS[i] === t));
+      TAB_IDS.forEach(id => document.getElementById('panel-' + id).classList.toggle('active', id === t));
     }
 
-    /* ── Key generator ── */
+    /* ── Key gen ── */
     function rnd(n) {
       const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let o = '';
@@ -1162,7 +1034,7 @@
       return o;
     }
 
-    /* ── Token persistence ── */
+    /* ── Token ── */
     const TOKEN_KEY = 'ring_admin_token';
 
     function loadToken() {
@@ -1170,7 +1042,7 @@
       if (saved) {
         document.getElementById('token').value = saved;
         document.getElementById('btnClearToken').style.display = 'inline-block';
-        document.getElementById('tokenHint').textContent = 'Token carregado do armazenamento local.';
+        document.getElementById('tokenHint').textContent = 'Token salvo localmente.';
       }
     }
 
@@ -1178,28 +1050,25 @@
       const val = document.getElementById('token').value.trim();
       const saved = localStorage.getItem(TOKEN_KEY);
       document.getElementById('btnClearToken').style.display = saved ? 'inline-block' : 'none';
-      if (saved && val !== saved) {
-        document.getElementById('tokenHint').textContent = 'Token alterado — clique em Salvar para atualizar.';
-      } else if (!saved) {
-        document.getElementById('tokenHint').textContent = '';
-      }
+      if (saved && val !== saved) document.getElementById('tokenHint').textContent = 'Alterado — salve para atualizar.';
+      else if (!saved) document.getElementById('tokenHint').textContent = '';
     }
 
     function saveToken() {
       const val = document.getElementById('token').value.trim();
-      if (!val) { document.getElementById('tokenHint').textContent = 'Digite um token antes de salvar.'; return; }
+      if (!val) { document.getElementById('tokenHint').textContent = 'Digite um token.'; return; }
       localStorage.setItem(TOKEN_KEY, val);
       document.getElementById('btnClearToken').style.display = 'inline-block';
-      document.getElementById('tokenHint').textContent = 'Token salvo com sucesso.';
-      setTimeout(() => { document.getElementById('tokenHint').textContent = 'Token carregado do armazenamento local.'; }, 2000);
+      document.getElementById('tokenHint').textContent = 'Salvo.';
+      setTimeout(() => { document.getElementById('tokenHint').textContent = 'Token salvo localmente.'; }, 1800);
     }
 
     function clearToken() {
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
       document.getElementById('btnClearToken').style.display = 'none';
-      document.getElementById('tokenHint').textContent = 'Token removido.';
-      setTimeout(() => { document.getElementById('tokenHint').textContent = ''; }, 2000);
+      document.getElementById('tokenHint').textContent = 'Removido.';
+      setTimeout(() => { document.getElementById('tokenHint').textContent = ''; }, 1800);
     }
 
     /* ── API ── */
@@ -1230,7 +1099,7 @@
       return d;
     }
 
-    /* ── Loading helper ── */
+    /* ── Helpers ── */
     function setLoading(id, on) {
       const b = document.getElementById(id);
       if (!b) return;
@@ -1240,7 +1109,6 @@
       if (on) b.textContent = 'Processando…';
     }
 
-    /* ── Result helper ── */
     function showResult(wrapId, badgeId, bodyId, data, ok) {
       const wrap = document.getElementById(wrapId);
       const badge = document.getElementById(badgeId);
@@ -1301,15 +1169,11 @@
       const lines = [];
 
       for (let i = 0; i < qty; i++) {
-        const keyValue = qty > 1
-          ? `${baseKey}-${rnd(4)}${rnd(4)}`
-          : baseKey;
-
+        const keyValue = qty > 1 ? `${baseKey}-${rnd(4)}${rnd(4)}` : baseKey;
         if (qty > 1) {
           bar.style.width = (((i) / qty) * 100) + '%';
           counter.textContent = `${i}/${qty}`;
         }
-
         try {
           const r = await api('/admin/auth-keys/create', { keyValue, durationDays: String(d) });
           ok++;
@@ -1319,7 +1183,6 @@
           fail++;
           lines.push(`✗ ${keyValue}\n  ${e.message}`);
         }
-
         bodyEl.textContent = lines.join('\n\n');
       }
 
@@ -1327,11 +1190,8 @@
       counter.textContent = `${qty}/${qty}`;
 
       const allOk = fail === 0;
-      badgeEl.textContent = qty > 1
-        ? `${ok} ok${fail > 0 ? ` · ${fail} erro${fail > 1 ? 's' : ''}` : ''}`
-        : (allOk ? 'Sucesso' : 'Erro');
+      badgeEl.textContent = qty > 1 ? `${ok} ok${fail > 0 ? ` · ${fail} erro${fail > 1 ? 's' : ''}` : ''}` : (allOk ? 'Sucesso' : 'Erro');
       badgeEl.className = 'badge ' + (allOk ? 'badge-ok' : (ok > 0 ? 'badge-warn' : 'badge-err'));
-
       setLoading('btnCreate', false);
     }
 
@@ -1395,9 +1255,7 @@
         return `<tr data-key="${k.replace(/"/g, '&quot;')}">
           <td class="mono-cell">${k}</td>
           <td><span class="pill ${ok ? 'pill-ok' : 'pill-off'}">${ok ? 'Ativa' : 'Inativa'}</span></td>
-          <td>${days}</td>
-          <td>${act}</td>
-          <td>${end}</td>
+          <td>${days}</td><td>${act}</td><td>${end}</td>
         </tr>`;
       }).join('');
 
