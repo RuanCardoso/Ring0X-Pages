@@ -836,6 +836,10 @@
             <button id="btnMethodCredit" onclick="setPayMethod('credit')">Cartão</button>
           </div>
 
+          <div id="cpfWrap" style="margin-bottom:8px;">
+            <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX" style="width:100%; padding:7px 10px; background:var(--bg); border:1px solid var(--border2); border-radius:var(--radius); color:var(--text); font-family:var(--sans); font-size:11.5px; outline:none; transition: border-color 0.15s;" />
+          </div>
+
           <button class="btn-primary" id="btnPayDebt" style="padding: 7px 12px; font-size:11px;" onclick="doPayDebt()" disabled>Pagar Saldo</button>
           
           <div id="qrWrap" style="display:none; margin-top:10px; background:#fff; padding:10px; border-radius:6px; text-align:center;">
@@ -1174,6 +1178,7 @@
       _payMethod = m;
       document.getElementById('btnMethodPix').classList.toggle('active', m === 'pix');
       document.getElementById('btnMethodCredit').classList.toggle('active', m === 'credit');
+      document.getElementById('cpfWrap').style.display = m === 'pix' ? 'block' : 'none';
     }
 
     let _lastPixCode = '';
@@ -1187,9 +1192,18 @@
     }
 
     async function doPayDebt() {
+      let doc = '';
+      if (_payMethod === 'pix') {
+         doc = document.getElementById('pixCpf').value.trim();
+         if (!doc) {
+             alert('Por favor, digite seu CPF para poder emitir a cobrança via PIX.');
+             return;
+         }
+      }
+
       setLoading('btnPayDebt', true);
       try {
-        const res = await api('/api/gateway/pay-debt', { paymentMethod: _payMethod, customerDocument: '' });
+        const res = await api('/api/gateway/pay-debt', { paymentMethod: _payMethod, customerDocument: doc });
         const type = res?.Result?.type || res?.Result?.Type;
         const raw = res?.Result?.raw || res?.Result?.Raw;
 
