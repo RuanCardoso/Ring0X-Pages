@@ -639,11 +639,29 @@
 
     .pill { display: inline-block; font-size: 11px; font-weight: 500; border-radius: 99px; padding: 2px 8px; }
     .pill-ok { background: var(--success-dim); color: var(--success); }
-    .pill-off { background: rgba(255,255,255,0.04); color: var(--muted); }
+    .pill-off { background: rgba(255,255,255,0.06); color: var(--hint); }
+    .pill-warn { background: rgba(59, 130, 246, 0.15); color: #60a5fa; } /* Azul para congelada */
 
-    td.mono-cell { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-
-    /* ────────────────────────────────
+    .mono-cell {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.03em;
+      color: rgba(255,255,255,0.85);
+    }
+    
+    .btn-action {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-action:hover {
+      background: rgba(255,255,255,0.1);
+    }/* ────────────────────────────────
        CLIENT SIMULATION
     ──────────────────────────────── */
     .client-sim-wrap {
@@ -891,6 +909,10 @@
         <div class="tabs">
           <button class="tab active" onclick="switchTab('admin')">Admin</button>
           <button class="tab" onclick="switchTab('list')">Listar</button>
+          
+          <button class="btn-secondary" style="margin-left:auto; width:auto; padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:6px" onclick="doFreeze('ALL', true)">
+            <span style="font-size:14px">❄️</span> Congelar Todas Ativas
+          </button>
         </div>
 
         <!-- Panel: Admin -->
@@ -968,6 +990,7 @@
                     <th>Dias</th>
                     <th>Ativada em</th>
                     <th>Termina em</th>
+                    <th style="text-align: right">Ação</th>
                   </tr>
                 </thead>
                 <tbody id="keysBody">
@@ -1393,13 +1416,28 @@
       body.innerHTML = items.map(i => {
         const k = i.key_value || i.KeyValue || '';
         const ok = Boolean(i.is_active ?? i.IsActive);
+        const paused = Boolean(i.is_paused ?? i.IsPaused);
         const days = i.duration_days ?? i.DurationDays ?? '—';
         const act = fmtDate(i.activated_at ?? i.ActivatedAt);
         const end = fmtDate(i.ends_at ?? i.EndsAt);
+        
+        let statusHtml = '';
+        let actionBtn = '';
+        if (paused) {
+          statusHtml = `<span class="pill pill-warn">Congelada</span>`;
+          actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', false); event.stopPropagation();">☀️ Retomar</button>`;
+        } else if (ok) {
+          statusHtml = `<span class="pill pill-ok">Ativa</span>`;
+          actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', true); event.stopPropagation();">❄️ Congelar</button>`;
+        } else {
+          statusHtml = `<span class="pill pill-off">Inativa</span>`;
+        }
+
         return `<tr data-key="${k.replace(/"/g, '&quot;')}">
           <td class="mono-cell">${k}</td>
-          <td><span class="pill ${ok ? 'pill-ok' : 'pill-off'}">${ok ? 'Ativa' : 'Inativa'}</span></td>
+          <td>${statusHtml}</td>
           <td>${days}</td><td>${act}</td><td>${end}</td>
+          <td style="text-align: right">${actionBtn}</td>
         </tr>`;
       }).join('');
 
@@ -1416,6 +1454,21 @@
       if (!_selectedKey) { alert('Selecione uma linha na tabela primeiro (.'); return; }
       document.getElementById('revokeKey').value = _selectedKey;
       switchTab('admin');
+    }
+
+    async function doFreeze(key, freeze) {
+      if (key === 'ALL') {
+        if (!confirm('Deseja realmente congelar TODAS as suas keys ativas?')) return;
+      }
+      try {
+        const r = await api('/admin/auth-keys/freeze', { keyValue: key, freeze: freeze });
+        alert(r?.StatusMessage || 'Ação realizada com sucesso!');
+        if (document.getElementById('panel-list').classList.contains('active')) {
+          doList(); // recarrega a tabela para atualizar status
+        }
+      } catch (e) {
+        alert('Erro: ' + e.message);
+      }
     }
 
     loadToken();
