@@ -1194,8 +1194,8 @@
     async function doPayDebt() {
       let doc = '';
       if (_payMethod === 'pix') {
-         doc = document.getElementById('pixCpf').value.trim();
-         if (!doc) {
+         doc = document.getElementById('pixCpf').value.trim().replace(/\D/g, '');
+         if (!doc || doc.length < 11) {
              alert('Por favor, digite seu CPF para poder emitir a cobrança via PIX.');
              return;
          }
