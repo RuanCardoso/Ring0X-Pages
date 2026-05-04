@@ -1190,10 +1190,13 @@
       setLoading('btnPayDebt', true);
       try {
         const res = await api('/api/gateway/pay-debt', { paymentMethod: _payMethod, customerDocument: '' });
-        if (res.Result && res.Result.raw) {
-           if (res.Result.type === 'qr') {
+        const type = res?.Result?.type || res?.Result?.Type;
+        const raw = res?.Result?.raw || res?.Result?.Raw;
+
+        if (raw) {
+           if (type === 'qr') {
              // PIX
-             _lastPixCode = res.Result.raw;
+             _lastPixCode = raw;
              document.getElementById('qrWrap').style.display = 'block';
              
              // Limpa o qr code anterior, se houver
@@ -1201,7 +1204,7 @@
              
              // Gera o novo qr code na tela
              new QRCode(document.getElementById("qrImg"), {
-               text: res.Result.raw,
+               text: raw,
                width: 180,
                height: 180,
                colorDark : "#000000",
@@ -1210,10 +1213,11 @@
              });
            } else {
              // Cartão (Stripe) retorna uma URL de checkout
-             window.open(res.Result.raw, '_blank');
+             window.open(raw, '_blank');
              alert("Sessão de pagamento no Cartão criada! Finalize na aba que se abriu.");
            }
-           // loadDebtBalance(); removido daqui para não apagar o qrcode
+        } else {
+           alert("Pagamento criado, mas o gateway não retornou a URL/QR Code. Resposta: " + JSON.stringify(res));
         }
       } catch (e) {
         alert("Erro ao gerar pagamento: " + e.message);
