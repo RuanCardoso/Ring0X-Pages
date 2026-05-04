@@ -726,6 +726,7 @@
       .btn-row { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -825,11 +826,22 @@
       <div>
         <div class="sidebar-section-label">Meu Saldo Devedor</div>
         <div class="calc-block" style="margin-top:7px">
-          <div class="calc-top" style="margin-bottom:0">
+          <div class="calc-top" style="margin-bottom:8px">
             <span class="calc-top-label" id="debtStatusLabel" style="font-size:12px">Aguardando...</span>
             <span class="calc-qty-val" id="debtValue" style="color:var(--danger)">R$ 0,00</span>
           </div>
-          <button class="btn-primary" id="btnPayDebt" style="margin-top:12px; padding: 7px 12px; font-size:11px;" onclick="doPayDebt()" disabled>Pagar Saldo (PIX)</button>
+          
+          <div class="seg" style="margin-bottom:8px">
+            <button id="btnMethodPix" class="active" onclick="setPayMethod('pix')">PIX</button>
+            <button id="btnMethodCredit" onclick="setPayMethod('credit')">Cartão</button>
+          </div>
+
+          <button class="btn-primary" id="btnPayDebt" style="padding: 7px 12px; font-size:11px;" onclick="doPayDebt()" disabled>Pagar Saldo</button>
+          
+          <div id="qrWrap" style="display:none; margin-top:10px; background:#fff; padding:10px; border-radius:6px; text-align:center;">
+            <div id="qrImg" style="display:flex; justify-content:center; margin-bottom:8px;"></div>
+            <button class="btn-secondary" style="margin-top:8px; padding:6px; font-size:11px; color:#0c0c0e; background:#e0e0e0; border-color:#ccc;" onclick="copyPixCode()">Copiar Código PIX</button>
+          </div>
         </div>
       </div>
 
@@ -1123,6 +1135,8 @@
       
       if (!btn || !val || !lbl) return;
 
+      document.getElementById('qrWrap').style.display = 'none'; // Sempre oculta ao recarregar
+
       if (!document.getElementById('token').value.trim()) {
         lbl.textContent = 'Sem token';
         val.textContent = 'R$ 0,00';
@@ -1155,14 +1169,51 @@
       }
     }
 
+    let _payMethod = 'pix';
+    function setPayMethod(m) {
+      _payMethod = m;
+      document.getElementById('btnMethodPix').classList.toggle('active', m === 'pix');
+      document.getElementById('btnMethodCredit').classList.toggle('active', m === 'credit');
+    }
+
+    let _lastPixCode = '';
+    function copyPixCode() {
+      if (!_lastPixCode) return;
+      navigator.clipboard.writeText(_lastPixCode).then(() => {
+        alert("Código PIX copiado para a área de transferência!");
+      }).catch(err => {
+        prompt("Copie o código PIX abaixo:", _lastPixCode);
+      });
+    }
+
     async function doPayDebt() {
       setLoading('btnPayDebt', true);
       try {
-        const res = await api('/api/gateway/pay-debt', { paymentMethod: 'pix', customerDocument: '' });
+        const res = await api('/api/gateway/pay-debt', { paymentMethod: _payMethod, customerDocument: '' });
         if (res.Result && res.Result.raw) {
-           window.open(res.Result.raw, '_blank');
-           alert("Sessão de pagamento PIX criada! Pague o QR Code na aba que se abriu.");
-           loadDebtBalance(); // Atualiza (embora dependa do webhook pra zerar no banco)
+           if (res.Result.type === 'qr') {
+             // PIX
+             _lastPixCode = res.Result.raw;
+             document.getElementById('qrWrap').style.display = 'block';
+             
+             // Limpa o qr code anterior, se houver
+             document.getElementById('qrImg').innerHTML = '';
+             
+             // Gera o novo qr code na tela
+             new QRCode(document.getElementById("qrImg"), {
+               text: res.Result.raw,
+               width: 180,
+               height: 180,
+               colorDark : "#000000",
+               colorLight : "#ffffff",
+               correctLevel : QRCode.CorrectLevel.M
+             });
+           } else {
+             // Cartão (Stripe) retorna uma URL de checkout
+             window.open(res.Result.raw, '_blank');
+             alert("Sessão de pagamento no Cartão criada! Finalize na aba que se abriu.");
+           }
+           // loadDebtBalance(); removido daqui para não apagar o qrcode
         }
       } catch (e) {
         alert("Erro ao gerar pagamento: " + e.message);
@@ -1263,6 +1314,10 @@
       const allOk = fail === 0;
       badgeEl.textContent = qty > 1 ? `${ok} ok${fail > 0 ? ` · ${fail} erro${fail > 1 ? 's' : ''}` : ''}` : (allOk ? 'Sucesso' : 'Erro');
       badgeEl.className = 'badge ' + (allOk ? 'badge-ok' : (ok > 0 ? 'badge-warn' : 'badge-err'));
+      
+      // Atualiza o saldo devedor se pelo menos uma key foi gerada com sucesso
+      if (ok > 0) loadDebtBalance();
+
       setLoading('btnCreate', false);
     }
 
