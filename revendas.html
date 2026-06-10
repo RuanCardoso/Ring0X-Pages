@@ -1017,7 +1017,7 @@
               <span class="result-label" style="font-size:10px">Resultado</span>
               <span class="badge" id="badge-revoke" style="font-size:10px"></span>
             </div>
-            <div class="result-body" style="font-size:11px;max-height:120px"></div>
+            <div class="result-body" id="body-revoke" style="font-size:11px;max-height:120px"></div>
           </div>
         </div>
       </div>
@@ -1527,7 +1527,6 @@
     function copySelected() {
       if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
       document.getElementById('revokeKey').value = _selectedKey;
-      switchTab('admin');
     }
 
     function getFreezeProduct(key) {
