@@ -782,27 +782,32 @@
       <!-- Preços de revenda -->
       <div>
         <div class="sidebar-section-label">Revenda · por key</div>
+        <div class="seg" style="margin-bottom:8px">
+          <button id="prodPB" onclick="setCalcProduct('PB')">PB</button>
+          <button id="prodFAIRLIGHT" onclick="setCalcProduct('FAIRLIGHT')">Fairlight</button>
+          <button id="prodPUBG" class="active" onclick="setCalcProduct('PUBG')">PUBG</button>
+        </div>
         <div class="pricing-plans">
           <div class="plan-row">
             <div class="plan-row-info">
               <div class="plan-row-name">Diária</div>
               <div class="plan-row-days">1 dia</div>
             </div>
-            <div class="plan-row-price">R$&nbsp;10</div>
+            <div class="plan-row-price" id="priceDiaria">R$&nbsp;10</div>
           </div>
           <div class="plan-row">
             <div class="plan-row-info">
               <div class="plan-row-name">Semanal</div>
               <div class="plan-row-days">7 dias</div>
             </div>
-            <div class="plan-row-price">R$&nbsp;35</div>
+            <div class="plan-row-price" id="priceSemanal">R$&nbsp;35</div>
           </div>
           <div class="plan-row">
             <div class="plan-row-info">
               <div class="plan-row-name">Mensal</div>
               <div class="plan-row-days">30 dias</div>
             </div>
-            <div class="plan-row-price">R$&nbsp;65</div>
+            <div class="plan-row-price" id="priceMensal">R$&nbsp;65</div>
           </div>
         </div>
 
@@ -926,25 +931,31 @@
             <div class="row" style="margin-bottom:14px">
               <div class="field" style="margin-bottom:0">
                 <label>Duração</label>
-                <select id="createDays">
+                <select id="createDays" onchange="updateCreateCost()">
+                  <option value="">Selecione...</option>
                   <option value="1">1 dia (Diária)</option>
                   <option value="7">7 dias (Semanal)</option>
-                  <option value="30" selected>30 dias (Mensal)</option>
+                  <option value="30">30 dias (Mensal)</option>
                 </select>
               </div>
               <div class="field" style="margin-bottom:0">
                 <label>Produto</label>
-                <select id="createProduct">
+                <select id="createProduct" onchange="updateCreateCost()">
                   <option value="">Selecione...</option>
                   <option value="PB">PB</option>
-                  <option value="FAIRLIGHT">Fairlight</option>
-                  <option value="PUBG">PUBG</option>
+                  <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
+                  <option value="PUBG" disabled>PUBG (bloqueado)</option>
                 </select>
               </div>
               <div class="field" style="margin-bottom:0">
                 <label>Quantidade</label>
                 <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" />
               </div>
+            </div>
+
+            <div style="margin-bottom:14px;display:flex;gap:8px;align-items:center">
+              <span style="font-size:12px;color:var(--muted)">Custo total:</span>
+              <span id="createCost" style="font-family:var(--mono);font-size:15px;color:var(--gold);font-weight:500">R$ 0,00</span>
             </div>
 
             <button class="btn-primary" id="btnCreate" onclick="doCreate()">Criar key</button>
@@ -1036,8 +1047,8 @@
             <input id="activateKey" class="client-input" type="text" placeholder="Cole a key para testar a ativação" style="flex:2" />
             <select id="activateProduct" style="width:140px;flex:none;padding:9px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:13px;outline:none">
               <option value="PB">PB</option>
-              <option value="FAIRLIGHT">Fairlight</option>
-              <option value="PUBG">PUBG</option>
+              <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
+              <option value="PUBG" disabled>PUBG (bloqueado)</option>
             </select>
           </div>
           <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
@@ -1061,18 +1072,34 @@
     let _selectedKey = '';
 
     /* ── Calc ── */
-    const PRICES = { diaria: 10, semanal: 35, mensal: 65 };
+    const PRICES = {
+      PB:      { diaria: 3,  semanal: 10, mensal: 17 },
+      FAIRLIGHT: { diaria: 5, semanal: 15, mensal: 30 },
+      PUBG:    { diaria: 10, semanal: 35, mensal: 65 }
+    };
     let _calcQty = 1;
+    let _calcProduct = 'PUBG';
 
     function fmt(v) {
       return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    function setCalcProduct(p) {
+      _calcProduct = p;
+      document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
+      document.getElementById('prod' + p).classList.add('active');
+      updateCalc();
+    }
+
     function updateCalc() {
+      const p = PRICES[_calcProduct];
       document.getElementById('calcQtyVal').textContent = _calcQty;
-      document.getElementById('calcDiaria').textContent = fmt(PRICES.diaria * _calcQty);
-      document.getElementById('calcSemanal').textContent = fmt(PRICES.semanal * _calcQty);
-      document.getElementById('calcMensal').textContent = fmt(PRICES.mensal * _calcQty);
+      document.getElementById('calcDiaria').textContent = fmt(p.diaria * _calcQty);
+      document.getElementById('calcSemanal').textContent = fmt(p.semanal * _calcQty);
+      document.getElementById('calcMensal').textContent = fmt(p.mensal * _calcQty);
+      document.getElementById('priceDiaria').innerHTML = 'R$&nbsp;' + p.diaria.toFixed(2).replace('.', ',');
+      document.getElementById('priceSemanal').innerHTML = 'R$&nbsp;' + p.semanal.toFixed(2).replace('.', ',');
+      document.getElementById('priceMensal').innerHTML = 'R$&nbsp;' + p.mensal.toFixed(2).replace('.', ',');
     }
 
     function changeQty(d) {
@@ -1280,6 +1307,17 @@
       setLoading('btnPayDebt', false);
     }
 
+    /* ── Cost ── */
+    function updateCreateCost() {
+      const qty = Number(document.getElementById('createQty').value) || 1;
+      const days = Number(document.getElementById('createDays').value) || 0;
+      const product = document.getElementById('createProduct').value;
+      const prices = PRICES[product];
+      const priceMap = { 1: 'diaria', 7: 'semanal', 30: 'mensal' };
+      const unit = prices ? (prices[priceMap[days]] || 0) : 0;
+      document.getElementById('createCost').textContent = fmt(unit * qty);
+    }
+
     /* ── Helpers ── */
     function setLoading(id, on) {
       const b = document.getElementById(id);
@@ -1315,6 +1353,7 @@
         btn.setAttribute('data-orig', 'Criar key');
         btn.textContent = 'Criar key';
       }
+      updateCreateCost();
     }
 
     async function doCreate() {
@@ -1537,6 +1576,7 @@
 
     loadToken();
     updateCalc();
+    updateCreateCost();
   </script>
 </body>
 </html>
