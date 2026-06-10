@@ -1192,13 +1192,19 @@
         lbl.textContent = 'Consultando...';
         val.style.color = 'var(--muted)';
         const res = await api('/admin/auth-keys/debt-balance', {});
-        const debt = parseFloat(res.Result) || 0;
+        const data = res.Result || {};
+        const debt = parseFloat(data.Balance ?? data.balance) || 0;
+        const isOverdue = data.IsOverdue === true || data.isOverdue === true;
         
         val.textContent = fmt(debt);
         
-        if (debt > 0) {
-          lbl.textContent = 'Você deve';
+        if (isOverdue) {
+          lbl.textContent = '⚠️ Débito vencido!';
           val.style.color = 'var(--danger)';
+          btn.disabled = false;
+        } else if (debt > 0) {
+          lbl.textContent = 'Você deve';
+          val.style.color = 'var(--gold)';
           btn.disabled = false;
         } else {
           lbl.textContent = 'Tudo pago!';
