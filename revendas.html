@@ -1169,6 +1169,9 @@
         const m = typeof d === 'string' ? d : d?.StatusMessage || JSON.stringify(d);
         throw new Error(`HTTP ${r.status}: ${m}`);
       }
+      if (d && d.StatusCode && d.StatusCode !== 200) {
+        throw new Error(d.StatusMessage || `Erro ${d.StatusCode}`);
+      }
       return d;
     }
 
