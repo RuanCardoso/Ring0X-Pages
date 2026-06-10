@@ -1042,6 +1042,16 @@
 
   <div id="toast"></div>
 
+  <div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center" onclick="if(event.target===this)closeConfirm()">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px 32px;max-width:420px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4);text-align:center">
+      <p id="confirmMsg" style="margin:0 0 20px;font-size:14px;color:var(--text);line-height:1.5"></p>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button id="confirmNo" class="btn-secondary" style="padding:8px 20px;font-size:13px">Cancelar</button>
+        <button id="confirmYes" class="btn-primary" style="padding:8px 20px;font-size:13px">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
     let _selectedKey = '';
@@ -1527,7 +1537,7 @@
 
     async function doFreeze(key, freeze) {
       if (key === 'ALL') {
-        if (!confirm('Deseja realmente congelar TODAS as keys ativas deste produto?')) return;
+        if (!await confirmModal('Deseja realmente ' + (freeze ? 'congelar' : 'descongelar') + ' TODAS as keys ativas deste produto?')) return;
       }
       try {
         const productType = getFreezeProduct(key);
@@ -1550,6 +1560,25 @@
       el.className = isErr ? 'visible toast-err' : 'visible';
       _toastTimer = setTimeout(() => el.classList.remove('visible'), 3500);
     }
+
+    /* ── Confirm modal ── */
+    let _confirmResolve = null;
+    function confirmModal(msg) {
+      return new Promise(resolve => {
+        _confirmResolve = resolve;
+        document.getElementById('confirmMsg').textContent = msg;
+        document.getElementById('confirmModal').style.display = 'flex';
+      });
+    }
+    function closeConfirm() {
+      document.getElementById('confirmModal').style.display = 'none';
+      if (_confirmResolve) _confirmResolve(false);
+    }
+    document.getElementById('confirmYes').addEventListener('click', () => {
+      document.getElementById('confirmModal').style.display = 'none';
+      if (_confirmResolve) _confirmResolve(true);
+    });
+    document.getElementById('confirmNo').addEventListener('click', closeConfirm);
 
     /* ── Resizable columns ── */
     function makeResizable(table) {
