@@ -953,6 +953,7 @@
                 <option value="PUBG">PUBG</option>
               </select>
               <button class="btn-secondary" style="width:auto;flex-shrink:0;padding:5px 12px;font-size:12px" onclick="doFreeze('ALL', true)">❄️ Congelar</button>
+              <button class="btn-secondary" style="width:auto;flex-shrink:0;padding:5px 12px;font-size:12px" onclick="doFreeze('ALL', false)">☀️ Descongelar</button>
             </div>
             <div class="table-wrap">
               <table>
@@ -965,12 +966,13 @@
                     <th>HWID</th>
                     <th>Ativada em</th>
                     <th>Termina em</th>
+                    <th>Congelado por</th>
                     <th style="text-align: right">Ação</th>
                   </tr>
                 </thead>
                 <tbody id="keysBody">
                   <tr>
-                    <td colspan="5" style="color:var(--hint);padding:16px 12px;font-size:12px">
+                    <td colspan="9" style="color:var(--hint);padding:16px 12px;font-size:12px">
                       Sem dados. Clique em "Carregar lista".
                     </td>
                   </tr>
@@ -1458,7 +1460,7 @@
     function renderTable(items) {
       const body = document.getElementById('keysBody');
       if (!Array.isArray(items) || !items.length) {
-        body.innerHTML = '<tr><td colspan="8" style="color:var(--hint);padding:16px 12px;font-size:12px">Nenhuma key encontrada.</td></tr>';
+        body.innerHTML = '<tr><td colspan="9" style="color:var(--hint);padding:16px 12px;font-size:12px">Nenhuma key encontrada.</td></tr>';
         return;
       }
       body.innerHTML = items.map(i => {
@@ -1489,6 +1491,8 @@
           : `<span style="color:var(--hint);font-size:10px">—</span>`;
 
         const ptName = pt !== null && pt !== undefined ? (PRODUCT_NAMES[pt] || 'PB') : 'PB';
+        const fb = i.frozen_by || i.FrozenBy || '';
+        const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
         return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptName}">
           <td class="mono-cell">${k}</td>
           <td>${statusHtml}</td>
@@ -1496,6 +1500,7 @@
           <td>${days}</td>
           <td>${hwidCell}</td>
           <td>${act}</td><td>${end}</td>
+          <td>${paused ? frozenByLabel : '—'}</td>
           <td style="text-align: right">${actionBtn}</td>
         </tr>`;
       }).join('');
