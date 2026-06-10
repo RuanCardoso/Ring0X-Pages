@@ -624,8 +624,16 @@
 
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
 
-    th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-
+    th, td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    th:nth-child(1), td:nth-child(1) { min-width: 200px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+    th:nth-child(2), td:nth-child(2) { width: 80px; text-align: center; }
+    th:nth-child(3), td:nth-child(3) { width: 85px; }
+    th:nth-child(4), td:nth-child(4) { width: 45px; text-align: center; }
+    th:nth-child(5), td:nth-child(5) { max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+    th:nth-child(6), td:nth-child(6) { width: 80px; }
+    th:nth-child(7), td:nth-child(7) { width: 80px; }
+    th:nth-child(8), td:nth-child(8) { width: 85px; text-align: right; }
+    
     th {
       background: var(--surface2);
       color: var(--muted);
@@ -925,6 +933,15 @@
                 </select>
               </div>
               <div class="field" style="margin-bottom:0">
+                <label>Produto</label>
+                <select id="createProduct">
+                  <option value="">Selecione...</option>
+                  <option value="PB">PB</option>
+                  <option value="FAIRLIGHT">Fairlight</option>
+                  <option value="PUBG">PUBG</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0">
                 <label>Quantidade</label>
                 <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" />
               </div>
@@ -976,9 +993,10 @@
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr>
+                    <tr>
                     <th>Key</th>
                     <th>Status</th>
+                    <th>Produto</th>
                     <th>Dias</th>
                     <th>HWID</th>
                     <th>Ativada em</th>
@@ -1014,7 +1032,14 @@
           <p class="client-sim-hint">Simula a perspectiva do cliente ao receber uma key. Não faz parte do fluxo admin.</p>
         </div>
         <div class="client-sim-body">
-          <input id="activateKey" class="client-input" type="text" placeholder="Cole a key para testar a ativação" />
+          <div style="display:flex;gap:8px;flex:1;align-items:flex-start">
+            <input id="activateKey" class="client-input" type="text" placeholder="Cole a key para testar a ativação" style="flex:2" />
+            <select id="activateProduct" style="width:140px;flex:none;padding:9px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:13px;outline:none">
+              <option value="PB">PB</option>
+              <option value="FAIRLIGHT">Fairlight</option>
+              <option value="PUBG">PUBG</option>
+            </select>
+          </div>
           <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
         </div>
         <div class="client-sim-result">
@@ -1296,11 +1321,13 @@
       const qty = Math.max(1, Math.min(100, Number(document.getElementById('createQty').value) || 1));
       let baseKey = document.getElementById('createKey').value.trim();
       const d = Number(document.getElementById('createDays').value);
+      const productType = document.getElementById('createProduct').value;
 
       if (!baseKey) {
         baseKey = `RING0X-KEY-${rnd(6)}-${rnd(6)}-${new Date().getFullYear()}`;
         document.getElementById('createKey').value = baseKey;
       }
+      if (!productType) { showResult('res-create', 'badge-create', 'body-create', 'Selecione um produto.', false); return; }
       if (!d || d < 1) { showResult('res-create', 'badge-create', 'body-create', 'Duração deve ser maior que 0.', false); return; }
 
 
@@ -1331,7 +1358,7 @@
           counter.textContent = `${i}/${qty}`;
         }
         try {
-          const r = await api('/admin/auth-keys/create', { keyValue, durationDays: String(d) });
+          const r = await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
           ok++;
           const msg = typeof r === 'string' ? r : r?.StatusMessage || JSON.stringify(r);
           lines.push(`✓ ${keyValue}\n  ${msg}`);
@@ -1374,7 +1401,8 @@
         const k = document.getElementById('activateKey').value.trim();
         if (!k) throw new Error('Informe a key.');
         const testHwid = 'TEST-HWID-SIMULATED-PC-' + navigator.userAgent.length;
-        const r = await api('/user/auth-keys/activate', { keyValue: k, hwid: testHwid });
+        const activateProduct = document.getElementById('activateProduct').value;
+        const r = await api('/user/auth-keys/activate', { keyValue: k, hwid: testHwid, productType: activateProduct });
         showResult('res-activate', 'badge-activate', 'body-activate', r, true);
       } catch (e) {
         showResult('res-activate', 'badge-activate', 'body-activate', e.message, false);
@@ -1401,10 +1429,12 @@
       return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR');
     }
 
+    const PRODUCT_NAMES = { 0: 'PB', 1: 'FAIRLIGHT', 2: 'PUBG' };
+
     function renderTable(items) {
       const body = document.getElementById('keysBody');
       if (!Array.isArray(items) || !items.length) {
-        body.innerHTML = '<tr><td colspan="5" style="color:var(--hint);padding:16px 12px;font-size:12px">Nenhuma key encontrada.</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" style="color:var(--hint);padding:16px 12px;font-size:12px">Nenhuma key encontrada.</td></tr>';
         return;
       }
       body.innerHTML = items.map(i => {
@@ -1414,6 +1444,8 @@
         const days = i.duration_days ?? i.DurationDays ?? '—';
         const act = fmtDate(i.activated_at ?? i.ActivatedAt);
         const end = fmtDate(i.ends_at ?? i.EndsAt);
+        const pt = i.product_type ?? i.ProductType;
+        const productName = pt !== null && pt !== undefined ? (PRODUCT_NAMES[pt] || `Desconhecido (${pt})`) : '—';
         
         let statusHtml = '';
         let actionBtn = '';
@@ -1435,6 +1467,7 @@
         return `<tr data-key="${k.replace(/"/g, '&quot;')}">
           <td class="mono-cell">${k}</td>
           <td>${statusHtml}</td>
+          <td>${productName}</td>
           <td>${days}</td>
           <td>${hwidCell}</td>
           <td>${act}</td><td>${end}</td>
@@ -1471,6 +1504,36 @@
         alert('Erro: ' + e.message);
       }
     }
+
+    /* ── Resizable columns ── */
+    function makeResizable(table) {
+      const cols = table.querySelectorAll('th');
+      cols.forEach(th => {
+        const grip = document.createElement('div');
+        grip.style.cssText = 'position:absolute;top:0;right:-4px;width:8px;height:100%;cursor:col-resize;z-index:2;user-select:none';
+        th.style.position = 'relative';
+        th.appendChild(grip);
+        grip.addEventListener('mousedown', e => {
+          e.preventDefault();
+          const startX = e.clientX;
+          const startW = th.offsetWidth;
+          function onMove(ev) {
+            const diff = ev.clientX - startX;
+            th.style.width = Math.max(40, startW + diff) + 'px';
+            th.style.minWidth = '0';
+            th.style.maxWidth = 'none';
+          }
+          function onUp() {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+          }
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onUp);
+        });
+      });
+    }
+    const tableEl = document.querySelector('.table-wrap table');
+    if (tableEl) makeResizable(tableEl);
 
     loadToken();
     updateCalc();
