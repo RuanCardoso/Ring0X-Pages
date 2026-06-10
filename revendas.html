@@ -697,6 +697,20 @@
     /* ────────────────────────────────
        RESPONSIVE
     ──────────────────────────────── */
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      max-width: 380px; padding: 12px 18px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius); font-size: 12px; color: var(--text);
+      line-height: 1.5; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transform: translateY(16px); opacity: 0;
+      transition: all 0.25s ease; pointer-events: none;
+    }
+    #toast.visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    #toast.toast-err { border-color: var(--danger-border); }
+    #toast.toast-err strong { color: var(--danger); }
+
     @media (max-width: 900px) {
       .sidebar-right { display: none; }
     }
@@ -1039,6 +1053,8 @@
 
   </div><!-- /body-wrap -->
 
+  <div id="toast"></div>
+
   <script>
     const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
     let _selectedKey = '';
@@ -1234,7 +1250,7 @@
     function copyPixCode() {
       if (!_lastPixCode) return;
       navigator.clipboard.writeText(_lastPixCode).then(() => {
-        alert("Código PIX copiado para a área de transferência!");
+        toast("Código PIX copiado!");
       }).catch(err => {
         prompt("Copie o código PIX abaixo:", _lastPixCode);
       });
@@ -1245,7 +1261,7 @@
       if (_payMethod === 'pix') {
          doc = document.getElementById('pixCpf').value.trim().replace(/\D/g, '');
          if (!doc || doc.length < 11) {
-             alert('Por favor, digite seu CPF para poder emitir a cobrança via PIX.');
+             toast('Digite seu CPF para emitir o PIX.', true);
              return;
          }
       }
@@ -1277,13 +1293,13 @@
            } else {
              // Cartão (Stripe) retorna uma URL de checkout
              window.open(raw, '_blank');
-             alert("Sessão de pagamento no Cartão criada! Finalize na aba que se abriu.");
+             toast("Sessão de pagamento criada! Finalize na aba que se abriu.");
            }
         } else {
-           alert("Pagamento criado, mas o gateway não retornou a URL/QR Code. Resposta: " + JSON.stringify(res));
+           toast("Gateway não retornou URL/QR Code.", true);
         }
       } catch (e) {
-        alert("Erro ao gerar pagamento: " + e.message);
+        toast("Erro: " + e.message, true);
       }
       setLoading('btnPayDebt', false);
     }
@@ -1509,7 +1525,7 @@
     }
 
     function copySelected() {
-      if (!_selectedKey) { alert('Selecione uma linha na tabela primeiro (.'); return; }
+      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
       document.getElementById('revokeKey').value = _selectedKey;
       switchTab('admin');
     }
@@ -1527,13 +1543,23 @@
       try {
         const productType = getFreezeProduct(key);
         const r = await api('/admin/auth-keys/freeze', { keyValue: key, freeze: freeze, productType });
-        alert(r?.StatusMessage || 'Ação realizada com sucesso!');
+        toast(r?.StatusMessage || 'Ação realizada com sucesso!');
         if (document.getElementById('panel-list').classList.contains('active')) {
           doList(); // recarrega a tabela para atualizar status
         }
       } catch (e) {
-        alert('Erro: ' + e.message);
+        toast('Erro: ' + e.message, true);
       }
+    }
+
+    /* ── Toast ── */
+    let _toastTimer;
+    function toast(msg, isErr) {
+      const el = document.getElementById('toast');
+      clearTimeout(_toastTimer);
+      el.textContent = msg;
+      el.className = isErr ? 'visible toast-err' : 'visible';
+      _toastTimer = setTimeout(() => el.classList.remove('visible'), 3500);
     }
 
     /* ── Resizable columns ── */
