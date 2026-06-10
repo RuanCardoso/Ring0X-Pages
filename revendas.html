@@ -119,6 +119,21 @@
       gap: 1.1rem;
     }
 
+    .sidebar-right {
+      width: 300px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-left: 1px solid var(--border);
+      padding: 1.1rem 1rem;
+      position: sticky;
+      top: var(--header-h);
+      height: calc(100vh - var(--header-h));
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
@@ -675,85 +690,19 @@
     }
     .btn-action:hover {
       background: rgba(255,255,255,0.1);
-    }/* ────────────────────────────────
-       CLIENT SIMULATION
-    ──────────────────────────────── */
-    .client-sim-wrap {
-      border-top: 1px solid var(--border);
-      padding: 1.25rem 1.5rem 2rem;
-      background: rgba(255,255,255,0.012);
     }
-
-    .client-sim-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 1rem;
-    }
-
-    .client-sim-badge {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border2);
-      border-radius: 99px;
-      padding: 3px 10px;
-    }
-
-    .client-sim-hint { font-size: 12px; color: var(--hint); }
-
-    .client-sim-body {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: flex-start;
-    }
-
-    .client-input {
-      width: 100%;
-      padding: 9px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
-    .client-input:focus { border-color: rgba(255,255,255,0.22); }
-    .client-input::placeholder { color: var(--hint); }
-
-    .btn-activate {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border2);
-      border-radius: var(--radius);
-      padding: 9px 18px;
-      font-family: var(--sans);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-
     .btn-activate:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
     .btn-activate:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .client-sim-result { margin-top: 10px; }
 
     /* ────────────────────────────────
        RESPONSIVE
     ──────────────────────────────── */
+    @media (max-width: 900px) {
+      .sidebar-right { display: none; }
+    }
     @media (max-width: 700px) {
       .body-wrap { flex-direction: column; }
       .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
-      .client-sim-body { grid-template-columns: 1fr; }
       .row { grid-template-columns: 1fr; }
       .btn-row { grid-template-columns: 1fr; }
     }
@@ -911,9 +860,6 @@
             <button class="tab" onclick="switchTab('list')">Listar</button>
           </div>
           
-          <button class="btn-secondary" style="width:auto; padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:6px" onclick="doFreeze('ALL', true)">
-            <span style="font-size:14px">❄️</span> Congelar Todas Ativas
-          </button>
         </div>
 
         <!-- Panel: Admin -->
@@ -973,23 +919,6 @@
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-title">Revogar key</div>
-            <p class="card-hint">A key é invalidada imediatamente. Ação irreversível.</p>
-            <div class="field" style="margin-bottom:14px">
-              <label>Key</label>
-              <input id="revokeKey" type="text" placeholder="Cole a key a revogar" />
-            </div>
-            <button class="btn-danger" id="btnRevoke" onclick="doRevoke()">Revogar key</button>
-            <div class="result-wrap" id="res-revoke">
-              <div class="result-header">
-                <span class="result-label">Resultado — revogar</span>
-                <span class="badge" id="badge-revoke"></span>
-              </div>
-              <div class="result-body" id="body-revoke"></div>
-            </div>
-          </div>
-
         </div>
 
         <!-- Panel: Listar -->
@@ -998,8 +927,17 @@
             <div class="card-title">Keys cadastradas</div>
             <p class="card-hint">Lista completa (somente admin). Clique em uma linha para selecioná-la.</p>
             <div class="btn-row" style="margin-bottom:14px">
-              <button class="btn-secondary" id="btnList" onclick="doList()">Carregar lista</button>
+              <button class="btn-secondary" id="btnList" onclick="doList()">Atualizar lista</button>
               <button class="btn-secondary" onclick="copySelected()">Mover selecionada para Revogar →</button>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:14px;flex-wrap:nowrap;justify-content:flex-end">
+              <span style="font-size:11px;color:var(--muted);white-space:nowrap">Congelar todas:</span>
+              <select id="freezeProduct" style="width:100px;flex-shrink:0;padding:5px 8px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer">
+                <option value="PB">PB</option>
+                <option value="FAIRLIGHT">Fairlight</option>
+                <option value="PUBG">PUBG</option>
+              </select>
+              <button class="btn-secondary" style="width:auto;flex-shrink:0;padding:5px 12px;font-size:12px" onclick="doFreeze('ALL', true)">❄️ Congelar</button>
             </div>
             <div class="table-wrap">
               <table>
@@ -1036,35 +974,69 @@
 
       </main>
 
-      <!-- ── Client simulation ── -->
-      <div class="client-sim-wrap">
-        <div class="client-sim-header">
-          <span class="client-sim-badge">Simulação de cliente</span>
-          <p class="client-sim-hint">Simula a perspectiva do cliente ao receber uma key. Não faz parte do fluxo admin.</p>
-        </div>
-        <div class="client-sim-body">
-          <div style="display:flex;gap:8px;flex:1;align-items:flex-start">
-            <input id="activateKey" class="client-input" type="text" placeholder="Cole a key para testar a ativação" style="flex:2" />
-            <select id="activateProduct" style="width:140px;flex:none;padding:9px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:13px;outline:none">
-              <option value="PB">PB</option>
-              <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
-              <option value="PUBG" disabled>PUBG (bloqueado)</option>
-            </select>
-          </div>
-          <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
-        </div>
-        <div class="client-sim-result">
-          <div class="result-wrap" id="res-activate">
-            <div class="result-header">
-              <span class="result-label">Resposta da API</span>
-              <span class="badge" id="badge-activate"></span>
-            </div>
-            <div class="result-body" id="body-activate"></div>
+      <!-- ── Billing notice ── -->
+      <div style="border-top:1px solid var(--border);padding:1rem 1.5rem">
+        <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;font-weight:600;color:var(--text);letter-spacing:0.02em">Política de cobrança</div>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text);line-height:1.5">
+            <div>• O débito é gerado no momento da criação da chave, independentemente de ativação ou uso.</div>
+            <div>• Keys revogadas, expiradas ou não ativadas continuam gerando débito.</div>
+            <div>• O saldo devedor tem vencimento de 7 dias corridos.</div>
+            <div>• Em caso de atraso, todas as keys ativas do revendedor são congeladas automaticamente até a regularização.</div>
           </div>
         </div>
       </div>
 
     </div><!-- /scroll-area -->
+
+    <!-- ── Right sidebar ── -->
+    <aside class="sidebar-right">
+
+      <div>
+        <div class="sidebar-section-label" style="color:var(--hint)">revogar key</div>
+        <div class="calc-block">
+          <div style="font-size:10px;color:var(--danger);margin-bottom:8px;line-height:1.5;opacity:0.75">A key é invalidada permanentemente. A dívida permanece no saldo devedor mesmo após revogação.</div>
+          <input id="revokeKey" type="text" placeholder="Cole a key" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:12px;outline:none;margin-bottom:8px" />
+          <button class="btn-danger" id="btnRevoke" onclick="doRevoke()" style="padding:6px;font-size:11px">Revogar</button>
+          <div class="result-wrap" id="res-revoke" style="margin-top:8px">
+            <div class="result-header" style="margin-bottom:4px">
+              <span class="result-label" style="font-size:10px">Resultado</span>
+              <span class="badge" id="badge-revoke" style="font-size:10px"></span>
+            </div>
+            <div class="result-body" style="font-size:11px;max-height:120px"></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sidebar-divider" />
+
+      <div>
+        <div class="sidebar-section-label" style="color:var(--hint)">simulação de cliente</div>
+        <div class="calc-block">
+          <div style="font-size:10px;color:var(--gold);margin-bottom:8px;line-height:1.5;opacity:0.75">Simula a ativação de uma key pelo cliente. Use para testar se a key é válida antes de enviar ao cliente.</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <input id="activateKey" type="text" placeholder="Cole a key" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:12px;outline:none" />
+            <select id="activateProduct" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:12px;outline:none">
+              <option value="PB">PB</option>
+              <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
+              <option value="PUBG" disabled>PUBG (bloqueado)</option>
+            </select>
+            <button class="btn-activate" id="btnActivate" onclick="doActivate()" style="width:100%;padding:6px;font-size:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--muted);cursor:pointer;transition:background 0.12s">Ativar key</button>
+          </div>
+          <div class="client-sim-result">
+            <div class="result-wrap" id="res-activate" style="margin-top:8px">
+              <div class="result-header" style="margin-bottom:4px">
+                <span class="result-label" style="font-size:10px">Resposta</span>
+                <span class="badge" id="badge-activate" style="font-size:10px"></span>
+              </div>
+              <div class="result-body" id="body-activate" style="font-size:11px;max-height:120px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
   </div><!-- /body-wrap -->
 
   <script>
@@ -1415,8 +1387,11 @@
       badgeEl.textContent = qty > 1 ? `${ok} ok${fail > 0 ? ` · ${fail} erro${fail > 1 ? 's' : ''}` : ''}` : (allOk ? 'Sucesso' : 'Erro');
       badgeEl.className = 'badge ' + (allOk ? 'badge-ok' : (ok > 0 ? 'badge-warn' : 'badge-err'));
       
-      // Atualiza o saldo devedor se pelo menos uma key foi gerada com sucesso
-      if (ok > 0) loadDebtBalance();
+      // Atualiza o saldo devedor e a lista se pelo menos uma key foi gerada
+      if (ok > 0) {
+        loadDebtBalance();
+        doList();
+      }
 
       setLoading('btnCreate', false);
     }
@@ -1503,7 +1478,8 @@
           ? `<span class="mono-cell" style="font-size:10px;max-width:110px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle" title="${hwid}">${hwid}</span>`
           : `<span style="color:var(--hint);font-size:10px">—</span>`;
 
-        return `<tr data-key="${k.replace(/"/g, '&quot;')}">
+        const ptName = pt !== null && pt !== undefined ? (PRODUCT_NAMES[pt] || 'PB') : 'PB';
+        return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptName}">
           <td class="mono-cell">${k}</td>
           <td>${statusHtml}</td>
           <td>${productName}</td>
@@ -1529,12 +1505,19 @@
       switchTab('admin');
     }
 
+    function getFreezeProduct(key) {
+      if (key === 'ALL') return document.getElementById('freezeProduct').value;
+      const row = document.querySelector(`tr[data-key="${key.replace(/"/g, '&quot;')}"]`);
+      return row ? row.getAttribute('data-product') : 'PB';
+    }
+
     async function doFreeze(key, freeze) {
       if (key === 'ALL') {
-        if (!confirm('Deseja realmente congelar TODAS as suas keys ativas?')) return;
+        if (!confirm('Deseja realmente congelar TODAS as keys ativas deste produto?')) return;
       }
       try {
-        const r = await api('/admin/auth-keys/freeze', { keyValue: key, freeze: freeze });
+        const productType = getFreezeProduct(key);
+        const r = await api('/admin/auth-keys/freeze', { keyValue: key, freeze: freeze, productType });
         alert(r?.StatusMessage || 'Ação realizada com sucesso!');
         if (document.getElementById('panel-list').classList.contains('active')) {
           doList(); // recarrega a tabela para atualizar status
