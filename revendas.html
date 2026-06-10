@@ -1012,13 +1012,6 @@
           <div style="font-size:10px;color:var(--danger);margin-bottom:8px;line-height:1.5;opacity:0.75">A key é invalidada permanentemente. A dívida permanece no saldo devedor mesmo após revogação.</div>
           <input id="revokeKey" type="text" placeholder="Cole a key" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--sans);font-size:12px;outline:none;margin-bottom:8px" />
           <button class="btn-danger" id="btnRevoke" onclick="doRevoke()" style="padding:6px;font-size:11px">Revogar</button>
-          <div class="result-wrap" id="res-revoke" style="margin-top:8px">
-            <div class="result-header" style="margin-bottom:4px">
-              <span class="result-label" style="font-size:10px">Resultado</span>
-              <span class="badge" id="badge-revoke" style="font-size:10px"></span>
-            </div>
-            <div class="result-body" id="body-revoke" style="font-size:11px;max-height:120px"></div>
-          </div>
         </div>
       </div>
 
@@ -1036,15 +1029,6 @@
               <option value="PUBG" disabled>PUBG (bloqueado)</option>
             </select>
             <button class="btn-activate" id="btnActivate" onclick="doActivate()" style="width:100%;padding:6px;font-size:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--muted);cursor:pointer;transition:background 0.12s">Ativar key</button>
-          </div>
-          <div class="client-sim-result">
-            <div class="result-wrap" id="res-activate" style="margin-top:8px">
-              <div class="result-header" style="margin-bottom:4px">
-                <span class="result-label" style="font-size:10px">Resposta</span>
-                <span class="badge" id="badge-activate" style="font-size:10px"></span>
-              </div>
-              <div class="result-body" id="body-activate" style="font-size:11px;max-height:120px;overflow-y:auto"></div>
-            </div>
           </div>
         </div>
       </div>
@@ -1427,9 +1411,9 @@
         const k = document.getElementById('revokeKey').value.trim();
         if (!k) throw new Error('Informe a key.');
         const r = await api('/admin/auth-keys/revoke', { keyValue: k });
-        showResult('res-revoke', 'badge-revoke', 'body-revoke', r, true);
+        toast(r?.StatusMessage || 'Key revogada com sucesso!');
       } catch (e) {
-        showResult('res-revoke', 'badge-revoke', 'body-revoke', e.message, false);
+        toast('Erro: ' + e.message, true);
       }
       setLoading('btnRevoke', false);
     }
@@ -1442,9 +1426,9 @@
         const testHwid = 'TEST-HWID-SIMULATED-PC-' + navigator.userAgent.length;
         const activateProduct = document.getElementById('activateProduct').value;
         const r = await api('/user/auth-keys/activate', { keyValue: k, hwid: testHwid, productType: activateProduct });
-        showResult('res-activate', 'badge-activate', 'body-activate', r, true);
+        toast(r?.StatusMessage || 'Key ativada com sucesso!');
       } catch (e) {
-        showResult('res-activate', 'badge-activate', 'body-activate', e.message, false);
+        toast('Erro: ' + e.message, true);
       }
       setLoading('btnActivate', false);
     }
