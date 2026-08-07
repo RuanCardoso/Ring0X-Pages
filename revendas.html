@@ -1435,8 +1435,8 @@
           <button id="prodPB" onclick="setCalcProduct('PB')">PB</button>
           <button id="prodFAIRLIGHT" onclick="setCalcProduct('FAIRLIGHT')">Fairlight</button>
           <button id="prodPUBG" class="active" onclick="setCalcProduct('PUBG')">PUBG Full</button>
-          <button id="prodPUBG_ESP" onclick="setCalcProduct('PUBG_ESP')">PUBG ESP</button>
-          <button id="prodPUBG_MACRO" onclick="setCalcProduct('PUBG_MACRO')">PUBG Macro</button>
+          <button id="prodPUBGESP" onclick="setCalcProduct('PUBGESP')">PUBG ESP</button>
+          <button id="prodPUBGMACRO" onclick="setCalcProduct('PUBGMACRO')">PUBG Macro</button>
         </div>
         <div class="pricing-plans">
           <div class="plan-row">
@@ -1588,8 +1588,8 @@
                   <option value="PB">PB</option>
                   <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
                   <option value="PUBG">PUBG - Full</option>
-                  <option value="PUBG_ESP">PUBG - ESP</option>
-                  <option value="PUBG_MACRO">PUBG - Macro</option>
+                  <option value="PUBGESP">PUBG - ESP</option>
+                  <option value="PUBGMACRO">PUBG - Macro</option>
                 </select>
               </div>
               <div class="field" style="margin-bottom:0">
@@ -1635,8 +1635,8 @@
                 <option value="PB">PB</option>
                 <option value="FAIRLIGHT">Fairlight</option>
                 <option value="PUBG">PUBG - Full</option>
-                <option value="PUBG_ESP">PUBG - ESP</option>
-                <option value="PUBG_MACRO">PUBG - Macro</option>
+                <option value="PUBGESP">PUBG - ESP</option>
+                <option value="PUBGMACRO">PUBG - Macro</option>
               </select>
               <button class="btn-secondary" onclick="doFreeze('ALL', true)">Congelar</button>
               <button class="btn-secondary" onclick="doFreeze('ALL', false)">Descongelar</button>
@@ -1714,8 +1714,8 @@
               <option value="PB">PB</option>
               <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
               <option value="PUBG">PUBG - Full</option>
-              <option value="PUBG_ESP">PUBG - ESP</option>
-              <option value="PUBG_MACRO">PUBG - Macro</option>
+              <option value="PUBGESP">PUBG - ESP</option>
+              <option value="PUBGMACRO">PUBG - Macro</option>
             </select>
             <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
           </div>
@@ -1749,8 +1749,8 @@
       FAIRLIGHT:   { diaria: 5, semanal: 15, mensal: 30 },
       /* Full = ESP+Macro (pacote). Avulsos somam mais caro → Full vale a pena. */
       PUBG:        { diaria: 8, semanal: 30, mensal: 60 },
-      PUBG_ESP:    { diaria: 5, semanal: 18, mensal: 35 },
-      PUBG_MACRO:  { diaria: 4, semanal: 15, mensal: 30 }
+      PUBGESP:    { diaria: 5, semanal: 18, mensal: 35 },
+      PUBGMACRO:  { diaria: 4, semanal: 15, mensal: 30 }
     };
     let _calcQty = 1;
     let _calcProduct = 'PUBG';
@@ -1759,16 +1759,16 @@
       PB:         { label: 'PB' },
       FAIRLIGHT:  { label: 'Fairlight' },
       PUBG:       { label: 'PUBG - Full' },
-      PUBG_ESP:   { label: 'PUBG - ESP' },
-      PUBG_MACRO: { label: 'PUBG - Macro' }
+      PUBGESP:   { label: 'PUBG - ESP' },
+      PUBGMACRO: { label: 'PUBG - Macro' }
     };
 
     /* enum numérico da API + códigos string */
     const PRODUCT_CODES = {
-      0: 'PB', 1: 'FAIRLIGHT', 2: 'PUBG', 3: 'PUBG_ESP', 4: 'PUBG_MACRO',
+      0: 'PB', 1: 'FAIRLIGHT', 2: 'PUBG', 3: 'PUBGESP', 4: 'PUBGMACRO',
       PB: 'PB', FAIRLIGHT: 'FAIRLIGHT', PUBG: 'PUBG',
-      PUBG_ESP: 'PUBG_ESP', PUBG_MACRO: 'PUBG_MACRO',
-      'PUBG - Full': 'PUBG', 'PUBG - ESP': 'PUBG_ESP', 'PUBG - Macro': 'PUBG_MACRO'
+      PUBGESP: 'PUBGESP', PUBGMACRO: 'PUBGMACRO',
+      'PUBG - Full': 'PUBG', 'PUBG - ESP': 'PUBGESP', 'PUBG - Macro': 'PUBGMACRO'
     };
 
     function resolveProductCode(pt) {
