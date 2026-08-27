@@ -1702,6 +1702,15 @@
         </div>
       </div>
 
+      <div>
+        <div class="sidebar-section-label">reset hwid</div>
+        <div class="calc-block">
+          <div class="rail-note rail-note-warn">Permite que a key seja ativada em um novo dispositivo na próxima validação. O HWID será atualizado automaticamente.</div>
+          <input id="resetHwidKey" type="text" placeholder="Cole a key" style="margin-bottom:8px" />
+          <button class="btn-secondary" id="btnResetHwid" onclick="doResetHwid()" style="padding:8px;font-size:12px">Reset HWID</button>
+        </div>
+      </div>
+
       <hr class="sidebar-divider" />
 
       <div>
@@ -2220,6 +2229,19 @@
         toast('Erro: ' + e.message, true);
       }
       setLoading('btnRevoke', false);
+    }
+
+    async function doResetHwid() {
+      setLoading('btnResetHwid', true);
+      try {
+        const k = document.getElementById('resetHwidKey').value.trim();
+        if (!k) throw new Error('Informe a key.');
+        const r = await api('/admin/auth-keys/reset-hwid', { keyValue: k });
+        toast(r?.StatusMessage || 'HWID reset habilitado com sucesso!');
+      } catch (e) {
+        toast('Erro: ' + e.message, true);
+      }
+      setLoading('btnResetHwid', false);
     }
 
     async function doActivate() {
