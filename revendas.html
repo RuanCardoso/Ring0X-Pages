@@ -915,6 +915,8 @@
     .pill-off::before { background: var(--hint); }
     .pill-warn { background: var(--steel-soft); color: var(--steel); border-color: rgba(61,122,140,0.25); }
     .pill-warn::before { background: var(--steel); }
+    .pill-expired { background: var(--danger-soft); color: var(--danger); border-color: rgba(212,49,44,0.25); }
+    .pill-expired::before { background: var(--danger); }
 
     .mono-cell {
       font-family: var(--mono);
@@ -2297,14 +2299,25 @@
         const ptCode = resolveProductCode(pt) || 'PB';
         const productName = pt !== null && pt !== undefined ? productLabel(ptCode) : '—';
 
+        // Check if key is expired
+        const endsAt = i.ends_at ?? i.EndsAt;
+        const endDate = endsAt ? new Date(endsAt) : null;
+        const now = new Date();
+        const isExpired = endDate && endDate < now;
+
         let statusHtml = '';
         let actionBtn = '';
         if (paused) {
           statusHtml = `<span class="pill pill-warn">Congelada</span>`;
           actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', false); event.stopPropagation();">Retomar</button>`;
         } else if (ok) {
-          statusHtml = `<span class="pill pill-ok">Ativa</span>`;
-          actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
+          if (isExpired) {
+            statusHtml = `<span class="pill pill-expired">Expirado</span>`;
+            actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
+          } else {
+            statusHtml = `<span class="pill pill-ok">Ativa</span>`;
+            actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
+          }
         } else {
           statusHtml = `<span class="pill pill-off">Inativa</span>`;
         }
