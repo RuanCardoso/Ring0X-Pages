@@ -67,7 +67,6 @@
     <div class="navbar bg-base-100 border-b border-base-content/10 px-6 h-16">
       <div class="flex items-center gap-3">
         <h1 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x</h1>
-        <div class="w-[2px] h-6 bg-error -skew-x-12"></div>
       </div>
       <p class="text-xs text-base-content/60 font-medium hidden sm:block">Painel de revenda · chaves de acesso</p>
       <div class="ml-auto">
@@ -84,13 +83,13 @@
         <!-- Product Selection -->
         <div>
           <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Revenda · por key</div>
-          <div class="join join-vertical w-full mb-2" id="prodSeg">
-            <button id="prodPB" onclick="setCalcProduct('PB')" class="join-item btn btn-sm btn-neutral">PB</button>
-            <button id="prodFAIRLIGHT" onclick="setCalcProduct('FAIRLIGHT')" class="join-item btn btn-sm btn-neutral">Fairlight</button>
-            <button id="prodPUBG" onclick="setCalcProduct('PUBG')" class="join-item btn btn-sm btn-error">PUBG Full</button>
-            <button id="prodPUBGESP" onclick="setCalcProduct('PUBGESP')" class="join-item btn btn-sm btn-neutral">PUBG ESP</button>
-            <button id="prodPUBGMACRO" onclick="setCalcProduct('PUBGMACRO')" class="join-item btn btn-sm btn-neutral">PUBG Macro</button>
-          </div>
+          <select id="prodSelect" onchange="setCalcProduct(this.value)" class="select select-bordered select-sm w-full">
+  <option value="PB">PB</option>
+  <option value="FAIRLIGHT">Fairlight</option>
+  <option value="PUBG" selected>PUBG Full</option>
+  <option value="PUBGESP">PUBG ESP</option>
+  <option value="PUBGMACRO">PUBG Macro</option>
+</select>
 
           <!-- Pricing Plans -->
           <ul class="menu bg-base-200 rounded-box p-1">
@@ -491,15 +490,6 @@
 
     function setCalcProduct(p) {
       _calcProduct = p;
-      document.querySelectorAll('#prodSeg button').forEach(b => {
-        b.classList.remove('btn-error');
-        b.classList.add('btn-neutral');
-      });
-      const activeBtn = document.getElementById('prod' + p);
-      if (activeBtn) {
-        activeBtn.classList.remove('btn-neutral');
-        activeBtn.classList.add('btn-error');
-      }
       updateCalc();
     }
 
