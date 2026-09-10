@@ -439,6 +439,28 @@
                       selecionada</button>
                   </div>
 
+                  <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <input id="filterSearch" type="text" placeholder="Buscar por key ou HWID..."
+                      oninput="applyFilters()" class="input input-bordered input-sm mono flex-1 min-w-[220px]" />
+                    <select id="filterStatus" onchange="applyFilters()" class="select select-bordered select-sm">
+                      <option value="">Todos os status</option>
+                      <option value="ativa">Ativa</option>
+                      <option value="congelada">Congelada</option>
+                      <option value="expirado">Expirado</option>
+                      <option value="inativa">Inativa</option>
+                    </select>
+                    <select id="filterProduct" onchange="applyFilters()" class="select select-bordered select-sm">
+                      <option value="">Todos os produtos</option>
+                      <option value="PB">PB</option>
+                      <option value="FAIRLIGHT">Fairlight</option>
+                      <option value="PUBG">PUBG - Full</option>
+                      <option value="PUBGESP">PUBG - ESP</option>
+                      <option value="PUBGMACRO">PUBG - Macro</option>
+                    </select>
+                    <button class="btn btn-ghost btn-sm text-base-content/50" onclick="clearFilters()">Limpar</button>
+                    <span class="mono text-[10px] text-base-content/40 ml-auto" id="filterCount"></span>
+                  </div>
+
                   <div class="rounded-2xl border border-base-content/10 bg-base-100 shadow-inner overflow-hidden">
                     <div class="overflow-x-auto overflow-y-auto max-h-[60vh]">
                       <table class="table w-full">
@@ -608,8 +630,8 @@
   </dialog>
 
   <script>
-    const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
     let _selectedKey = '';
+    let _allKeyItems = [];
 
     const PRICES = {
       PB: { diaria: 3, semanal: 10, mensal: 17 },
@@ -803,10 +825,6 @@
       }
     }
 
-    function onTokenInput() { }
-
-    function saveToken() { }
-
     function clearToken() {
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
@@ -988,17 +1006,6 @@
       if (on) b.textContent = 'Processando…';
     }
 
-    function showResult(wrapId, badgeId, bodyId, data, ok) {
-      const wrap = document.getElementById(wrapId);
-      const badge = document.getElementById(badgeId);
-      const body = document.getElementById(bodyId);
-      const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-      badge.textContent = ok ? 'Sucesso' : 'Erro';
-      badge.className = 'badge ' + (ok ? 'badge-success' : 'badge-error');
-      body.textContent = text;
-      wrap.classList.remove('hidden');
-    }
-
     function onQtyChange() {
       const qty = Number(document.getElementById('createQty').value);
       const note = document.getElementById('createKeyNote');
@@ -1098,7 +1105,8 @@
       try {
         const d = await api('/admin/auth-keys/list', {});
         const items = d?.Result || d?.result || [];
-        renderTable(items);
+        _allKeyItems = items;
+        applyFilters();
       } catch (e) {
         toast('Erro: ' + e.message, true);
       }
@@ -1111,7 +1119,51 @@
       return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR');
     }
 
-    const PRODUCT_NAMES = PRODUCT_CODES;
+    function getStatusKey(i) {
+      const ok = Boolean(i.is_active ?? i.IsActive);
+      const paused = Boolean(i.is_paused ?? i.IsPaused);
+      const endsAt = i.ends_at ?? i.EndsAt;
+      const endDate = endsAt ? new Date(endsAt) : null;
+      const isExpired = endDate && endDate < new Date();
+      if (paused) return 'congelada';
+      if (ok) return isExpired ? 'expirado' : 'ativa';
+      return 'inativa';
+    }
+
+    function applyFilters() {
+      const q = (document.getElementById('filterSearch').value || '').trim().toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value;
+      const productFilter = document.getElementById('filterProduct').value;
+
+      const filtered = _allKeyItems.filter(i => {
+        if (statusFilter && getStatusKey(i) !== statusFilter) return false;
+        if (productFilter) {
+          const pt = i.product_type ?? i.ProductType;
+          const ptCode = resolveProductCode(pt) || 'PB';
+          if (ptCode !== productFilter) return false;
+        }
+        if (q) {
+          const k = (i.key_value || i.KeyValue || '').toLowerCase();
+          const hwid = (i.hwid || i.Hwid || '').toLowerCase();
+          if (!k.includes(q) && !hwid.includes(q)) return false;
+        }
+        return true;
+      });
+
+      renderTable(filtered);
+
+      const countEl = document.getElementById('filterCount');
+      if (countEl) {
+        countEl.textContent = _allKeyItems.length ? `${filtered.length} de ${_allKeyItems.length}` : '';
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById('filterSearch').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterProduct').value = '';
+      applyFilters();
+    }
 
     function statusPill(kind, label) {
       const styles = {
