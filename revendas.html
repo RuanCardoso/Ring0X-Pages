@@ -122,10 +122,14 @@
       </div>
       <p class="text-xs text-base-content/60 font-medium hidden sm:block"> Painel de revenda · chaves de acesso</p>
       <div class="ml-auto flex items-center gap-2">
-        <div class="badge badge-neutral mono text-[10px] font-medium uppercase tracking-wider">ops / <span
-            class="font-bold text-error">reseller</span></div>
+        <button onclick="clearToken()" class="btn btn-sm btn-neutral gap-1 mono text-[10px] font-medium uppercase tracking-wider">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
+          Sair
+        </button>
       </div>
     </div>
+
+    <input id="token" type="hidden" value="" />
 
     <!-- Main Layout -->
     <div class="flex flex-1 min-h-0 overflow-hidden">
@@ -236,27 +240,6 @@
               <div id="qrImg" class="flex justify-center mb-2"></div>
               <button class="btn btn-sm btn-neutral w-full" onclick="copyPixCode()">Copiar Código PIX</button>
             </div>
-          </div>
-        </div>
-
-        <div class="divider my-1"></div>
-
-        <!-- API Config -->
-        <div>
-          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Configuração da
-            API</div>
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text mono text-[9px] font-bold uppercase tracking-wider">Token admin</span>
-            </label>
-            <div class="join w-full">
-              <input id="token" type="password" placeholder="Bearer token"
-                class="input input-bordered input-sm join-item flex-1 min-w-0 mono" oninput="onTokenInput()" />
-              <button id="btnSaveToken" onclick="saveToken()" class="join-item btn btn-sm btn-error">Salvar</button>
-              <button id="btnClearToken" onclick="clearToken()"
-                class="join-item btn btn-sm btn-neutral hidden">✕</button>
-            </div>
-            <div class="text-[10px] text-base-content/60 mt-1 min-h-[14px]" id="tokenHint"></div>
           </div>
         </div>
 
@@ -709,8 +692,6 @@
     function applyAuthToken(val) {
       localStorage.setItem(TOKEN_KEY, val);
       document.getElementById('token').value = val;
-      document.getElementById('btnClearToken').classList.remove('hidden');
-      document.getElementById('tokenHint').textContent = 'Token salvo localmente.';
     }
 
     async function validateToken(val) {
@@ -760,46 +741,25 @@
 
       showAuthLoading('Validando acesso…');
       document.getElementById('token').value = saved;
-      document.getElementById('btnClearToken').classList.remove('hidden');
-      document.getElementById('tokenHint').textContent = 'Validando token…';
 
       try {
         await validateToken(saved);
-        document.getElementById('tokenHint').textContent = 'Token salvo localmente.';
         showApp();
         loadDebtBalance();
       } catch (ex) {
         localStorage.removeItem(TOKEN_KEY);
         document.getElementById('token').value = '';
-        document.getElementById('btnClearToken').classList.add('hidden');
-        document.getElementById('tokenHint').textContent = '';
         showLogin(ex.message || 'Token inválido. Faça login novamente.');
       }
     }
 
-    function onTokenInput() {
-      const val = document.getElementById('token').value.trim();
-      const saved = localStorage.getItem(TOKEN_KEY);
-      document.getElementById('btnClearToken').classList.toggle('hidden', !saved);
-      if (saved && val !== saved) document.getElementById('tokenHint').textContent = 'Alterado — salve para atualizar.';
-      else if (!saved) document.getElementById('tokenHint').textContent = '';
-    }
+    function onTokenInput() {}
 
-    function saveToken() {
-      const val = document.getElementById('token').value.trim();
-      if (!val) { document.getElementById('tokenHint').textContent = 'Digite um token.'; return; }
-      localStorage.setItem(TOKEN_KEY, val);
-      document.getElementById('btnClearToken').classList.remove('hidden');
-      document.getElementById('tokenHint').textContent = 'Salvo.';
-      setTimeout(() => { document.getElementById('tokenHint').textContent = 'Token salvo localmente.'; }, 1800);
-      loadDebtBalance();
-    }
+    function saveToken() {}
 
     function clearToken() {
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
-      document.getElementById('btnClearToken').classList.add('hidden');
-      document.getElementById('tokenHint').textContent = '';
       showLogin();
     }
 
@@ -1180,7 +1140,7 @@
         const fb = i.frozen_by || i.FrozenBy || '';
         const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
         return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}" class="hover:bg-base-content/5 cursor-pointer">
-          <td class="mono text-[11.5px] tracking-[0.02em] truncate overflow-hidden" title="${k}">${k}</td>
+          <td class="mono text-[11.5px] tracking-[0.02em] truncate overflow-hidden max-w-[200px]" title="${k}">${k}</td>
           <td>${statusHtml}</td>
           <td>${productName}</td>
           <td>${days}</td>
