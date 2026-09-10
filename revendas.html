@@ -385,18 +385,18 @@
                 </div>
 
                   <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
-                    <table class="table table-xs">
+                    <table class="table table-xs table-fixed">
                       <thead>
                         <tr>
-                          <th>Key</th>
-                          <th>Status</th>
-                          <th>Produto</th>
-                          <th>Dias</th>
-                          <th>HWID</th>
-                          <th>Ativada em</th>
-                          <th>Termina em</th>
-                          <th>Congelado por</th>
-                          <th class="text-right">Ação</th>
+                          <th class="w-[28%]">Key</th>
+                          <th class="w-[10%]">Status</th>
+                          <th class="w-[12%]">Produto</th>
+                          <th class="w-[6%]">Dias</th>
+                          <th class="w-[14%]">HWID</th>
+                          <th class="w-[10%]">Ativada em</th>
+                          <th class="w-[10%]">Termina em</th>
+                          <th class="w-[6%]">Congelado por</th>
+                          <th class="w-[4%] text-right">Ação</th>
                         </tr>
                       </thead>
                       <tbody id="keysBody">
@@ -1159,7 +1159,7 @@
         const fb = i.frozen_by || i.FrozenBy || '';
         const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
         return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}" class="hover:bg-base-content/5 cursor-pointer">
-          <td class="mono text-[11.5px] tracking-[0.02em]">${k}</td>
+          <td class="mono text-[11.5px] tracking-[0.02em] truncate" title="${k}">${k}</td>
           <td>${statusHtml}</td>
           <td>${productName}</td>
           <td>${days}</td>
