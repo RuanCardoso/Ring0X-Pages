@@ -282,10 +282,14 @@
                       </svg>
                       Testar Ativação
                     </a></li>
-                <li><a onclick="document.getElementById('modalFreeze').showModal()">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-warning"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
-                  Congelar em Lote
-                </a></li>
+                  <li><a onclick="document.getElementById('modalFreeze').showModal()">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4 text-warning">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                      </svg>
+                      Congelar em Lote
+                    </a></li>
                 </ul>
               </div>
             </div>
@@ -378,11 +382,11 @@
               <div class="card bg-base-100 border border-base-content/10 shadow-xl">
                 <div class="card-body">
 
-                <div class="flex gap-2 mb-4">
-                  <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
-                  <button class="btn btn-neutral" onclick="copySelected()">Revogar selecionada</button>
-                  <button class="btn btn-neutral" onclick="copySelectedToHwid()">Reset HWID da selecionada</button>
-                </div>
+                  <div class="flex gap-2 mb-4">
+                    <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
+                    <button class="btn btn-neutral" onclick="copySelected()">Revogar selecionada</button>
+                    <button class="btn btn-neutral" onclick="copySelectedToHwid()">Reset HWID da selecionada</button>
+                  </div>
 
                   <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
                     <table class="table table-xs table-fixed">
@@ -429,7 +433,7 @@
 
         <!-- Billing Notice -->
         <div id="billingNotice" class="border-t border-base-content/10 p-6 bg-base-300 shrink-0">
-            <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-3">
             <div class="display text-sm font-bold tracking-tight">Política de cobrança</div>
             <ul class="text-sm text-base-content/60 space-y-1.5 list-disc list-inside marker:text-error">
               <li>O débito é gerado no momento da criação da chave, independentemente de ativação ou uso.</li>
@@ -532,7 +536,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Congelar em Lote</h3>
-      <p class="text-sm text-base-content/60 py-2">Congela ou descongela todas as keys de um produto específico de uma vez.</p>
+      <p class="text-sm text-base-content/60 py-2">Congela ou descongela todas as keys de um produto específico de uma
+        vez.</p>
       <div class="flex flex-col gap-3">
         <select id="freezeProductModal" class="select select-bordered select-sm w-full">
           <option value="PB">PB</option>
@@ -1178,7 +1183,7 @@
           _selectedKey = row.getAttribute('data-key');
           navigator.clipboard.writeText(_selectedKey).then(() => {
             toast('Key copiada!');
-          }).catch(() => {});
+          }).catch(() => { });
         });
       });
     }
