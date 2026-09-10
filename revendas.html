@@ -329,7 +329,7 @@
             <!-- Admin Panel -->
             <div id="panel-admin" class="block">
 
-              <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4">
+              <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4 max-h-[40vh] overflow-y-auto">
                 <div class="card-body">
 
                   <div class="form-control mb-4">
@@ -386,23 +386,6 @@
 
                   <button class="btn btn-error w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
 
-                  <div class="hidden mt-4" id="res-create">
-                    <div class="flex items-center justify-between mb-2">
-                      <span class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60"
-                        id="label-create">Resultado — criar</span>
-                      <span class="badge" id="badge-create"></span>
-                    </div>
-                    <div class="hidden mb-2" id="batch-progress">
-                      <div class="flex items-center gap-3">
-                        <progress class="progress progress-error flex-1 h-2" value="0" max="100"
-                          id="batch-bar"></progress>
-                        <span class="mono text-[11px] text-base-content/60" id="batch-counter"></span>
-                      </div>
-                    </div>
-                    <div
-                      class="mono text-[11.5px] whitespace-pre-wrap break-all leading-[1.65] max-h-[220px] overflow-y-auto bg-base-300 border border-base-content/10 p-4"
-                      id="body-create"></div>
-                  </div>
                 </div>
               </div>
 
@@ -997,58 +980,29 @@
         baseKey = `RING0X-KEY-${rnd(6)}-${rnd(6)}-${new Date().getFullYear()}`;
         document.getElementById('createKey').value = baseKey;
       }
-      if (!productType) { showResult('res-create', 'badge-create', 'body-create', 'Selecione um produto.', false); return; }
-      if (!d || d < 1) { showResult('res-create', 'badge-create', 'body-create', 'Duração deve ser maior que 0.', false); return; }
+      if (!productType) { toast('Selecione um produto.', true); return; }
+      if (!d || d < 1) { toast('Duração deve ser maior que 0.', true); return; }
 
       setLoading('btnCreate', true);
 
-      const wrap = document.getElementById('res-create');
-      const progress = document.getElementById('batch-progress');
-      const bar = document.getElementById('batch-bar');
-      const counter = document.getElementById('batch-counter');
-      const bodyEl = document.getElementById('body-create');
-      const badgeEl = document.getElementById('badge-create');
-      const labelEl = document.getElementById('label-create');
-
-      wrap.classList.remove('hidden');
-      progress.classList.toggle('hidden', qty <= 1);
-      bodyEl.textContent = '';
-      badgeEl.textContent = '';
-      badgeEl.className = 'badge';
-      labelEl.textContent = qty > 1 ? `Resultado — ${qty} keys` : 'Resultado — criar';
-
       let ok = 0, fail = 0;
-      const lines = [];
 
       for (let i = 0; i < qty; i++) {
         const keyValue = qty > 1 ? `${baseKey}-${rnd(4)}${rnd(4)}` : baseKey;
-        if (qty > 1) {
-          bar.value = ((i) / qty) * 100;
-          counter.textContent = `${i}/${qty}`;
-        }
         try {
-          const r = await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
+          await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
           ok++;
-          const msg = typeof r === 'string' ? r : r?.StatusMessage || JSON.stringify(r);
-          lines.push(`✓ ${keyValue}\n  ${msg}`);
         } catch (e) {
           fail++;
-          lines.push(`✗ ${keyValue}\n  ${e.message}`);
         }
-        bodyEl.textContent = lines.join('\n\n');
       }
 
-      bar.value = 100;
-      counter.textContent = `${qty}/${qty}`;
-
-      const allOk = fail === 0;
-      badgeEl.textContent = qty > 1 ? `${ok} ok${fail > 0 ? ` · ${fail} erro${fail > 1 ? 's' : ''}` : ''}` : (allOk ? 'Sucesso' : 'Erro');
-      badgeEl.className = 'badge ' + (allOk ? 'badge-success' : (ok > 0 ? 'badge-warning' : 'badge-error'));
-
       if (ok > 0) {
+        toast(`${ok} key${ok > 1 ? 's' : ''} criada${ok > 1 ? 's' : ''} com sucesso!`);
         loadDebtBalance();
         doList();
       }
+      if (fail > 0) toast(`${fail} erro${fail > 1 ? 's' : ''} ao criar key${fail > 1 ? 's' : ''}.`, true);
 
       setLoading('btnCreate', false);
     }
