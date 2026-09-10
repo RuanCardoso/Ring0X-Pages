@@ -325,17 +325,17 @@
                   <button class="btn btn-neutral" onclick="copySelected()">Revogar selecionada</button>
                 </div>
 
-                <div class="join items-center mb-4 flex-wrap justify-end">
-                  <span class="join-item text-[11px] text-base-content/60 px-2">Congelar todas</span>
-                  <select id="freezeProduct" class="join-item select select-xs select-bordered w-[110px]">
+                <div class="flex items-center mb-4 flex-wrap justify-end gap-2">
+                  <span class="text-[11px] text-base-content/60">Congelar todas</span>
+                  <select id="freezeProduct" class="select select-sm select-bordered w-[110px]">
                     <option value="PB">PB</option>
                     <option value="FAIRLIGHT">Fairlight</option>
                     <option value="PUBG">PUBG - Full</option>
                     <option value="PUBGESP">PUBG - ESP</option>
                     <option value="PUBGMACRO">PUBG - Macro</option>
                   </select>
-                  <button class="join-item btn btn-xs btn-neutral" onclick="doFreeze('ALL', true)">Congelar</button>
-                  <button class="join-item btn btn-xs btn-neutral" onclick="doFreeze('ALL', false)">Descongelar</button>
+                  <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', true)">Congelar</button>
+                  <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', false)">Descongelar</button>
                 </div>
 
                 <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
