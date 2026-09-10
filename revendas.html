@@ -329,7 +329,7 @@
             <!-- Admin Panel -->
             <div id="panel-admin" class="block">
 
-              <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4 max-h-[40vh] overflow-y-auto">
+              <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4 max-h-[50vh] overflow-y-auto">
                 <div class="card-body">
 
                   <div class="form-control mb-4">
@@ -403,11 +403,11 @@
                     <button class="btn btn-error" onclick="copySelectedToHwid()">Reset HWID da selecionada</button>
                   </div>
 
-                  <div class="overflow-x-auto max-h-[60vh] border border-base-content/10 bg-base-200">
-                    <table class="table table-xs table-fixed">
+                  <div class="overflow-hidden max-h-[60vh] border border-base-content/10 bg-base-200">
+                    <table class="table table-xs w-full">
                       <thead>
                         <tr>
-                          <th class="w-[22%]">Key</th>
+                          <th>Key</th>
                           <th>Status</th>
                           <th>Produto</th>
                           <th>Dias</th>
@@ -415,7 +415,7 @@
                           <th>Ativada em</th>
                           <th>Termina em</th>
                           <th>Congelado por</th>
-                          <th class="w-[6%] text-right">Ação</th>
+                          <th class="text-right">Ação</th>
                         </tr>
                       </thead>
                       <tbody id="keysBody">
@@ -1110,17 +1110,17 @@
 
         const hwid = i.hwid || i.Hwid || '';
         const hwidCell = hwid
-          ? `<span class="mono text-[10px] truncate block" title="${hwid}">${hwid}</span>`
-          : `<span class="text-base-content/60 text-[10px]">—</span>`;
+          ? `<td class="mono text-[10px] truncate max-w-0 overflow-hidden" title="${hwid}">${hwid}</td>`
+          : `<td class="text-base-content/60 text-[10px]">—</td>`;
 
         const fb = i.frozen_by || i.FrozenBy || '';
         const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
         return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}" class="hover:bg-base-content/5 cursor-pointer">
-          <td class="mono text-[11.5px] tracking-[0.02em] truncate overflow-hidden max-w-[100px]" title="${k}">${k}</td>
+          <td class="mono text-[11.5px] tracking-[0.02em] truncate max-w-0 overflow-hidden" title="${k}">${k}</td>
           <td>${statusHtml}</td>
           <td>${productName}</td>
           <td>${days}</td>
-          <td class="overflow-hidden max-w-[150px]">${hwidCell}</td>
+          ${hwidCell}
           <td>${act}</td><td>${end}</td>
           <td>${paused ? frozenByLabel : '—'}</td>
           <td class="text-right">${actionBtn}</td>
