@@ -282,6 +282,10 @@
                       </svg>
                       Testar Ativação
                     </a></li>
+                <li><a onclick="document.getElementById('modalFreeze').showModal()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-warning"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                  Congelar em Lote
+                </a></li>
                 </ul>
               </div>
             </div>
@@ -386,20 +390,7 @@
                 <div class="flex gap-2 mb-4">
                   <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
                   <button class="btn btn-neutral" onclick="copySelected()">Revogar selecionada</button>
-                  </div>
-
-                  <div class="flex items-center mb-4 flex-wrap justify-end gap-2">
-                    <span class="text-[11px] text-base-content/60">Congelar todas</span>
-                    <select id="freezeProduct" class="select select-sm select-bordered w-[110px]">
-                      <option value="PB">PB</option>
-                      <option value="FAIRLIGHT">Fairlight</option>
-                      <option value="PUBG">PUBG - Full</option>
-                      <option value="PUBGESP">PUBG - ESP</option>
-                      <option value="PUBGMACRO">PUBG - Macro</option>
-                    </select>
-                    <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', true)">Congelar</button>
-                    <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', false)">Descongelar</button>
-                  </div>
+                </div>
 
                   <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
                     <table class="table table-xs">
@@ -536,6 +527,32 @@
           <option value="PUBGMACRO">PUBG - Macro</option>
         </select>
         <button class="btn btn-neutral btn-sm w-full" id="btnActivate" onclick="doActivate()">Ativar key</button>
+      </div>
+      <div class="modal-action">
+        <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Modal: Congelar em Lote -->
+  <dialog id="modalFreeze" class="modal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <h3 class="font-bold text-lg">Congelar em Lote</h3>
+      <p class="text-sm text-base-content/60 py-2">Congela ou descongela todas as keys de um produto específico de uma vez.</p>
+      <div class="flex flex-col gap-3">
+        <select id="freezeProductModal" class="select select-bordered select-sm w-full">
+          <option value="PB">PB</option>
+          <option value="FAIRLIGHT">Fairlight</option>
+          <option value="PUBG">PUBG - Full</option>
+          <option value="PUBGESP">PUBG - ESP</option>
+          <option value="PUBGMACRO">PUBG - Macro</option>
+        </select>
+        <div class="flex gap-2">
+          <button class="btn btn-warning btn-sm flex-1" onclick="doFreezeFromModal(true)">Congelar todas</button>
+          <button class="btn btn-neutral btn-sm flex-1" onclick="doFreezeFromModal(false)">Descongelar todas</button>
+        </div>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -1177,9 +1194,13 @@
     }
 
     function getFreezeProduct(key) {
-      if (key === 'ALL') return document.getElementById('freezeProduct').value;
+      if (key === 'ALL') return document.getElementById('freezeProductModal').value;
       const row = document.querySelector(`tr[data-key="${key.replace(/"/g, '&quot;')}"]`);
       return row ? row.getAttribute('data-product') : 'PB';
+    }
+
+    function doFreezeFromModal(freeze) {
+      doFreeze('ALL', freeze);
     }
 
     async function doFreeze(key, freeze) {
