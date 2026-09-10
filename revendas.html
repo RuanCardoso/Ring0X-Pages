@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ring0x · Painel de Revendedores</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap"
+    rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -24,20 +27,36 @@
     }
   </script>
   <style>
-    .mono { font-family: 'JetBrains Mono', monospace; }
-    .display { font-family: 'Space Grotesk', sans-serif; }
-    .tabs-boxed { display: inline-flex !important; width: fit-content !important; }
-    .tabs-boxed .tab { flex: 0 0 auto !important; width: auto !important; }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .tabs-boxed {
+      display: inline-flex !important;
+      width: fit-content !important;
+    }
+
+    .tabs-boxed .tab {
+      flex: 0 0 auto !important;
+      width: auto !important;
+    }
   </style>
 </head>
+
 <body class="min-h-screen bg-base-200">
 
   <!-- Auth Loading -->
-  <div id="authLoading" class="hidden fixed inset-0 z-[10001] flex flex-col items-center justify-center gap-4 bg-base-300">
+  <div id="authLoading"
+    class="hidden fixed inset-0 z-[10001] flex flex-col items-center justify-center gap-4 bg-base-300">
     <div class="flex flex-col items-center gap-4">
       <h2 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x</h2>
       <div class="loading loading-spinner loading-lg text-error"></div>
-      <span class="mono text-xs font-semibold uppercase tracking-widest text-base-content/60" id="authLoadingLabel">Validando acesso…</span>
+      <span class="mono text-xs font-semibold uppercase tracking-widest text-base-content/60"
+        id="authLoadingLabel">Validando acesso…</span>
     </div>
   </div>
 
@@ -46,14 +65,17 @@
     <div class="card bg-base-100 border border-base-content/20 w-full max-w-md shadow-2xl">
       <div class="card-body">
         <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">acesso · reseller</div>
-        <h2 class="display text-3xl font-extrabold uppercase tracking-tighter mb-1">Ring<span class="text-error">0</span>x</h2>
-        <p class="text-sm text-base-content/60 mb-6">Informe o Bearer token de admin para entrar no painel de revenda.</p>
+        <h2 class="display text-3xl font-extrabold uppercase tracking-tighter mb-1">Ring<span
+            class="text-error">0</span>x</h2>
+        <p class="text-sm text-base-content/60 mb-6">Informe o Bearer token de admin para entrar no painel de revenda.
+        </p>
         <form id="loginForm" onsubmit="doLogin(event)">
           <div class="form-control mb-4">
             <label class="label">
               <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Bearer token</span>
             </label>
-            <input id="loginToken" type="password" autocomplete="off" placeholder="Cole o token aqui" class="input input-bordered w-full mono" autofocus />
+            <input id="loginToken" type="password" autocomplete="off" placeholder="Cole o token aqui"
+              class="input input-bordered w-full mono" autofocus />
           </div>
           <div class="text-xs text-error min-h-[18px] mb-4" id="loginError"></div>
           <button type="submit" class="btn btn-error w-full font-bold" id="btnLogin">Entrar</button>
@@ -68,11 +90,13 @@
     <!-- Header -->
     <div class="navbar bg-base-100 border-b border-base-content/10 px-6 h-16 gap-4">
       <div class="flex items-center gap-3">
-        <h1 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x</h1>
+        <h1 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x
+        </h1>
       </div>
-      <p class="text-xs text-base-content/60 font-medium hidden sm:block">       Painel de revenda · chaves de acesso</p>
+      <p class="text-xs text-base-content/60 font-medium hidden sm:block"> Painel de revenda · chaves de acesso</p>
       <div class="ml-auto flex items-center gap-2">
-        <div class="badge badge-neutral mono text-[10px] font-medium uppercase tracking-wider">ops / <span class="font-bold text-error">reseller</span></div>
+        <div class="badge badge-neutral mono text-[10px] font-medium uppercase tracking-wider">ops / <span
+            class="font-bold text-error">reseller</span></div>
       </div>
     </div>
 
@@ -80,18 +104,21 @@
     <div class="flex flex-1 min-h-0 overflow-hidden">
 
       <!-- Left Sidebar -->
-      <aside class="w-[268px] bg-base-300 border-r border-base-content/10 overflow-y-auto flex flex-col gap-3 p-4 hidden lg:flex">
+      <aside
+        class="w-[268px] bg-base-300 border-r border-base-content/10 overflow-y-auto flex flex-col gap-3 p-4 hidden lg:flex">
 
         <!-- Product Selection -->
         <div>
-          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Revenda · por key</div>
-          <select id="prodSelect" onchange="setCalcProduct(this.value)" class="select select-bordered select-sm w-full mb-2">
-  <option value="PB">PB</option>
-  <option value="FAIRLIGHT">Fairlight</option>
-  <option value="PUBG" selected>PUBG Full</option>
-  <option value="PUBGESP">PUBG ESP</option>
-  <option value="PUBGMACRO">PUBG Macro</option>
-</select>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Revenda · por
+            key</div>
+          <select id="prodSelect" onchange="setCalcProduct(this.value)"
+            class="select select-bordered select-sm w-full mb-2">
+            <option value="PB">PB</option>
+            <option value="FAIRLIGHT">Fairlight</option>
+            <option value="PUBG" selected>PUBG Full</option>
+            <option value="PUBGESP">PUBG ESP</option>
+            <option value="PUBGMACRO">PUBG Macro</option>
+          </select>
 
           <!-- Pricing Plans -->
           <ul class="menu bg-base-200 rounded-box p-1">
@@ -155,7 +182,8 @@
 
         <!-- Debt Balance -->
         <div>
-          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Meu Saldo Devedor</div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Meu Saldo
+            Devedor</div>
           <div class="card bg-base-200 border border-base-content/10 p-3">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs" id="debtStatusLabel">Aguardando...</span>
@@ -163,15 +191,19 @@
             </div>
 
             <div class="join w-full mb-2" id="paySeg">
-              <button id="btnMethodPix" onclick="setPayMethod('pix')" class="join-item btn btn-sm btn-error">PIX</button>
-              <button id="btnMethodCredit" onclick="setPayMethod('credit')" class="join-item btn btn-sm btn-neutral">Cartão</button>
+              <button id="btnMethodPix" onclick="setPayMethod('pix')"
+                class="join-item btn btn-sm btn-error">PIX</button>
+              <button id="btnMethodCredit" onclick="setPayMethod('credit')"
+                class="join-item btn btn-sm btn-neutral">Cartão</button>
             </div>
 
             <div id="cpfWrap" class="mb-2">
-              <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX" class="input input-bordered input-sm w-full" />
+              <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX"
+                class="input input-bordered input-sm w-full" />
             </div>
 
-            <button class="btn btn-error btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar Saldo</button>
+            <button class="btn btn-error btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar
+              Saldo</button>
 
             <div id="qrWrap" class="hidden mt-3 bg-white p-3 text-center border border-base-content/20">
               <div id="qrImg" class="flex justify-center mb-2"></div>
@@ -184,15 +216,18 @@
 
         <!-- API Config -->
         <div>
-          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Configuração da API</div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Configuração da
+            API</div>
           <div class="form-control">
             <label class="label">
               <span class="label-text mono text-[9px] font-bold uppercase tracking-wider">Token admin</span>
             </label>
             <div class="join w-full">
-              <input id="token" type="password" placeholder="Bearer token" class="input input-bordered input-sm join-item flex-1 min-w-0 mono" oninput="onTokenInput()" />
+              <input id="token" type="password" placeholder="Bearer token"
+                class="input input-bordered input-sm join-item flex-1 min-w-0 mono" oninput="onTokenInput()" />
               <button id="btnSaveToken" onclick="saveToken()" class="join-item btn btn-sm btn-error">Salvar</button>
-              <button id="btnClearToken" onclick="clearToken()" class="join-item btn btn-sm btn-neutral hidden">✕</button>
+              <button id="btnClearToken" onclick="clearToken()"
+                class="join-item btn btn-sm btn-neutral hidden">✕</button>
             </div>
             <div class="text-[10px] text-base-content/60 mt-1 min-h-[14px]" id="tokenHint"></div>
           </div>
@@ -206,176 +241,207 @@
         <div class="flex-1 min-h-0 overflow-y-auto">
           <main class="p-6 max-w-[1100px] mx-auto w-full">
 
-          <!-- Tabs -->
-          <div class="flex items-center mb-6 gap-3">
-            <div class="tabs tabs-boxed">
-              <a class="tab tab-active" onclick="switchTab('admin')" id="tab-admin">Gerar</a>
-              <a class="tab" onclick="switchTab('list')" id="tab-list">Listar</a>
-            </div>
-            <div class="dropdown dropdown-end ml-auto">
-              <div tabindex="0" role="button" class="btn btn-sm btn-neutral gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" /></svg>
-                Ferramentas
+            <!-- Tabs -->
+            <div class="flex items-center mb-6 gap-3">
+              <div class="tabs tabs-boxed">
+                <a class="tab tab-active" onclick="switchTab('admin')" id="tab-admin">Gerar</a>
+                <a class="tab" onclick="switchTab('list')" id="tab-list">Listar</a>
               </div>
-              <ul tabindex="0" class="dropdown-content menu bg-base-200 border border-base-content/10 rounded-box z-[1] w-52 p-2 shadow-lg mt-2">
-                <li><a onclick="document.getElementById('modalRevoke').showModal()">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-error"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-                  Revogar
-                </a></li>
-                <li><a onclick="document.getElementById('modalResetHwid').showModal()">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-warning"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
-                  Resetar HWID
-                </a></li>
-                <li><a onclick="document.getElementById('modalSimulate').showModal()">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-info"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
-                  Testar Ativação
-                </a></li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Admin Panel -->
-          <div id="panel-admin" class="block">
-
-            <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4">
-              <div class="card-body">
-                <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">01 — geração</div>
-                <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Criar key</h2>
-                <p class="text-sm text-base-content/60 mb-4">Define a key e a duração em dias. A validade começa a contar quando o cliente ativa.</p>
-
-                <div class="form-control mb-4">
-                  <label class="label">
-                    <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Key</span>
-                    <span class="label-text-alt text-[10px] text-base-content/60 font-normal normal-case tracking-normal" id="createKeyNote">(prefixo — sufixo aleatório ao criar múltiplas)</span>
-                  </label>
-                  <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" class="input input-bordered w-full" />
+              <div class="dropdown dropdown-end ml-auto">
+                <div tabindex="0" role="button" class="btn btn-sm btn-neutral gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+                  </svg>
+                  Ferramentas
                 </div>
+                <ul tabindex="0"
+                  class="dropdown-content menu bg-base-200 border border-base-content/10 rounded-box z-[1] w-52 p-2 shadow-lg mt-2">
+                  <li><a onclick="document.getElementById('modalRevoke').showModal()">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4 text-error">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                      Revogar
+                    </a></li>
+                  <li><a onclick="document.getElementById('modalResetHwid').showModal()">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4 text-warning">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+                      </svg>
+                      Resetar HWID
+                    </a></li>
+                  <li><a onclick="document.getElementById('modalSimulate').showModal()">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4 text-info">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                      </svg>
+                      Testar Ativação
+                    </a></li>
+                </ul>
+              </div>
+            </div>
 
-                <div class="grid grid-cols-3 gap-3 mb-4">
-                  <div class="form-control">
+            <!-- Admin Panel -->
+            <div id="panel-admin" class="block">
+
+              <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4">
+                <div class="card-body">
+                  <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">01 — geração</div>
+                  <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Criar key</h2>
+                  <p class="text-sm text-base-content/60 mb-4">Define a key e a duração em dias. A validade começa a
+                    contar quando o cliente ativa.</p>
+
+                  <div class="form-control mb-4">
                     <label class="label">
-                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Duração</span>
+                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Key</span>
+                      <span
+                        class="label-text-alt text-[10px] text-base-content/60 font-normal normal-case tracking-normal"
+                        id="createKeyNote">(prefixo — sufixo aleatório ao criar múltiplas)</span>
                     </label>
-                    <select id="createDays" onchange="updateCreateCost()" class="select select-bordered w-full">
-                      <option value="">Selecione...</option>
-                      <option value="1">1 dia (Diária)</option>
-                      <option value="7">7 dias (Semanal)</option>
-                      <option value="30">30 dias (Mensal)</option>
-                    </select>
+                    <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026"
+                      class="input input-bordered w-full" />
                   </div>
-                  <div class="form-control">
-                    <label class="label">
-                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Produto</span>
-                    </label>
-                    <select id="createProduct" onchange="updateCreateCost()" class="select select-bordered w-full">
-                      <option value="">Selecione...</option>
+
+                  <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="form-control">
+                      <label class="label">
+                        <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Duração</span>
+                      </label>
+                      <select id="createDays" onchange="updateCreateCost()" class="select select-bordered w-full">
+                        <option value="">Selecione...</option>
+                        <option value="1">1 dia (Diária)</option>
+                        <option value="7">7 dias (Semanal)</option>
+                        <option value="30">30 dias (Mensal)</option>
+                      </select>
+                    </div>
+                    <div class="form-control">
+                      <label class="label">
+                        <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Produto</span>
+                      </label>
+                      <select id="createProduct" onchange="updateCreateCost()" class="select select-bordered w-full">
+                        <option value="">Selecione...</option>
+                        <option value="PB">PB</option>
+                        <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
+                        <option value="PUBG">PUBG - Full</option>
+                        <option value="PUBGESP">PUBG - ESP</option>
+                        <option value="PUBGMACRO">PUBG - Macro</option>
+                      </select>
+                    </div>
+                    <div class="form-control">
+                      <label class="label">
+                        <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Quantidade</span>
+                      </label>
+                      <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()"
+                        class="input input-bordered w-full" />
+                    </div>
+                  </div>
+
+                  <div class="alert bg-base-200 border border-base-content/20 mb-4">
+                    <div class="flex items-center gap-3 w-full justify-between">
+                      <span class="text-sm text-base-content/60">Custo total</span>
+                      <span class="mono text-xl font-semibold text-error" id="createCost">R$ 0,00</span>
+                    </div>
+                  </div>
+
+                  <button class="btn btn-error w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
+
+                  <div class="hidden mt-4" id="res-create">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60"
+                        id="label-create">Resultado — criar</span>
+                      <span class="badge" id="badge-create"></span>
+                    </div>
+                    <div class="hidden mb-2" id="batch-progress">
+                      <div class="flex items-center gap-3">
+                        <progress class="progress progress-error flex-1 h-2" value="0" max="100"
+                          id="batch-bar"></progress>
+                        <span class="mono text-[11px] text-base-content/60" id="batch-counter"></span>
+                      </div>
+                    </div>
+                    <div
+                      class="mono text-[11.5px] whitespace-pre-wrap break-all leading-[1.65] max-h-[220px] overflow-y-auto bg-base-300 border border-base-content/10 p-4"
+                      id="body-create"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- List Panel -->
+            <div id="panel-list" class="hidden">
+
+              <div class="card bg-base-100 border border-base-content/10 shadow-xl">
+                <div class="card-body">
+                  <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">02 — inventário
+                  </div>
+                  <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Keys cadastradas</h2>
+                  <p class="text-sm text-base-content/60 mb-4">Lista completa (somente admin). Clique em uma linha para
+                    selecioná-la.</p>
+
+                  <div class="grid grid-cols-2 gap-2 mb-4">
+                    <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
+                    <button class="btn btn-neutral" onclick="copySelected()">Revogar selecionada</button>
+                  </div>
+
+                  <div class="flex items-center mb-4 flex-wrap justify-end gap-2">
+                    <span class="text-[11px] text-base-content/60">Congelar todas</span>
+                    <select id="freezeProduct" class="select select-sm select-bordered w-[110px]">
                       <option value="PB">PB</option>
-                      <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
+                      <option value="FAIRLIGHT">Fairlight</option>
                       <option value="PUBG">PUBG - Full</option>
                       <option value="PUBGESP">PUBG - ESP</option>
                       <option value="PUBGMACRO">PUBG - Macro</option>
                     </select>
+                    <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', true)">Congelar</button>
+                    <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', false)">Descongelar</button>
                   </div>
-                  <div class="form-control">
-                    <label class="label">
-                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Quantidade</span>
-                    </label>
-                    <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" class="input input-bordered w-full" />
-                  </div>
-                </div>
 
-                <div class="alert bg-base-200 border border-base-content/20 mb-4">
-                  <div class="flex items-center gap-3 w-full justify-between">
-                    <span class="text-sm text-base-content/60">Custo total</span>
-                    <span class="mono text-xl font-semibold text-error" id="createCost">R$ 0,00</span>
+                  <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
+                    <table class="table table-xs">
+                      <thead>
+                        <tr>
+                          <th>Key</th>
+                          <th>Status</th>
+                          <th>Produto</th>
+                          <th>Dias</th>
+                          <th>HWID</th>
+                          <th>Ativada em</th>
+                          <th>Termina em</th>
+                          <th>Congelado por</th>
+                          <th class="text-right">Ação</th>
+                        </tr>
+                      </thead>
+                      <tbody id="keysBody">
+                        <tr>
+                          <td colspan="9" class="text-center py-5 text-base-content/60 text-xs">
+                            Sem dados. Clique em "Atualizar lista".
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                </div>
 
-                <button class="btn btn-error w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
-
-                <div class="hidden mt-4" id="res-create">
-                  <div class="flex items-center justify-between mb-2">
-                    <span class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60" id="label-create">Resultado — criar</span>
-                    <span class="badge" id="badge-create"></span>
-                  </div>
-                  <div class="hidden mb-2" id="batch-progress">
-                    <div class="flex items-center gap-3">
-                      <progress class="progress progress-error flex-1 h-2" value="0" max="100" id="batch-bar"></progress>
-                      <span class="mono text-[11px] text-base-content/60" id="batch-counter"></span>
+                  <div class="hidden mt-4" id="res-list">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60">Resultado —
+                        listar</span>
+                      <span class="badge" id="badge-list"></span>
                     </div>
+                    <div
+                      class="mono text-[11.5px] whitespace-pre-wrap break-all leading-[1.65] max-h-[220px] overflow-y-auto bg-base-300 border border-base-content/10 p-4"
+                      id="body-list"></div>
                   </div>
-                  <div class="mono text-[11.5px] whitespace-pre-wrap break-all leading-[1.65] max-h-[220px] overflow-y-auto bg-base-300 border border-base-content/10 p-4" id="body-create"></div>
                 </div>
               </div>
+
             </div>
 
-          </div>
-
-          <!-- List Panel -->
-          <div id="panel-list" class="hidden">
-
-            <div class="card bg-base-100 border border-base-content/10 shadow-xl">
-              <div class="card-body">
-                <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">02 — inventário</div>
-                <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Keys cadastradas</h2>
-                <p class="text-sm text-base-content/60 mb-4">Lista completa (somente admin). Clique em uma linha para selecioná-la.</p>
-
-                <div class="grid grid-cols-2 gap-2 mb-4">
-                  <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
-                  <button class="btn btn-neutral" onclick="copySelected()">Revogar selecionada</button>
-                </div>
-
-                <div class="flex items-center mb-4 flex-wrap justify-end gap-2">
-                  <span class="text-[11px] text-base-content/60">Congelar todas</span>
-                  <select id="freezeProduct" class="select select-sm select-bordered w-[110px]">
-                    <option value="PB">PB</option>
-                    <option value="FAIRLIGHT">Fairlight</option>
-                    <option value="PUBG">PUBG - Full</option>
-                    <option value="PUBGESP">PUBG - ESP</option>
-                    <option value="PUBGMACRO">PUBG - Macro</option>
-                  </select>
-                  <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', true)">Congelar</button>
-                  <button class="btn btn-xs btn-neutral" onclick="doFreeze('ALL', false)">Descongelar</button>
-                </div>
-
-                <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
-                  <table class="table table-xs">
-                    <thead>
-                      <tr>
-                        <th>Key</th>
-                        <th>Status</th>
-                        <th>Produto</th>
-                        <th>Dias</th>
-                        <th>HWID</th>
-                        <th>Ativada em</th>
-                        <th>Termina em</th>
-                        <th>Congelado por</th>
-                        <th class="text-right">Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody id="keysBody">
-                      <tr>
-                        <td colspan="9" class="text-center py-5 text-base-content/60 text-xs">
-                          Sem dados. Clique em "Atualizar lista".
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="hidden mt-4" id="res-list">
-                  <div class="flex items-center justify-between mb-2">
-                    <span class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60">Resultado — listar</span>
-                    <span class="badge" id="badge-list"></span>
-                  </div>
-                  <div class="mono text-[11.5px] whitespace-pre-wrap break-all leading-[1.65] max-h-[220px] overflow-y-auto bg-base-300 border border-base-content/10 p-4" id="body-list"></div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-        </main>
+          </main>
         </div>
 
         <!-- Billing Notice -->
@@ -386,7 +452,8 @@
               <li>O débito é gerado no momento da criação da chave, independentemente de ativação ou uso.</li>
               <li>Keys revogadas, expiradas ou não ativadas continuam gerando débito.</li>
               <li>O saldo devedor tem vencimento de 7 dias corridos.</li>
-              <li>Em caso de atraso, todas as keys ativas do revendedor são congeladas automaticamente até a regularização.</li>
+              <li>Em caso de atraso, todas as keys ativas do revendedor são congeladas automaticamente até a
+                regularização.</li>
             </ul>
           </div>
         </div>
@@ -421,7 +488,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Revogar Key</h3>
-      <p class="text-sm text-base-content/60 py-2">A key é invalidada permanentemente. A dívida permanece no saldo mesmo após revogação.</p>
+      <p class="text-sm text-base-content/60 py-2">A key é invalidada permanentemente. A dívida permanece no saldo mesmo
+        após revogação.</p>
       <div class="flex flex-col gap-3">
         <input id="revokeKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
         <button class="btn btn-error btn-sm w-full" id="btnRevoke" onclick="doRevoke()">Revogar</button>
@@ -438,7 +506,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Reset HWID</h3>
-      <p class="text-sm text-base-content/60 py-2">Permite que a key seja ativada em um novo dispositivo. O HWID será atualizado automaticamente.</p>
+      <p class="text-sm text-base-content/60 py-2">Permite que a key seja ativada em um novo dispositivo. O HWID será
+        atualizado automaticamente.</p>
       <div class="flex flex-col gap-3">
         <input id="resetHwidKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
         <button class="btn btn-neutral btn-sm w-full" id="btnResetHwid" onclick="doResetHwid()">Reset HWID</button>
@@ -455,7 +524,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Simular Ativação</h3>
-      <p class="text-sm text-base-content/60 py-2">Simula a ativação pelo cliente. Use para validar a key antes de enviar.</p>
+      <p class="text-sm text-base-content/60 py-2">Simula a ativação pelo cliente. Use para validar a key antes de
+        enviar.</p>
       <div class="flex flex-col gap-3">
         <input id="activateKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
         <select id="activateProduct" class="select select-bordered select-sm w-full">
@@ -479,21 +549,21 @@
     let _selectedKey = '';
 
     const PRICES = {
-      PB:          { diaria: 3, semanal: 10, mensal: 17 },
-      FAIRLIGHT:   { diaria: 5, semanal: 15, mensal: 30 },
+      PB: { diaria: 3, semanal: 10, mensal: 17 },
+      FAIRLIGHT: { diaria: 5, semanal: 15, mensal: 30 },
       /* Full = ESP+Macro (pacote). Avulsos somam mais caro → Full vale a pena. */
-      PUBG:        { diaria: 8, semanal: 30, mensal: 60 },
-      PUBGESP:    { diaria: 5, semanal: 18, mensal: 35 },
-      PUBGMACRO:  { diaria: 4, semanal: 15, mensal: 30 }
+      PUBG: { diaria: 8, semanal: 30, mensal: 60 },
+      PUBGESP: { diaria: 5, semanal: 18, mensal: 35 },
+      PUBGMACRO: { diaria: 4, semanal: 15, mensal: 30 }
     };
     let _calcQty = 1;
     let _calcProduct = 'PUBG';
 
     const PRODUCT_META = {
-      PB:         { label: 'PB' },
-      FAIRLIGHT:  { label: 'Fairlight' },
-      PUBG:       { label: 'PUBG - Full' },
-      PUBGESP:   { label: 'PUBG - ESP' },
+      PB: { label: 'PB' },
+      FAIRLIGHT: { label: 'Fairlight' },
+      PUBG: { label: 'PUBG - Full' },
+      PUBGESP: { label: 'PUBG - ESP' },
       PUBGMACRO: { label: 'PUBG - Macro' }
     };
 
@@ -790,7 +860,7 @@
       const pixBtn = document.getElementById('btnMethodPix');
       const creditBtn = document.getElementById('btnMethodCredit');
       const cpfWrap = document.getElementById('cpfWrap');
-      
+
       if (m === 'pix') {
         pixBtn.classList.remove('btn-neutral');
         pixBtn.classList.add('btn-error');
@@ -819,11 +889,11 @@
     async function doPayDebt() {
       let doc = '';
       if (_payMethod === 'pix') {
-         doc = document.getElementById('pixCpf').value.trim().replace(/\D/g, '');
-         if (!doc || doc.length < 11) {
-             toast('Digite seu CPF para emitir o PIX.', true);
-             return;
-         }
+        doc = document.getElementById('pixCpf').value.trim().replace(/\D/g, '');
+        if (!doc || doc.length < 11) {
+          toast('Digite seu CPF para emitir o PIX.', true);
+          return;
+        }
       }
 
       setLoading('btnPayDebt', true);
@@ -833,24 +903,24 @@
         const raw = res?.Result?.raw || res?.Result?.Raw;
 
         if (raw) {
-           if (type === 'qr') {
-             _lastPixCode = raw;
-             document.getElementById('qrWrap').classList.remove('hidden');
-             document.getElementById('qrImg').innerHTML = '';
-             new QRCode(document.getElementById("qrImg"), {
-               text: raw,
-               width: 180,
-               height: 180,
-               colorDark : "#000000",
-               colorLight : "#ffffff",
-               correctLevel : QRCode.CorrectLevel.M
-             });
-           } else {
-             window.open(raw, '_blank');
-             toast("Sessão de pagamento criada! Finalize na aba que se abriu.");
-           }
+          if (type === 'qr') {
+            _lastPixCode = raw;
+            document.getElementById('qrWrap').classList.remove('hidden');
+            document.getElementById('qrImg').innerHTML = '';
+            new QRCode(document.getElementById("qrImg"), {
+              text: raw,
+              width: 180,
+              height: 180,
+              colorDark: "#000000",
+              colorLight: "#ffffff",
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          } else {
+            window.open(raw, '_blank');
+            toast("Sessão de pagamento criada! Finalize na aba que se abriu.");
+          }
         } else {
-           toast("Gateway não retornou URL/QR Code.", true);
+          toast("Gateway não retornou URL/QR Code.", true);
         }
       } catch (e) {
         toast("Erro: " + e.message, true);
@@ -1160,4 +1230,5 @@
     updateCreateCost();
   </script>
 </body>
+
 </html>
