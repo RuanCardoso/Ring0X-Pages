@@ -295,10 +295,6 @@
 
               <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4">
                 <div class="card-body">
-                  <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">01 — geração</div>
-                  <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Criar key</h2>
-                  <p class="text-sm text-base-content/60 mb-4">Define a key e a duração em dias. A validade começa a
-                    contar quando o cliente ativa.</p>
 
                   <div class="form-control mb-4">
                     <label class="label">
@@ -381,15 +377,11 @@
 
               <div class="card bg-base-100 border border-base-content/10 shadow-xl">
                 <div class="card-body">
-                  <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">02 — inventário
-                  </div>
-                  <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Keys cadastradas</h2>
-                  <p class="text-sm text-base-content/60 mb-4">Lista completa (somente admin). Clique em uma linha para
-                    selecioná-la.</p>
 
                 <div class="flex gap-2 mb-4">
                   <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
                   <button class="btn btn-neutral" onclick="copySelected()">Revogar selecionada</button>
+                  <button class="btn btn-neutral" onclick="copySelectedToHwid()">Reset HWID da selecionada</button>
                 </div>
 
                   <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
@@ -483,7 +475,7 @@
         após revogação.</p>
       <div class="flex flex-col gap-3">
         <input id="revokeKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
-        <button class="btn btn-error btn-sm w-full" id="btnRevoke" onclick="doRevoke()">Revogar</button>
+        <button class="btn btn-error w-full" id="btnRevoke" onclick="doRevoke()">Revogar</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -501,7 +493,7 @@
         atualizado automaticamente.</p>
       <div class="flex flex-col gap-3">
         <input id="resetHwidKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
-        <button class="btn btn-neutral btn-sm w-full" id="btnResetHwid" onclick="doResetHwid()">Reset HWID</button>
+        <button class="btn btn-neutral w-full" id="btnResetHwid" onclick="doResetHwid()">Reset HWID</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -526,7 +518,7 @@
           <option value="PUBGESP">PUBG - ESP</option>
           <option value="PUBGMACRO">PUBG - Macro</option>
         </select>
-        <button class="btn btn-neutral btn-sm w-full" id="btnActivate" onclick="doActivate()">Ativar key</button>
+        <button class="btn btn-neutral w-full" id="btnActivate" onclick="doActivate()">Ativar key</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -550,8 +542,8 @@
           <option value="PUBGMACRO">PUBG - Macro</option>
         </select>
         <div class="flex gap-2">
-          <button class="btn btn-warning btn-sm flex-1" onclick="doFreezeFromModal(true)">Congelar todas</button>
-          <button class="btn btn-neutral btn-sm flex-1" onclick="doFreezeFromModal(false)">Descongelar todas</button>
+          <button class="btn btn-warning flex-1" onclick="doFreezeFromModal(true)">Congelar todas</button>
+          <button class="btn btn-neutral flex-1" onclick="doFreezeFromModal(false)">Descongelar todas</button>
         </div>
       </div>
       <div class="modal-action">
@@ -1191,6 +1183,12 @@
       if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
       document.getElementById('revokeKey').value = _selectedKey;
       document.getElementById('modalRevoke').showModal();
+    }
+
+    function copySelectedToHwid() {
+      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
+      document.getElementById('resetHwidKey').value = _selectedKey;
+      document.getElementById('modalResetHwid').showModal();
     }
 
     function getFreezeProduct(key) {
