@@ -1,1755 +1,448 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ring0x · Painel de Revendedores</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #12141a;
-      --bg-deep: #0c0e12;
-      --ink: #e8eaef;
-      --ink-soft: #c4c9d4;
-      --muted: #8a92a6;
-      --hint: #5c6478;
-      --line: rgba(255, 255, 255, 0.06);
-      --line-strong: rgba(255, 255, 255, 0.1);
-      --surface: #181b22;
-      --surface-raised: #1e222b;
-      --panel: #0e1015;
-      --panel-2: #161920;
-      --panel-line: rgba(255, 255, 255, 0.07);
-      --panel-text: #e8eaef;
-      --panel-muted: #8b93a7;
-      --panel-hint: #5a6275;
-      --ember: #e8472a;
-      --ember-deep: #c2331a;
-      --ember-soft: rgba(232, 71, 42, 0.14);
-      --ember-glow: rgba(232, 71, 42, 0.22);
-      --steel: #5a9aab;
-      --steel-soft: rgba(90, 154, 171, 0.14);
-      --success: #3dba78;
-      --success-soft: rgba(61, 186, 120, 0.12);
-      --danger: #e85550;
-      --danger-soft: rgba(232, 85, 80, 0.12);
-      --warn: #d4a017;
-      --warn-soft: rgba(212, 160, 23, 0.12);
-      --gold: #d4a017;
-      --display: 'Syne', sans-serif;
-      --sans: 'Outfit', sans-serif;
-      --mono: 'JetBrains Mono', monospace;
-      --radius: 4px;
-      --radius-lg: 6px;
-      --sidebar-w: 268px;
-      --rail-w: 280px;
-      --header-h: 64px;
-      --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body { height: 100%; }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--ink);
-      font-size: 14px;
-      line-height: 1.5;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* Atmospheric grid + wash */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      background:
-        radial-gradient(ellipse 80% 50% at 0% 0%, rgba(232, 71, 42, 0.09), transparent 55%),
-        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(61, 122, 140, 0.07), transparent 50%),
-        linear-gradient(var(--line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line) 1px, transparent 1px);
-      background-size: auto, auto, 48px 48px, 48px 48px;
-      opacity: 0.85;
-    }
-
-    /* ── Header ── */
-    .page-header {
-      height: var(--header-h);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      padding: 0 1.5rem;
-      position: relative;
-      z-index: 20;
-      border-bottom: 1px solid var(--line-strong);
-      background: rgba(18, 20, 26, 0.88);
-      backdrop-filter: blur(12px);
-      animation: headerIn 0.7s var(--ease) both;
-    }
-
-    @keyframes headerIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .brand-mark {
-      display: flex;
-      align-items: baseline;
-      gap: 0.55rem;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .brand-mark h1 {
-      font-family: var(--display);
-      font-weight: 800;
-      font-size: 1.55rem;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      text-transform: uppercase;
-    }
-
-    .brand-mark h1 span {
-      color: var(--ember);
-    }
-
-    .brand-slash {
-      width: 2px;
-      height: 22px;
-      background: var(--ember);
-      transform: skewX(-18deg);
-      flex-shrink: 0;
-    }
-
-    .page-header p {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-      letter-spacing: 0.02em;
-    }
-
-    .header-meta {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .header-chip {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 5px 10px;
-      border: 1px solid var(--line-strong);
-      background: var(--surface-raised);
-      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
-    }
-
-    .header-chip strong {
-      color: var(--ember);
-      font-weight: 600;
-    }
-
-    /* ── Body layout ── */
-    .body-wrap {
-      display: flex;
-      flex: 1;
-      min-height: 0;
-      position: relative;
-      z-index: 1;
-      animation: bodyIn 0.8s var(--ease) 0.08s both;
-    }
-
-    @keyframes bodyIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Sidebars ── */
-    .sidebar,
-    .sidebar-right {
-      flex-shrink: 0;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.15rem;
-      padding: 1.25rem 1.1rem;
-      position: sticky;
-      top: 0;
-      height: calc(100vh - var(--header-h));
-    }
-
-    .sidebar {
-      width: var(--sidebar-w);
-      background: var(--panel);
-      color: var(--panel-text);
-      border-right: 1px solid rgba(0, 0, 0, 0.35);
-      box-shadow: inset -1px 0 0 var(--panel-line);
-    }
-
-    .sidebar-right {
-      width: var(--rail-w);
-      background: var(--surface);
-      border-left: 1px solid var(--line-strong);
-    }
-
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 0; }
-    .sidebar-right::-webkit-scrollbar-thumb,
-    .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); }
-
-    .sidebar-section-label {
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--panel-hint);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      margin-bottom: 10px;
-    }
-
-    .sidebar-right .sidebar-section-label {
-      color: var(--hint);
-    }
-
-    /* ── Seg control ── */
-    .seg {
-      display: flex;
-      gap: 2px;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid var(--panel-line);
-      padding: 3px;
-      width: 100%;
-    }
-
-    .sidebar-right .seg {
-      background: var(--bg-deep);
-      border-color: var(--line);
-    }
-
-    .seg button {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--panel-muted);
-      font-family: var(--sans);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 8px;
-      cursor: pointer;
-      transition: color 0.2s var(--ease), background 0.2s var(--ease);
-      clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%);
-    }
-
-    .seg-products {
-      flex-wrap: wrap;
-    }
-
-    .seg-products button {
-      flex: 1 1 calc(33.33% - 2px);
-      min-width: 0;
-      font-size: 10px;
-      padding: 7px 3px;
-      letter-spacing: -0.01em;
-    }
-
-    .sidebar-right .seg button { color: var(--muted); }
-
-    .seg button:hover { color: var(--panel-text); }
-    .sidebar-right .seg button:hover { color: var(--ink); }
-
-    .seg button.active {
-      background: var(--ember);
-      color: #fff;
-    }
-
-    /* ── Pricing ── */
-    .pricing-plans { display: flex; flex-direction: column; gap: 6px; }
-
-    .plan-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border: 1px solid var(--panel-line);
-      background: var(--panel-2);
-      position: relative;
-      transition: border-color 0.2s, transform 0.25s var(--ease);
-      cursor: default;
-      overflow: hidden;
-    }
-
-    .plan-row::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: transparent;
-      transition: background 0.2s;
-    }
-
-    .plan-row:hover {
-      border-color: rgba(232, 71, 42, 0.35);
-      transform: translateX(2px);
-    }
-
-    .plan-row:hover::before { background: var(--ember); }
-
-    .plan-row-info { display: flex; flex-direction: column; gap: 1px; }
-    .plan-row-name { font-size: 13px; font-weight: 600; color: var(--panel-text); }
-    .plan-row-days {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--panel-hint);
-      letter-spacing: 0.04em;
-    }
-
-    .plan-row-price {
-      font-family: var(--mono);
-      font-size: 14px;
-      color: var(--ember);
-      font-weight: 600;
-    }
-
-    /* ── Calc / blocks ── */
-    .calc-block {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--panel-line);
-      padding: 11px 12px;
-    }
-
-    .sidebar-right .calc-block {
-      background: var(--surface-raised);
-      border-color: var(--line);
-    }
-
-    .calc-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .calc-top-label { font-size: 12px; color: var(--panel-muted); }
-    .sidebar-right .calc-top-label { color: var(--muted); }
-
-    .calc-qty-row { display: flex; align-items: center; gap: 6px; }
-
-    .calc-btn {
-      width: 24px; height: 24px;
-      background: var(--panel-2);
-      border: 1px solid var(--panel-line);
-      color: var(--panel-text);
-      font-size: 14px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s, border-color 0.15s;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    .calc-btn:hover {
-      background: var(--ember-soft);
-      border-color: rgba(232, 71, 42, 0.4);
-      color: #ff8a74;
-    }
-
-    .calc-qty-val {
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--panel-text);
-      min-width: 24px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .calc-results { display: flex; flex-direction: column; gap: 5px; }
-
-    .calc-result-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .calc-result-plan { font-size: 11px; color: var(--panel-hint); }
-    .calc-result-val {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: #ff8a74;
-      font-weight: 500;
-    }
-
-    /* ── Config ── */
-    .config-field { margin-bottom: 8px; }
-    .config-field:last-child { margin-bottom: 0; }
-
-    .config-label {
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--panel-hint);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 5px;
-      display: block;
-    }
-
-    .sidebar input[type="text"],
-    .sidebar input[type="password"] {
-      width: 100%;
-      padding: 8px 11px;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid var(--panel-line);
-      border-radius: 0;
-      color: var(--panel-text);
-      font-family: var(--sans);
-      font-size: 12px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .sidebar input:focus { border-color: rgba(232, 71, 42, 0.55); }
-    .sidebar input::placeholder { color: var(--panel-hint); }
-
-    .token-group {
-      display: flex;
-      border: 1px solid var(--panel-line);
-      overflow: hidden;
-      background: rgba(0, 0, 0, 0.35);
-    }
-
-    .token-group input {
-      flex: 1;
-      min-width: 0;
-      border: none !important;
-      background: transparent !important;
-      font-size: 11px !important;
-      padding: 7px 10px !important;
-    }
-
-    .token-group:focus-within { border-color: rgba(232, 71, 42, 0.55); }
-
-    .token-btn {
-      flex-shrink: 0;
-      border: none;
-      border-left: 1px solid var(--panel-line);
-      padding: 0 10px;
-      font-family: var(--sans);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-      white-space: nowrap;
-    }
-
-    .token-btn-save { background: var(--ember-soft); color: #ff8a74; }
-    .token-btn-save:hover { background: rgba(232, 71, 42, 0.22); color: #fff; }
-    .token-btn-clear { background: transparent; color: var(--panel-hint); }
-    .token-btn-clear:hover { background: var(--danger-soft); color: #ff6b66; }
-
-    .token-hint { font-size: 10px; color: var(--panel-hint); margin-top: 5px; min-height: 14px; }
-
-    .sidebar-divider {
-      border: none;
-      border-top: 1px solid var(--panel-line);
-      margin: 0 -0.15rem;
-    }
-
-    .sidebar-right .sidebar-divider { border-color: var(--line); }
-
-    /* ── Main scroll ── */
-    .scroll-area {
-      flex: 1;
-      min-width: 0;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      background: transparent;
-    }
-
-    .main {
-      padding: 1.5rem 1.75rem 1.25rem;
-      flex: 1;
-      max-width: 1100px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    /* ── Tabs ── */
-    .tabs-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 1.35rem;
-      gap: 1rem;
-      border-bottom: 1px solid var(--line-strong);
-      padding-bottom: 0;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 0;
-      position: relative;
-    }
-
-    .tab {
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--muted);
-      padding: 10px 18px 12px;
-      cursor: pointer;
-      font-family: var(--display);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      transition: color 0.2s, border-color 0.25s var(--ease);
-      margin-bottom: -1px;
-    }
-
-    .tab:hover { color: var(--ink); }
-
-    .tab.active {
-      color: var(--ink);
-      border-bottom-color: var(--ember);
-    }
-
-    .tabs-meta {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--hint);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding-bottom: 12px;
-    }
-
-    /* ── Panels ── */
-    .panel { display: none; }
-    .panel.active {
-      display: block;
-      animation: panelIn 0.45s var(--ease) both;
-    }
-
-    @keyframes panelIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Workbench card ── */
-    .card {
-      background: var(--surface-raised);
-      border: 1px solid var(--line-strong);
-      border-radius: 0;
-      padding: 1.5rem 1.5rem 1.35rem;
-      margin-bottom: 1rem;
-      position: relative;
-      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
-      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.25);
-    }
-
-    .card::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 18px; height: 18px;
-      background: linear-gradient(135deg, transparent 50%, var(--bg) 50%);
-      border-left: 1px solid var(--line-strong);
-      border-bottom: 1px solid var(--line-strong);
-    }
-
-    .card:last-child { margin-bottom: 0; }
-
-    .card-kicker {
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ember);
-      margin-bottom: 6px;
-    }
-
-    .card-title {
-      font-family: var(--display);
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      margin-bottom: 6px;
-      color: var(--ink);
-    }
-
-    .card-hint {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 1.25rem;
-      line-height: 1.55;
-      max-width: 52ch;
-    }
-
-    /* ── Form ── */
-    .field { margin-bottom: 14px; }
-    .field:last-of-type { margin-bottom: 0; }
-
-    label {
-      display: block;
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--hint);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 7px;
-    }
-
-    .main input[type="text"],
-    .main input[type="number"],
-    .main select,
-    .sidebar-right input[type="text"],
-    .sidebar-right select {
-      width: 100%;
-      padding: 10px 12px;
-      background: var(--bg);
-      border: 1px solid var(--line-strong);
-      border-radius: 0;
-      color: var(--ink);
-      font-family: var(--sans);
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      -webkit-appearance: none;
-    }
-
-    .main input:focus,
-    .main select:focus,
-    .sidebar-right input:focus,
-    .sidebar-right select:focus {
-      border-color: var(--ember);
-      box-shadow: 0 0 0 3px var(--ember-soft);
-    }
-
-    .main input::placeholder,
-    .sidebar-right input::placeholder { color: var(--hint); }
-
-    .main select option { background: var(--surface); color: var(--ink); }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-    }
-
-    .cost-strip {
-      margin-bottom: 16px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      padding: 12px 14px;
-      background: var(--bg);
-      border: 1px dashed var(--line-strong);
-    }
-
-    .cost-strip span:first-child {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .cost-strip #createCost {
-      font-family: var(--mono);
-      font-size: 18px;
-      color: var(--ember);
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-
-    /* ── Buttons ── */
-    .btn-primary {
-      background: var(--ember);
-      color: #fff;
-      border: none;
-      border-radius: 0;
-      padding: 12px 18px;
-      font-family: var(--display);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.2s, transform 0.2s var(--ease);
-      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
-      position: relative;
-    }
-
-    .btn-primary:hover {
-      background: var(--ember-deep);
-      transform: translateY(-1px);
-    }
-
-    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--line-strong);
-      border-radius: 0;
-      padding: 11px 16px;
-      font-family: var(--sans);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-    }
-
-    .btn-secondary:hover {
-      background: var(--ember);
-      color: #fff;
-      border-color: var(--ember);
-    }
-
-    .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .btn-danger {
-      background: var(--danger-soft);
-      color: var(--danger);
-      border: 1px solid rgba(212, 49, 44, 0.25);
-      border-radius: 0;
-      padding: 10px 16px;
-      font-family: var(--sans);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.15s, color 0.15s;
-    }
-
-    .btn-danger:hover {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .btn-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .btn-activate {
-      width: 100%;
-      padding: 9px;
-      font-size: 12px;
-      font-weight: 600;
-      font-family: var(--sans);
-      background: var(--surface-raised);
-      border: 1px solid var(--line-strong);
-      border-radius: 0;
-      color: var(--ink);
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-    }
-
-    .btn-activate:hover {
-      background: var(--ember);
-      border-color: var(--ember);
-      color: #fff;
-    }
-
-    /* ── Result ── */
-    .result-wrap { margin-top: 1.15rem; display: none; }
-    .result-wrap.visible { display: block; animation: panelIn 0.35s var(--ease) both; }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .result-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--hint);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border: 1px solid transparent;
-    }
-
-    .badge-ok { background: var(--success-soft); color: var(--success); border-color: rgba(26,154,92,0.25); }
-    .badge-err { background: var(--danger-soft); color: var(--danger); border-color: rgba(212,49,44,0.25); }
-    .badge-warn { background: var(--warn-soft); color: var(--warn); border-color: rgba(196,122,18,0.25); }
-
-    .result-body {
-      background: var(--bg-deep);
-      border: 1px solid var(--line-strong);
-      padding: 14px;
-      font-family: var(--mono);
-      font-size: 11.5px;
-      color: var(--ink-soft);
-      white-space: pre-wrap;
-      word-break: break-all;
-      line-height: 1.65;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-
-    /* ── Batch progress ── */
-    .batch-progress { margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
-
-    .batch-bar-wrap {
-      flex: 1;
-      height: 4px;
-      background: var(--bg-deep);
-      overflow: hidden;
-    }
-
-    .batch-bar {
-      height: 100%;
-      background: var(--ember);
-      width: 0%;
-      transition: width 0.25s var(--ease);
-    }
-
-    .batch-counter {
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    /* ── Table ── */
-    .table-wrap {
-      border: 1px solid var(--line-strong);
-      overflow: auto;
-      max-height: 340px;
-      background: var(--surface-raised);
-    }
-
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-
-    th, td {
-      padding: 10px 10px;
-      text-align: left;
-      border-bottom: 1px solid var(--line);
-      white-space: nowrap;
-    }
-
-    th:nth-child(1), td:nth-child(1) { min-width: 200px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
-    th:nth-child(2), td:nth-child(2) { width: 90px; text-align: left; }
-    th:nth-child(3), td:nth-child(3) { width: 85px; }
-    th:nth-child(4), td:nth-child(4) { width: 45px; text-align: center; }
-    th:nth-child(5), td:nth-child(5) { max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
-    th:nth-child(6), td:nth-child(6) { width: 80px; }
-    th:nth-child(7), td:nth-child(7) { width: 80px; }
-    th:nth-child(8), td:nth-child(8) { width: 90px; }
-    th:nth-child(9), td:nth-child(9) { width: 95px; text-align: right; }
-
-    th {
-      background: var(--bg);
-      color: var(--hint);
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr[data-key] { cursor: pointer; transition: background 0.12s; }
-    tr[data-key]:hover td { background: rgba(232, 71, 42, 0.04); }
-    tr[data-key].selected td {
-      background: var(--ember-soft);
-      box-shadow: inset 3px 0 0 var(--ember);
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      padding: 3px 7px;
-      border: 1px solid transparent;
-    }
-
-    .pill::before {
-      content: '';
-      width: 5px; height: 5px;
-      flex-shrink: 0;
-    }
-
-    .pill-ok { background: var(--success-soft); color: var(--success); border-color: rgba(26,154,92,0.2); }
-    .pill-ok::before { background: var(--success); }
-    .pill-off { background: rgba(255,255,255,0.04); color: var(--hint); border-color: var(--line); }
-    .pill-off::before { background: var(--hint); }
-    .pill-warn { background: var(--steel-soft); color: var(--steel); border-color: rgba(61,122,140,0.25); }
-    .pill-warn::before { background: var(--steel); }
-    .pill-expired { background: var(--danger-soft); color: var(--danger); border-color: rgba(212,49,44,0.25); }
-    .pill-expired::before { background: var(--danger); }
-
-    .mono-cell {
-      font-family: var(--mono);
-      font-size: 11.5px;
-      letter-spacing: 0.02em;
-      color: var(--ink-soft);
-    }
-
-    .btn-action {
-      background: var(--bg);
-      border: 1px solid var(--line-strong);
-      color: var(--ink);
-      padding: 4px 9px;
-      border-radius: 0;
-      font-size: 11px;
-      font-weight: 600;
-      font-family: var(--sans);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .btn-action:hover {
-      background: var(--ember);
-      color: #fff;
-      border-color: var(--ember);
-    }
-
-    .freeze-bar {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      padding: 10px 12px;
-      background: var(--bg);
-      border: 1px solid var(--line);
-    }
-
-    .freeze-bar span {
-      font-size: 11px;
-      color: var(--muted);
-      white-space: nowrap;
-      margin-right: auto;
-      font-weight: 500;
-    }
-
-    .freeze-bar select {
-      width: 110px;
-      flex-shrink: 0;
-      padding: 6px 8px;
-      background: var(--surface-raised);
-      border: 1px solid var(--line-strong);
-      color: var(--ink);
-      font-family: var(--sans);
-      font-size: 12px;
-      outline: none;
-      cursor: pointer;
-    }
-
-    .freeze-bar .btn-secondary {
-      width: auto;
-      flex-shrink: 0;
-      padding: 6px 12px;
-      font-size: 12px;
-    }
-
-    /* ── Billing notice ── */
-    .billing-notice {
-      border-top: 1px solid var(--line-strong);
-      padding: 1.25rem 1.75rem 1.5rem;
-      background: rgba(12, 14, 18, 0.65);
-    }
-
-    .billing-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 140px 1fr;
-      gap: 1.25rem;
-      align-items: start;
-    }
-
-    .billing-title {
-      font-family: var(--display);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: -0.01em;
-      line-height: 1.3;
-    }
-
-    .billing-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 12.5px;
-      color: var(--muted);
-      line-height: 1.5;
-      list-style: none;
-    }
-
-    .billing-list li {
-      padding-left: 14px;
-      position: relative;
-    }
-
-    .billing-list li::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 7px;
-      width: 6px; height: 1.5px;
-      background: var(--ember);
-    }
-
-    /* ── Rail notes ── */
-    .rail-note {
-      font-size: 11px;
-      line-height: 1.5;
-      margin-bottom: 10px;
-      padding: 8px 10px;
-      border-left: 2px solid;
-    }
-
-    .rail-note-danger {
-      color: var(--danger);
-      background: var(--danger-soft);
-      border-color: var(--danger);
-    }
-
-    .rail-note-warn {
-      color: var(--warn);
-      background: var(--warn-soft);
-      border-color: var(--warn);
-    }
-
-    .rail-stack { display: flex; flex-direction: column; gap: 8px; }
-
-    /* Debt value emphasis */
-    #debtValue {
-      font-family: var(--mono);
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    #qrWrap {
-      display: none;
-      margin-top: 12px;
-      background: #f4f5f8;
-      padding: 12px;
-      text-align: center;
-      border: 1px solid var(--panel-line);
-    }
-
-    #qrImg {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 8px;
-    }
-
-    /* ── Toast ── */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 9999;
-      max-width: 420px;
-      padding: 14px 20px;
-      background: var(--panel);
-      border: 1px solid var(--panel-line);
-      border-left: 3px solid var(--ember);
-      font-size: 13px;
-      color: var(--panel-text);
-      line-height: 1.5;
-      font-weight: 500;
-      transform: translateY(16px);
-      opacity: 0;
-      transition: all 0.3s var(--ease);
-      pointer-events: none;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-    }
-
-    #toast.visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
-    #toast.toast-err { border-left-color: var(--danger); }
-    #toast.toast-err strong { color: #ff6b66; }
-
-    /* ── Modal ── */
-    #confirmModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-box {
-      background: var(--surface-raised);
-      border: 1px solid var(--line-strong);
-      padding: 28px 30px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
-      animation: panelIn 0.35s var(--ease) both;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
-    }
-
-    .modal-box p {
-      margin: 0 0 22px;
-      font-size: 14px;
-      color: var(--ink);
-      line-height: 1.55;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .modal-actions .btn-secondary,
-    .modal-actions .btn-primary {
-      width: auto;
-      padding: 9px 22px;
-      font-size: 13px;
-    }
-
-    /* ── Login gate ── */
-    #loginGate {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      background:
-        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(232, 71, 42, 0.12), transparent 55%),
-        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(61, 122, 140, 0.1), transparent 50%),
-        var(--bg-deep);
-    }
-
-    #loginGate.visible { display: flex; }
-
-    #loginGate::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      opacity: 0.7;
-    }
-
-    .login-card {
-      position: relative;
-      width: 100%;
-      max-width: 400px;
-      background: var(--surface-raised);
-      border: 1px solid var(--line-strong);
-      padding: 2rem 1.75rem 1.75rem;
-      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
-      box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.35);
-      animation: panelIn 0.5s var(--ease) both;
-    }
-
-    .login-card::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 20px; height: 20px;
-      background: linear-gradient(135deg, transparent 50%, var(--bg-deep) 50%);
-      border-left: 1px solid var(--line-strong);
-      border-bottom: 1px solid var(--line-strong);
-    }
-
-    .login-brand {
-      display: flex;
-      align-items: baseline;
-      gap: 0.55rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .login-brand h2 {
-      font-family: var(--display);
-      font-weight: 800;
-      font-size: 1.75rem;
-      letter-spacing: -0.04em;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-
-    .login-brand h2 span { color: var(--ember); }
-
-    .login-brand .brand-slash {
-      width: 2px;
-      height: 24px;
-      background: var(--ember);
-      transform: skewX(-18deg);
-    }
-
-    .login-kicker {
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ember);
-      margin-bottom: 6px;
-    }
-
-    .login-hint {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 1.35rem;
-      line-height: 1.5;
-    }
-
-    .login-field { margin-bottom: 1rem; }
-
-    .login-field label {
-      display: block;
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--hint);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 7px;
-    }
-
-    .login-field input {
-      width: 100%;
-      padding: 11px 13px;
-      background: var(--bg);
-      border: 1px solid var(--line-strong);
-      border-radius: 0;
-      color: var(--ink);
-      font-family: var(--mono);
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .login-field input:focus {
-      border-color: var(--ember);
-      box-shadow: 0 0 0 3px var(--ember-soft);
-    }
-
-    .login-field input::placeholder { color: var(--hint); }
-
-    .login-error {
-      font-size: 12px;
-      color: var(--danger);
-      min-height: 18px;
-      margin-bottom: 10px;
-    }
-
-    #appShell { display: none; flex-direction: column; flex: 1; min-height: 0; }
-    #appShell.visible { display: flex; }
-
-    body.login-open { overflow: hidden; }
-
-    /* ── Auth loading ── */
-    #authLoading {
-      position: fixed;
-      inset: 0;
-      z-index: 10001;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 1.1rem;
-      background:
-        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(232, 71, 42, 0.12), transparent 55%),
-        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(61, 122, 140, 0.1), transparent 50%),
-        var(--bg-deep);
-    }
-
-    #authLoading.visible { display: flex; }
-
-    #authLoading::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      opacity: 0.7;
-    }
-
-    .auth-loading-inner {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      animation: panelIn 0.4s var(--ease) both;
-    }
-
-    .auth-spinner {
-      width: 36px;
-      height: 36px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: var(--ember);
-      border-right-color: var(--ember);
-      animation: authSpin 0.7s linear infinite;
-      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);
-    }
-
-    @keyframes authSpin {
-      to { transform: rotate(360deg); }
-    }
-
-    .auth-loading-label {
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .auth-loading-brand {
-      font-family: var(--display);
-      font-weight: 800;
-      font-size: 1.2rem;
-      letter-spacing: -0.04em;
-      text-transform: uppercase;
-      color: var(--ink);
-      margin-bottom: 0.25rem;
-    }
-
-    .auth-loading-brand span { color: var(--ember); }
-
-    /* ── Responsive ── */
-    @media (max-width: 1100px) {
-      .sidebar-right { display: none; }
-    }
-
-    @media (max-width: 760px) {
-      body { overflow: auto; }
-      .body-wrap { flex-direction: column; }
-      .sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        border-right: none;
-        border-bottom: 1px solid rgba(0,0,0,0.35);
-      }
-      .row { grid-template-columns: 1fr; }
-      .btn-row { grid-template-columns: 1fr; }
-      .billing-inner { grid-template-columns: 1fr; gap: 0.75rem; }
-      .page-header p { display: none; }
-      .header-chip { display: none; }
-      .card { clip-path: none; box-shadow: none; }
-      .card::after { display: none; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            display: ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .display { font-family: 'Space Grotesk', sans-serif; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-base-200">
 
-  <div id="authLoading">
-    <div class="auth-loading-inner">
-      <div class="auth-loading-brand">Ring<span>0</span>x</div>
-      <div class="auth-spinner" aria-hidden="true"></div>
-      <div class="auth-loading-label" id="authLoadingLabel">Validando acesso…</div>
+  <!-- Auth Loading -->
+  <div id="authLoading" class="hidden fixed inset-0 z-[10001] flex flex-col items-center justify-center gap-4 bg-base-300">
+    <div class="flex flex-col items-center gap-4">
+      <h2 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x</h2>
+      <div class="loading loading-spinner loading-lg text-error"></div>
+      <span class="mono text-xs font-semibold uppercase tracking-widest text-base-content/60" id="authLoadingLabel">Validando acesso…</span>
     </div>
   </div>
 
-  <div id="loginGate">
-    <div class="login-card">
-      <div class="login-kicker">acesso · reseller</div>
-      <div class="login-brand">
-        <h2>Ring<span>0</span>x</h2>
-        <div class="brand-slash" aria-hidden="true"></div>
+  <!-- Login Gate -->
+  <div id="loginGate" class="hidden fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-base-300">
+    <div class="card bg-base-100 border border-base-content/20 w-full max-w-md shadow-2xl">
+      <div class="card-body">
+        <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">acesso · reseller</div>
+        <h2 class="display text-3xl font-extrabold uppercase tracking-tighter mb-1">Ring<span class="text-error">0</span>x</h2>
+        <p class="text-sm text-base-content/60 mb-6">Informe o Bearer token de admin para entrar no painel de revenda.</p>
+        <form id="loginForm" onsubmit="doLogin(event)">
+          <div class="form-control mb-4">
+            <label class="label">
+              <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Bearer token</span>
+            </label>
+            <input id="loginToken" type="password" autocomplete="off" placeholder="Cole o token aqui" class="input input-bordered w-full mono" autofocus />
+          </div>
+          <div class="text-xs text-error min-h-[18px] mb-4" id="loginError"></div>
+          <button type="submit" class="btn btn-error w-full font-bold" id="btnLogin">Entrar</button>
+        </form>
       </div>
-      <p class="login-hint">Informe o Bearer token de admin para entrar no painel de revenda.</p>
-      <form id="loginForm" onsubmit="doLogin(event)">
-        <div class="login-field">
-          <label for="loginToken">Bearer token</label>
-          <input id="loginToken" type="password" autocomplete="off" placeholder="Cole o token aqui" autofocus />
-        </div>
-        <div class="login-error" id="loginError"></div>
-        <button type="submit" class="btn-primary" id="btnLogin">Entrar</button>
-      </form>
     </div>
   </div>
 
-  <div id="appShell">
+  <!-- App Shell -->
+  <div id="appShell" class="hidden flex flex-col min-h-0">
 
-  <header class="page-header">
-    <div class="brand-mark">
-      <h1>Ring<span>0</span>x</h1>
-      <div class="brand-slash" aria-hidden="true"></div>
+    <!-- Header -->
+    <div class="navbar bg-base-100 border-b border-base-content/10 px-6 h-16">
+      <div class="flex items-center gap-3">
+        <h1 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x</h1>
+        <div class="w-[2px] h-6 bg-error -skew-x-12"></div>
+      </div>
+      <p class="text-xs text-base-content/60 font-medium hidden sm:block">Painel de revenda · chaves de acesso</p>
+      <div class="ml-auto">
+        <div class="badge badge-neutral mono text-[10px] font-medium uppercase tracking-wider">ops / <span class="font-bold text-error">reseller</span></div>
+      </div>
     </div>
-    <p>Painel de revenda · chaves de acesso</p>
-    <div class="header-meta">
-      <div class="header-chip">ops / <strong>reseller</strong></div>
-    </div>
-  </header>
 
-  <div class="body-wrap">
+    <!-- Main Layout -->
+    <div class="flex flex-1 min-h-0 overflow-hidden">
 
-    <aside class="sidebar">
+      <!-- Left Sidebar -->
+      <aside class="w-[268px] bg-base-300 border-r border-base-content/10 overflow-y-auto flex flex-col gap-4 p-5 hidden lg:flex">
 
-      <div>
-        <div class="sidebar-section-label">Revenda · por key</div>
-        <div class="seg seg-products" id="prodSeg" style="margin-bottom:10px">
-          <button id="prodPB" onclick="setCalcProduct('PB')">PB</button>
-          <button id="prodFAIRLIGHT" onclick="setCalcProduct('FAIRLIGHT')">Fairlight</button>
-          <button id="prodPUBG" class="active" onclick="setCalcProduct('PUBG')">PUBG Full</button>
-          <button id="prodPUBGESP" onclick="setCalcProduct('PUBGESP')">PUBG ESP</button>
-          <button id="prodPUBGMACRO" onclick="setCalcProduct('PUBGMACRO')">PUBG Macro</button>
+        <!-- Product Selection -->
+        <div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Revenda · por key</div>
+          <div class="join join-vertical w-full mb-2" id="prodSeg">
+            <button id="prodPB" onclick="setCalcProduct('PB')" class="join-item btn btn-sm btn-neutral">PB</button>
+            <button id="prodFAIRLIGHT" onclick="setCalcProduct('FAIRLIGHT')" class="join-item btn btn-sm btn-neutral">Fairlight</button>
+            <button id="prodPUBG" onclick="setCalcProduct('PUBG')" class="join-item btn btn-sm btn-error">PUBG Full</button>
+            <button id="prodPUBGESP" onclick="setCalcProduct('PUBGESP')" class="join-item btn btn-sm btn-neutral">PUBG ESP</button>
+            <button id="prodPUBGMACRO" onclick="setCalcProduct('PUBGMACRO')" class="join-item btn btn-sm btn-neutral">PUBG Macro</button>
+          </div>
+
+          <!-- Pricing Plans -->
+          <ul class="menu bg-base-200 rounded-box p-1">
+            <li>
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-sm font-semibold">Diária</span>
+                  <span class="mono text-[10px] text-base-content/60 tracking-wider">1 dia</span>
+                </div>
+                <span class="mono text-sm font-semibold text-error" id="priceDiaria">R$ 8</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-sm font-semibold">Semanal</span>
+                  <span class="mono text-[10px] text-base-content/60 tracking-wider">7 dias</span>
+                </div>
+                <span class="mono text-sm font-semibold text-error" id="priceSemanal">R$ 30</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-sm font-semibold">Mensal</span>
+                  <span class="mono text-[10px] text-base-content/60 tracking-wider">30 dias</span>
+                </div>
+                <span class="mono text-sm font-semibold text-error" id="priceMensal">R$ 60</span>
+              </div>
+            </li>
+          </ul>
+
+          <!-- Calculator -->
+          <div class="card bg-base-200 border border-base-content/10 mt-2 p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-base-content/60">Calcular para</span>
+              <div class="join">
+                <button class="join-item btn btn-xs btn-neutral" onclick="changeQty(-1)">−</button>
+                <span class="join-item btn btn-xs btn-disabled mono font-semibold" id="calcQtyVal">1</span>
+                <button class="join-item btn btn-xs btn-neutral" onclick="changeQty(1)">+</button>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between">
+                <span class="text-[11px] text-base-content/60">Diária</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcDiaria">R$ 8,00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[11px] text-base-content/60">Semanal</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcSemanal">R$ 30,00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[11px] text-base-content/60">Mensal</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcMensal">R$ 60,00</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="pricing-plans">
-          <div class="plan-row">
-            <div class="plan-row-info">
-              <div class="plan-row-name">Diária</div>
-              <div class="plan-row-days">1 dia</div>
+
+        <div class="divider"></div>
+
+        <!-- Debt Balance -->
+        <div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Meu Saldo Devedor</div>
+          <div class="card bg-base-200 border border-base-content/10 p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs" id="debtStatusLabel">Aguardando...</span>
+              <span class="mono font-semibold text-error" id="debtValue">R$ 0,00</span>
             </div>
-            <div class="plan-row-price" id="priceDiaria">R$&nbsp;8</div>
-          </div>
-          <div class="plan-row">
-            <div class="plan-row-info">
-              <div class="plan-row-name">Semanal</div>
-              <div class="plan-row-days">7 dias</div>
+
+            <div class="join w-full mb-2" id="paySeg">
+              <button id="btnMethodPix" onclick="setPayMethod('pix')" class="join-item btn btn-sm btn-error">PIX</button>
+              <button id="btnMethodCredit" onclick="setPayMethod('credit')" class="join-item btn btn-sm btn-neutral">Cartão</button>
             </div>
-            <div class="plan-row-price" id="priceSemanal">R$&nbsp;30</div>
-          </div>
-          <div class="plan-row">
-            <div class="plan-row-info">
-              <div class="plan-row-name">Mensal</div>
-              <div class="plan-row-days">30 dias</div>
+
+            <div id="cpfWrap" class="mb-2">
+              <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX" class="input input-bordered input-sm w-full" />
             </div>
-            <div class="plan-row-price" id="priceMensal">R$&nbsp;60</div>
+
+            <button class="btn btn-error btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar Saldo</button>
+
+            <div id="qrWrap" class="hidden mt-3 bg-white p-3 text-center border border-base-content/20">
+              <div id="qrImg" class="flex justify-center mb-2"></div>
+              <button class="btn btn-sm btn-neutral w-full" onclick="copyPixCode()">Copiar Código PIX</button>
+            </div>
           </div>
         </div>
 
-        <div class="calc-block" style="margin-top:8px">
-          <div class="calc-top">
-            <span class="calc-top-label">Calcular para</span>
-            <div class="calc-qty-row">
-              <button class="calc-btn" onclick="changeQty(-1)">−</button>
-              <span class="calc-qty-val" id="calcQtyVal">1</span>
-              <button class="calc-btn" onclick="changeQty(1)">+</button>
+        <div class="divider"></div>
+
+        <!-- API Config -->
+        <div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Configuração da API</div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text mono text-[9px] font-bold uppercase tracking-wider">Token admin</span>
+            </label>
+            <div class="join w-full">
+              <input id="token" type="password" placeholder="Bearer token" class="input input-bordered input-sm join-item flex-1 mono" oninput="onTokenInput()" />
+              <button id="btnSaveToken" onclick="saveToken()" class="join-item btn btn-sm btn-error">Salvar</button>
+              <button id="btnClearToken" onclick="clearToken()" class="join-item btn btn-sm btn-neutral hidden">✕</button>
             </div>
-          </div>
-          <div class="calc-results">
-            <div class="calc-result-row">
-              <span class="calc-result-plan">Diária</span>
-              <span class="calc-result-val" id="calcDiaria">R$ 8,00</span>
-            </div>
-            <div class="calc-result-row">
-              <span class="calc-result-plan">Semanal</span>
-              <span class="calc-result-val" id="calcSemanal">R$ 30,00</span>
-            </div>
-            <div class="calc-result-row">
-              <span class="calc-result-plan">Mensal</span>
-              <span class="calc-result-val" id="calcMensal">R$ 60,00</span>
-            </div>
+            <div class="text-[10px] text-base-content/60 mt-1 min-h-[14px]" id="tokenHint"></div>
           </div>
         </div>
+
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="flex-1 min-w-0 overflow-y-auto flex flex-col bg-base-200">
+
+        <main class="p-6 flex-1 max-w-[1100px] mx-auto w-full">
+
+          <!-- Tabs -->
+          <div class="tabs tabs-boxed mb-6">
+            <a class="tab tab-active" onclick="switchTab('admin')" id="tab-admin">Admin</a>
+            <a class="tab" onclick="switchTab('list')" id="tab-list">Listar</a>
+          </div>
+
+          <!-- Admin Panel -->
+          <div id="panel-admin" class="block">
+
+            <div class="card bg-base-100 border border-base-content/10 shadow-xl mb-4">
+              <div class="card-body">
+                <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">01 — geração</div>
+                <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Criar key</h2>
+                <p class="text-sm text-base-content/60 mb-4">Define a key e a duração em dias. A validade começa a contar quando o cliente ativa.</p>
+
+                <div class="form-control mb-4">
+                  <label class="label">
+                    <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Key</span>
+                    <span class="label-text-alt text-[10px] text-base-content/60 font-normal normal-case tracking-normal" id="createKeyNote">(prefixo — sufixo aleatório ao criar múltiplas)</span>
+                  </label>
+                  <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" class="input input-bordered w-full" />
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Duração</span>
+                    </label>
+                    <select id="createDays" onchange="updateCreateCost()" class="select select-bordered w-full">
+                      <option value="">Selecione...</option>
+                      <option value="1">1 dia (Diária)</option>
+                      <option value="7">7 dias (Semanal)</option>
+                      <option value="30">30 dias (Mensal)</option>
+                    </select>
+                  </div>
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Produto</span>
+                    </label>
+                    <select id="createProduct" onchange="updateCreateCost()" class="select select-bordered w-full">
+                      <option value="">Selecione...</option>
+                      <option value="PB">PB</option>
+                      <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
+                      <option value="PUBG">PUBG - Full</option>
+                      <option value="PUBGESP">PUBG - ESP</option>
+                      <option value="PUBGMACRO">PUBG - Macro</option>
+                    </select>
+                  </div>
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Quantidade</span>
+                    </label>
+                    <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" class="input input-bordered w-full" />
+                  </div>
+                </div>
+
+                <div class="alert bg-base-200 border border-base-content/20 mb-4">
+                  <div class="flex items-center gap-3 w-full justify-between">
+                    <span class="text-sm text-base-content/60">Custo total</span>
+                    <span class="mono text-xl font-semibold text-error" id="createCost">R$ 0,00</span>
+                  </div>
+                </div>
+
+                <button class="btn btn-error w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
+
+                <div class="hidden mt-4" id="res-create">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60" id="label-create">Resultado — criar</span>
+                    <span class="badge" id="badge-create"></span>
+                  </div>
+                  <div class="hidden mb-2" id="batch-progress">
+                    <div class="flex items-center gap-3">
+                      <progress class="progress progress-error flex-1 h-2" value="0" max="100" id="batch-bar"></progress>
+                      <span class="mono text-[11px] text-base-content/60" id="batch-counter"></span>
+                    </div>
+                  </div>
+                  <div class="mono text-[11.5px] whitespace-pre-wrap break-all leading-[1.65] max-h-[220px] overflow-y-auto bg-base-300 border border-base-content/10 p-4" id="body-create"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- List Panel -->
+          <div id="panel-list" class="hidden">
+
+            <div class="card bg-base-100 border border-base-content/10 shadow-xl">
+              <div class="card-body">
+                <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">02 — inventário</div>
+                <h2 class="card-title display text-2xl font-bold tracking-tight mb-2">Keys cadastradas</h2>
+                <p class="text-sm text-base-content/60 mb-4">Lista completa (somente admin). Clique em uma linha para selecioná-la.</p>
+
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                  <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
+                  <button class="btn btn-neutral" onclick="copySelected()">Mover selecionada para Revogar →</button>
+                </div>
+
+                <div class="join items-center mb-4 flex-wrap justify-end">
+                  <span class="join-item text-[11px] text-base-content/60 px-2">Congelar todas</span>
+                  <select id="freezeProduct" class="join-item select select-xs select-bordered w-[110px]">
+                    <option value="PB">PB</option>
+                    <option value="FAIRLIGHT">Fairlight</option>
+                    <option value="PUBG">PUBG - Full</option>
+                    <option value="PUBGESP">PUBG - ESP</option>
+                    <option value="PUBGMACRO">PUBG - Macro</option>
+                  </select>
+                  <button class="join-item btn btn-xs btn-neutral" onclick="doFreeze('ALL', true)">Congelar</button>
+                  <button class="join-item btn btn-xs btn-neutral" onclick="doFreeze('ALL', false)">Descongelar</button>
+                </div>
+
+                <div class="overflow-x-auto max-h-[340px] border border-base-content/10 bg-base-200">
+                  <table class="table table-xs">
+                    <thead>
+                      <tr>
+                        <th>Key</th>
+                        <th>Status</th>
+                        <th>Produto</th>
+                        <th>Dias</th>
+                        <th>HWID</th>
+                        <th>Ativada em</th>
+                        <th>Termina em</th>
+                        <th>Congelado por</th>
+                        <th class="text-right">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody id="keysBody">
+                      <tr>
+                        <td colspan="9" class="text-center py-5 text-base-content/60 text-xs">
+                          Sem dados. Clique em "Atualizar lista".
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="hidden mt-4" id="res-list">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60">Resultado — listar</span>
+                    <span class="badge" id="badge-list"></span>
+                  </div>
+                  <div class="mono text-[11.5px] whitespace-pre-wrap break-all leading-[1.65] max-h-[220px] overflow-y-auto bg-base-300 border border-base-content/10 p-4" id="body-list"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </main>
+
+        <!-- Billing Notice -->
+        <div class="border-t border-base-content/10 p-6 bg-base-300">
+          <div class="max-w-[1100px] mx-auto grid grid-cols-[140px_1fr] gap-5 items-start">
+            <div class="display text-sm font-bold tracking-tight">Política de cobrança</div>
+            <ul class="text-sm text-base-content/60 space-y-1.5 list-disc list-inside marker:text-error">
+              <li>O débito é gerado no momento da criação da chave, independentemente de ativação ou uso.</li>
+              <li>Keys revogadas, expiradas ou não ativadas continuam gerando débito.</li>
+              <li>O saldo devedor tem vencimento de 7 dias corridos.</li>
+              <li>Em caso de atraso, todas as keys ativas do revendedor são congeladas automaticamente até a regularização.</li>
+            </ul>
+          </div>
+        </div>
+
       </div>
 
-      <hr class="sidebar-divider" />
+      <!-- Right Sidebar -->
+      <aside class="w-[280px] bg-base-100 border-l border-base-content/10 overflow-y-auto flex flex-col gap-4 p-5 hidden lg:flex">
 
-      <div>
-        <div class="sidebar-section-label">Meu Saldo Devedor</div>
-        <div class="calc-block" style="margin-top:0">
-          <div class="calc-top" style="margin-bottom:10px">
-            <span class="calc-top-label" id="debtStatusLabel" style="font-size:12px">Aguardando...</span>
-            <span class="calc-qty-val" id="debtValue" style="color:var(--danger)">R$ 0,00</span>
-          </div>
-
-          <div class="seg" id="paySeg" style="margin-bottom:10px">
-            <button id="btnMethodPix" class="active" onclick="setPayMethod('pix')">PIX</button>
-            <button id="btnMethodCredit" onclick="setPayMethod('credit')">Cartão</button>
-          </div>
-
-          <div id="cpfWrap" style="margin-bottom:10px;">
-            <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX" />
-          </div>
-
-          <button class="btn-primary" id="btnPayDebt" style="padding:9px 12px;font-size:12px;" onclick="doPayDebt()" disabled>Pagar Saldo</button>
-
-          <div id="qrWrap">
-            <div id="qrImg"></div>
-            <button class="btn-secondary" style="margin-top:8px;padding:7px;font-size:11px;color:#12141a;background:#e8eaef;border-color:#c8ccd6;" onclick="copyPixCode()">Copiar Código PIX</button>
-          </div>
-        </div>
-      </div>
-
-      <hr class="sidebar-divider" />
-
-      <div>
-        <div class="sidebar-section-label">Configuração da API</div>
-
-        <div class="config-field" style="display: none;">
-          <span class="config-label">Ambiente</span>
-          <div class="seg">
-            <button id="envDev" onclick="setEnv('dev')">Dev</button>
-            <button id="envProd" class="active" onclick="setEnv('prod')">Produção</button>
-          </div>
-        </div>
-
-        <div class="config-field" style="display: none;">
-          <span class="config-label">Base URL</span>
-          <input id="baseUrl" type="text" value="https://ringapi.guaranihub.com" />
-        </div>
-
-        <div class="config-field">
-          <span class="config-label">Token admin</span>
-          <div class="token-group">
-            <input id="token" type="password" placeholder="Bearer token" oninput="onTokenInput()" />
-            <button id="btnSaveToken" class="token-btn token-btn-save" onclick="saveToken()">Salvar</button>
-            <button id="btnClearToken" class="token-btn token-btn-clear" onclick="clearToken()" style="display:none">✕</button>
-          </div>
-          <div id="tokenHint" class="token-hint"></div>
-        </div>
-      </div>
-
-    </aside>
-
-    <div class="scroll-area">
-
-      <main class="main">
-
-        <div class="tabs-bar">
-          <div class="tabs">
-            <button class="tab active" onclick="switchTab('admin')">Admin</button>
-            <button class="tab" onclick="switchTab('list')">Listar</button>
-          </div>
-          <div class="tabs-meta">key console</div>
-        </div>
-
-        <div id="panel-admin" class="panel active">
-
-          <div class="card">
-            <div class="card-kicker">01 — geração</div>
-            <div class="card-title">Criar key</div>
-            <p class="card-hint">Define a key e a duração em dias. A validade começa a contar quando o cliente ativa.</p>
-
-            <div class="field">
-              <label>Key <span id="createKeyNote" style="color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0">(prefixo — sufixo aleatório ao criar múltiplas)</span></label>
-              <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026" />
+        <!-- Revoke Key -->
+        <div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">revogar key</div>
+          <div class="card bg-base-200 border border-base-content/10 p-3">
+            <div class="alert alert-error text-xs mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-4 w-4" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>A key é invalidada permanentemente. A dívida permanece no saldo mesmo após revogação.</span>
             </div>
-
-            <div class="row" style="margin-bottom:16px">
-              <div class="field" style="margin-bottom:0">
-                <label>Duração</label>
-                <select id="createDays" onchange="updateCreateCost()">
-                  <option value="">Selecione...</option>
-                  <option value="1">1 dia (Diária)</option>
-                  <option value="7">7 dias (Semanal)</option>
-                  <option value="30">30 dias (Mensal)</option>
-                </select>
-              </div>
-              <div class="field" style="margin-bottom:0">
-                <label>Produto</label>
-                <select id="createProduct" onchange="updateCreateCost()">
-                  <option value="">Selecione...</option>
-                  <option value="PB">PB</option>
-                  <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
-                  <option value="PUBG">PUBG - Full</option>
-                  <option value="PUBGESP">PUBG - ESP</option>
-                  <option value="PUBGMACRO">PUBG - Macro</option>
-                </select>
-              </div>
-              <div class="field" style="margin-bottom:0">
-                <label>Quantidade</label>
-                <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()" />
-              </div>
-            </div>
-
-            <div class="cost-strip">
-              <span>Custo total</span>
-              <span id="createCost">R$ 0,00</span>
-            </div>
-
-            <button class="btn-primary" id="btnCreate" onclick="doCreate()">Criar key</button>
-
-            <div class="result-wrap" id="res-create">
-              <div class="result-header">
-                <span class="result-label" id="label-create">Resultado — criar</span>
-                <span class="badge" id="badge-create"></span>
-              </div>
-              <div class="batch-progress" id="batch-progress" style="display:none">
-                <div class="batch-bar-wrap"><div class="batch-bar" id="batch-bar"></div></div>
-                <span class="batch-counter" id="batch-counter"></span>
-              </div>
-              <div class="result-body" id="body-create"></div>
-            </div>
+            <input id="revokeKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full mb-2" />
+            <button class="btn btn-error btn-sm w-full" id="btnRevoke" onclick="doRevoke()">Revogar</button>
           </div>
-
         </div>
 
-        <div id="panel-list" class="panel">
-          <div class="card">
-            <div class="card-kicker">02 — inventário</div>
-            <div class="card-title">Keys cadastradas</div>
-            <p class="card-hint">Lista completa (somente admin). Clique em uma linha para selecioná-la.</p>
-            <div class="btn-row" style="margin-bottom:14px">
-              <button class="btn-secondary" id="btnList" onclick="doList()">Atualizar lista</button>
-              <button class="btn-secondary" onclick="copySelected()">Mover selecionada para Revogar →</button>
+        <!-- Reset HWID -->
+        <div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">reset hwid</div>
+          <div class="card bg-base-200 border border-base-content/10 p-3">
+            <div class="alert alert-warning text-xs mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-4 w-4" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <span>Permite que a key seja ativada em um novo dispositivo. O HWID será atualizado automaticamente.</span>
             </div>
-            <div class="freeze-bar">
-              <span>Congelar todas</span>
-              <select id="freezeProduct">
+            <input id="resetHwidKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full mb-2" />
+            <button class="btn btn-neutral btn-sm w-full" id="btnResetHwid" onclick="doResetHwid()">Reset HWID</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Client Simulation -->
+        <div>
+          <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">simulação de cliente</div>
+          <div class="card bg-base-200 border border-base-content/10 p-3">
+            <div class="alert alert-warning text-xs mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-4 w-4" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <span>Simula a ativação pelo cliente. Use para validar a key antes de enviar.</span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <input id="activateKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
+              <select id="activateProduct" class="select select-bordered select-sm w-full">
                 <option value="PB">PB</option>
-                <option value="FAIRLIGHT">Fairlight</option>
+                <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
                 <option value="PUBG">PUBG - Full</option>
                 <option value="PUBGESP">PUBG - ESP</option>
                 <option value="PUBGMACRO">PUBG - Macro</option>
               </select>
-              <button class="btn-secondary" onclick="doFreeze('ALL', true)">Congelar</button>
-              <button class="btn-secondary" onclick="doFreeze('ALL', false)">Descongelar</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Key</th>
-                    <th>Status</th>
-                    <th>Produto</th>
-                    <th>Dias</th>
-                    <th>HWID</th>
-                    <th>Ativada em</th>
-                    <th>Termina em</th>
-                    <th>Congelado por</th>
-                    <th style="text-align: right">Ação</th>
-                  </tr>
-                </thead>
-                <tbody id="keysBody">
-                  <tr>
-                    <td colspan="9" style="color:var(--hint);padding:20px 12px;font-size:12px">
-                      Sem dados. Clique em "Atualizar lista".
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="result-wrap" id="res-list">
-              <div class="result-header">
-                <span class="result-label">Resultado — listar</span>
-                <span class="badge" id="badge-list"></span>
-              </div>
-              <div class="result-body" id="body-list"></div>
+              <button class="btn btn-neutral btn-sm w-full" id="btnActivate" onclick="doActivate()">Ativar key</button>
             </div>
           </div>
         </div>
 
-      </main>
-
-      <div class="billing-notice">
-        <div class="billing-inner">
-          <div class="billing-title">Política de cobrança</div>
-          <ul class="billing-list">
-            <li>O débito é gerado no momento da criação da chave, independentemente de ativação ou uso.</li>
-            <li>Keys revogadas, expiradas ou não ativadas continuam gerando débito.</li>
-            <li>O saldo devedor tem vencimento de 7 dias corridos.</li>
-            <li>Em caso de atraso, todas as keys ativas do revendedor são congeladas automaticamente até a regularização.</li>
-          </ul>
-        </div>
-      </div>
+      </aside>
 
     </div>
 
-    <aside class="sidebar-right">
-
-      <div>
-        <div class="sidebar-section-label">revogar key</div>
-        <div class="calc-block">
-          <div class="rail-note rail-note-danger">A key é invalidada permanentemente. A dívida permanece no saldo mesmo após revogação.</div>
-          <input id="revokeKey" type="text" placeholder="Cole a key" style="margin-bottom:8px" />
-          <button class="btn-danger" id="btnRevoke" onclick="doRevoke()" style="padding:8px;font-size:12px">Revogar</button>
-        </div>
-      </div>
-
-      <div>
-        <div class="sidebar-section-label">reset hwid</div>
-        <div class="calc-block">
-          <div class="rail-note rail-note-warn">Permite que a key seja ativada em um novo dispositivo na próxima validação. O HWID será atualizado automaticamente.</div>
-          <input id="resetHwidKey" type="text" placeholder="Cole a key" style="margin-bottom:8px" />
-          <button class="btn-secondary" id="btnResetHwid" onclick="doResetHwid()" style="padding:8px;font-size:12px">Reset HWID</button>
-        </div>
-      </div>
-
-      <hr class="sidebar-divider" />
-
-      <div>
-        <div class="sidebar-section-label">simulação de cliente</div>
-        <div class="calc-block">
-          <div class="rail-note rail-note-warn">Simula a ativação pelo cliente. Use para validar a key antes de enviar.</div>
-          <div class="rail-stack">
-            <input id="activateKey" type="text" placeholder="Cole a key" />
-            <select id="activateProduct">
-              <option value="PB">PB</option>
-              <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
-              <option value="PUBG">PUBG - Full</option>
-              <option value="PUBGESP">PUBG - ESP</option>
-              <option value="PUBGMACRO">PUBG - Macro</option>
-            </select>
-            <button class="btn-activate" id="btnActivate" onclick="doActivate()">Ativar key</button>
-          </div>
-        </div>
-      </div>
-
-    </aside>
-
-  </div><!-- /body-wrap -->
-
-  </div><!-- /appShell -->
-
-  <div id="toast"></div>
-
-  <div id="confirmModal" onclick="if(event.target===this)closeConfirm()">
-    <div class="modal-box">
-      <p id="confirmMsg"></p>
-      <div class="modal-actions">
-        <button id="confirmNo" class="btn-secondary">Cancelar</button>
-        <button id="confirmYes" class="btn-primary">Confirmar</button>
-      </div>
-    </div>
   </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast toast-end toast-bottom z-[9999] max-w-[420px]"></div>
+
+  <!-- Confirm Modal -->
+  <dialog id="confirmModal" class="modal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <p id="confirmMsg" class="py-4"></p>
+      <div class="modal-action">
+        <button id="confirmNo" class="btn btn-neutral">Cancelar</button>
+        <button id="confirmYes" class="btn btn-error">Confirmar</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
 
   <script>
     const ENV = { dev: 'http://localhost:8443', prod: 'https://ringapi.guaranihub.com' };
@@ -1798,8 +491,15 @@
 
     function setCalcProduct(p) {
       _calcProduct = p;
-      document.querySelectorAll('#prodSeg button').forEach(b => b.classList.remove('active'));
-      document.getElementById('prod' + p).classList.add('active');
+      document.querySelectorAll('#prodSeg button').forEach(b => {
+        b.classList.remove('btn-error');
+        b.classList.add('btn-neutral');
+      });
+      const activeBtn = document.getElementById('prod' + p);
+      if (activeBtn) {
+        activeBtn.classList.remove('btn-neutral');
+        activeBtn.classList.add('btn-error');
+      }
       updateCalc();
     }
 
@@ -1809,9 +509,9 @@
       document.getElementById('calcDiaria').textContent = fmt(p.diaria * _calcQty);
       document.getElementById('calcSemanal').textContent = fmt(p.semanal * _calcQty);
       document.getElementById('calcMensal').textContent = fmt(p.mensal * _calcQty);
-      document.getElementById('priceDiaria').innerHTML = 'R$&nbsp;' + p.diaria.toFixed(2).replace('.', ',');
-      document.getElementById('priceSemanal').innerHTML = 'R$&nbsp;' + p.semanal.toFixed(2).replace('.', ',');
-      document.getElementById('priceMensal').innerHTML = 'R$&nbsp;' + p.mensal.toFixed(2).replace('.', ',');
+      document.getElementById('priceDiaria').textContent = 'R$ ' + p.diaria.toFixed(2).replace('.', ',');
+      document.getElementById('priceSemanal').textContent = 'R$ ' + p.semanal.toFixed(2).replace('.', ',');
+      document.getElementById('priceMensal').textContent = 'R$ ' + p.mensal.toFixed(2).replace('.', ',');
     }
 
     function changeQty(d) {
@@ -1819,17 +519,26 @@
       updateCalc();
     }
 
-    function setEnv(e) {
-      document.getElementById('baseUrl').value = ENV[e];
-      document.getElementById('envDev').classList.toggle('active', e === 'dev');
-      document.getElementById('envProd').classList.toggle('active', e === 'prod');
-    }
-
     const TAB_IDS = ['admin', 'list'];
 
     function switchTab(t) {
-      document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', TAB_IDS[i] === t));
-      TAB_IDS.forEach(id => document.getElementById('panel-' + id).classList.toggle('active', id === t));
+      document.querySelectorAll('.tab').forEach((b, i) => {
+        if (TAB_IDS[i] === t) {
+          b.classList.add('tab-active');
+        } else {
+          b.classList.remove('tab-active');
+        }
+      });
+      TAB_IDS.forEach(id => {
+        const panel = document.getElementById('panel-' + id);
+        if (id === t) {
+          panel.classList.remove('hidden');
+          panel.classList.add('block');
+        } else {
+          panel.classList.add('hidden');
+          panel.classList.remove('block');
+        }
+      });
     }
 
     function rnd(n) {
@@ -1845,19 +554,20 @@
       const el = document.getElementById('authLoading');
       const label = document.getElementById('authLoadingLabel');
       if (label) label.textContent = msg || 'Validando acesso…';
-      el.classList.add('visible');
-      document.body.classList.add('login-open');
+      el.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
     }
 
     function hideAuthLoading() {
-      document.getElementById('authLoading').classList.remove('visible');
+      document.getElementById('authLoading').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
     }
 
     function showLogin(errorMsg) {
       hideAuthLoading();
-      document.getElementById('loginGate').classList.add('visible');
-      document.getElementById('appShell').classList.remove('visible');
-      document.body.classList.add('login-open');
+      document.getElementById('loginGate').classList.remove('hidden');
+      document.getElementById('appShell').classList.add('hidden');
+      document.body.classList.add('overflow-hidden');
       const err = document.getElementById('loginError');
       if (err) err.textContent = errorMsg || '';
       const input = document.getElementById('loginToken');
@@ -1869,15 +579,15 @@
 
     function showApp() {
       hideAuthLoading();
-      document.getElementById('loginGate').classList.remove('visible');
-      document.getElementById('appShell').classList.add('visible');
-      document.body.classList.remove('login-open');
+      document.getElementById('loginGate').classList.add('hidden');
+      document.getElementById('appShell').classList.remove('hidden');
+      document.body.classList.remove('overflow-hidden');
     }
 
     function applyAuthToken(val) {
       localStorage.setItem(TOKEN_KEY, val);
       document.getElementById('token').value = val;
-      document.getElementById('btnClearToken').style.display = 'inline-block';
+      document.getElementById('btnClearToken').classList.remove('hidden');
       document.getElementById('tokenHint').textContent = 'Token salvo localmente.';
     }
 
@@ -1928,7 +638,7 @@
 
       showAuthLoading('Validando acesso…');
       document.getElementById('token').value = saved;
-      document.getElementById('btnClearToken').style.display = 'inline-block';
+      document.getElementById('btnClearToken').classList.remove('hidden');
       document.getElementById('tokenHint').textContent = 'Validando token…';
 
       try {
@@ -1939,7 +649,7 @@
       } catch (ex) {
         localStorage.removeItem(TOKEN_KEY);
         document.getElementById('token').value = '';
-        document.getElementById('btnClearToken').style.display = 'none';
+        document.getElementById('btnClearToken').classList.add('hidden');
         document.getElementById('tokenHint').textContent = '';
         showLogin(ex.message || 'Token inválido. Faça login novamente.');
       }
@@ -1948,7 +658,7 @@
     function onTokenInput() {
       const val = document.getElementById('token').value.trim();
       const saved = localStorage.getItem(TOKEN_KEY);
-      document.getElementById('btnClearToken').style.display = saved ? 'inline-block' : 'none';
+      document.getElementById('btnClearToken').classList.toggle('hidden', !saved);
       if (saved && val !== saved) document.getElementById('tokenHint').textContent = 'Alterado — salve para atualizar.';
       else if (!saved) document.getElementById('tokenHint').textContent = '';
     }
@@ -1957,7 +667,7 @@
       const val = document.getElementById('token').value.trim();
       if (!val) { document.getElementById('tokenHint').textContent = 'Digite um token.'; return; }
       localStorage.setItem(TOKEN_KEY, val);
-      document.getElementById('btnClearToken').style.display = 'inline-block';
+      document.getElementById('btnClearToken').classList.remove('hidden');
       document.getElementById('tokenHint').textContent = 'Salvo.';
       setTimeout(() => { document.getElementById('tokenHint').textContent = 'Token salvo localmente.'; }, 1800);
       loadDebtBalance();
@@ -1966,7 +676,7 @@
     function clearToken() {
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
-      document.getElementById('btnClearToken').style.display = 'none';
+      document.getElementById('btnClearToken').classList.add('hidden');
       document.getElementById('tokenHint').textContent = '';
       showLogin();
     }
@@ -1979,7 +689,7 @@
     }
 
     function getBase() {
-      return (document.getElementById('baseUrl').value || '').trim().replace(/\/+$/, '');
+      return 'https://ringapi.guaranihub.com';
     }
 
     async function api(path, body) {
@@ -2008,7 +718,7 @@
 
       if (!btn || !val || !lbl) return;
 
-      document.getElementById('qrWrap').style.display = 'none';
+      document.getElementById('qrWrap').classList.add('hidden');
 
       if (!document.getElementById('token').value.trim()) {
         lbl.textContent = 'Sem token';
@@ -2019,7 +729,8 @@
 
       try {
         lbl.textContent = 'Consultando...';
-        val.style.color = 'var(--panel-muted)';
+        val.classList.remove('text-error', 'text-success');
+        val.classList.add('text-base-content/60');
         const res = await api('/admin/auth-keys/debt-balance', {});
         const data = res.Result || {};
         const debt = parseFloat(data.Balance ?? data.balance) || 0;
@@ -2029,21 +740,25 @@
 
         if (isOverdue) {
           lbl.textContent = 'Débito vencido!';
-          val.style.color = 'var(--danger)';
+          val.classList.remove('text-base-content/60', 'text-success');
+          val.classList.add('text-error');
           btn.disabled = false;
         } else if (debt > 0) {
           lbl.textContent = 'Você deve';
-          val.style.color = '#ff8a74';
+          val.classList.remove('text-base-content/60', 'text-success');
+          val.classList.add('text-error');
           btn.disabled = false;
         } else {
           lbl.textContent = 'Tudo pago!';
-          val.style.color = 'var(--success)';
+          val.classList.remove('text-base-content/60', 'text-error');
+          val.classList.add('text-success');
           btn.disabled = true;
         }
       } catch (e) {
         lbl.textContent = 'Erro ao ler';
         val.textContent = 'R$ 0,00';
-        val.style.color = 'var(--danger)';
+        val.classList.remove('text-base-content/60', 'text-success');
+        val.classList.add('text-error');
         btn.disabled = true;
       }
     }
@@ -2051,9 +766,23 @@
     let _payMethod = 'pix';
     function setPayMethod(m) {
       _payMethod = m;
-      document.getElementById('btnMethodPix').classList.toggle('active', m === 'pix');
-      document.getElementById('btnMethodCredit').classList.toggle('active', m === 'credit');
-      document.getElementById('cpfWrap').style.display = m === 'pix' ? 'block' : 'none';
+      const pixBtn = document.getElementById('btnMethodPix');
+      const creditBtn = document.getElementById('btnMethodCredit');
+      const cpfWrap = document.getElementById('cpfWrap');
+      
+      if (m === 'pix') {
+        pixBtn.classList.remove('btn-neutral');
+        pixBtn.classList.add('btn-error');
+        creditBtn.classList.remove('btn-error');
+        creditBtn.classList.add('btn-neutral');
+        cpfWrap.classList.remove('hidden');
+      } else {
+        creditBtn.classList.remove('btn-neutral');
+        creditBtn.classList.add('btn-error');
+        pixBtn.classList.remove('btn-error');
+        pixBtn.classList.add('btn-neutral');
+        cpfWrap.classList.add('hidden');
+      }
     }
 
     let _lastPixCode = '';
@@ -2085,7 +814,7 @@
         if (raw) {
            if (type === 'qr') {
              _lastPixCode = raw;
-             document.getElementById('qrWrap').style.display = 'block';
+             document.getElementById('qrWrap').classList.remove('hidden');
              document.getElementById('qrImg').innerHTML = '';
              new QRCode(document.getElementById("qrImg"), {
                text: raw,
@@ -2133,9 +862,9 @@
       const body = document.getElementById(bodyId);
       const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
       badge.textContent = ok ? 'Sucesso' : 'Erro';
-      badge.className = 'badge ' + (ok ? 'badge-ok' : 'badge-err');
+      badge.className = 'badge ' + (ok ? 'badge-success' : 'badge-error');
       body.textContent = text;
-      wrap.classList.add('visible');
+      wrap.classList.remove('hidden');
     }
 
     function onQtyChange() {
@@ -2143,11 +872,11 @@
       const note = document.getElementById('createKeyNote');
       const btn = document.getElementById('btnCreate');
       if (qty > 1) {
-        note.style.display = 'inline';
+        note.classList.remove('hidden');
         btn.setAttribute('data-orig', `Criar ${qty} keys`);
         btn.textContent = `Criar ${qty} keys`;
       } else {
-        note.style.display = 'none';
+        note.classList.add('hidden');
         btn.setAttribute('data-orig', 'Criar key');
         btn.textContent = 'Criar key';
       }
@@ -2177,8 +906,8 @@
       const badgeEl = document.getElementById('badge-create');
       const labelEl = document.getElementById('label-create');
 
-      wrap.classList.add('visible');
-      progress.style.display = qty > 1 ? 'flex' : 'none';
+      wrap.classList.remove('hidden');
+      progress.classList.toggle('hidden', qty <= 1);
       bodyEl.textContent = '';
       badgeEl.textContent = '';
       badgeEl.className = 'badge';
@@ -2190,7 +919,7 @@
       for (let i = 0; i < qty; i++) {
         const keyValue = qty > 1 ? `${baseKey}-${rnd(4)}${rnd(4)}` : baseKey;
         if (qty > 1) {
-          bar.style.width = (((i) / qty) * 100) + '%';
+          bar.value = ((i) / qty) * 100;
           counter.textContent = `${i}/${qty}`;
         }
         try {
@@ -2205,12 +934,12 @@
         bodyEl.textContent = lines.join('\n\n');
       }
 
-      bar.style.width = '100%';
+      bar.value = 100;
       counter.textContent = `${qty}/${qty}`;
 
       const allOk = fail === 0;
       badgeEl.textContent = qty > 1 ? `${ok} ok${fail > 0 ? ` · ${fail} erro${fail > 1 ? 's' : ''}` : ''}` : (allOk ? 'Sucesso' : 'Erro');
-      badgeEl.className = 'badge ' + (allOk ? 'badge-ok' : (ok > 0 ? 'badge-warn' : 'badge-err'));
+      badgeEl.className = 'badge ' + (allOk ? 'badge-success' : (ok > 0 ? 'badge-warning' : 'badge-error'));
 
       if (ok > 0) {
         loadDebtBalance();
@@ -2285,7 +1014,7 @@
     function renderTable(items) {
       const body = document.getElementById('keysBody');
       if (!Array.isArray(items) || !items.length) {
-        body.innerHTML = '<tr><td colspan="9" style="color:var(--hint);padding:16px 12px;font-size:12px">Nenhuma key encontrada.</td></tr>';
+        body.innerHTML = '<tr><td colspan="9" class="text-center py-5 text-base-content/60 text-xs">Nenhuma key encontrada.</td></tr>';
         return;
       }
       body.innerHTML = items.map(i => {
@@ -2308,43 +1037,43 @@
         let statusHtml = '';
         let actionBtn = '';
         if (paused) {
-          statusHtml = `<span class="pill pill-warn">Congelada</span>`;
-          actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', false); event.stopPropagation();">Retomar</button>`;
+          statusHtml = `<span class="badge badge-warning">Congelada</span>`;
+          actionBtn = `<button class="btn btn-xs btn-neutral" onclick="doFreeze('${k}', false); event.stopPropagation();">Retomar</button>`;
         } else if (ok) {
           if (isExpired) {
-            statusHtml = `<span class="pill pill-expired">Expirado</span>`;
-            actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
+            statusHtml = `<span class="badge badge-error">Expirado</span>`;
+            actionBtn = `<button class="btn btn-xs btn-neutral" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
           } else {
-            statusHtml = `<span class="pill pill-ok">Ativa</span>`;
-            actionBtn = `<button class="btn-action" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
+            statusHtml = `<span class="badge badge-success">Ativa</span>`;
+            actionBtn = `<button class="btn btn-xs btn-neutral" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
           }
         } else {
-          statusHtml = `<span class="pill pill-off">Inativa</span>`;
+          statusHtml = `<span class="badge badge-neutral">Inativa</span>`;
         }
 
         const hwid = i.hwid || i.Hwid || '';
         const hwidCell = hwid
-          ? `<span class="mono-cell" style="font-size:10px;max-width:110px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle" title="${hwid}">${hwid}</span>`
-          : `<span style="color:var(--hint);font-size:10px">—</span>`;
+          ? `<span class="mono text-[11.5px] tracking-[0.02em] text-[10px] max-w-[140px] inline-block overflow-hidden text-ellipsis whitespace-nowrap align-middle" title="${hwid}">${hwid}</span>`
+          : `<span class="text-base-content/60 text-[10px]">—</span>`;
 
         const fb = i.frozen_by || i.FrozenBy || '';
         const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
-        return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}">
-          <td class="mono-cell">${k}</td>
+        return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}" class="hover:bg-base-content/5 cursor-pointer">
+          <td class="mono text-[11.5px] tracking-[0.02em]">${k}</td>
           <td>${statusHtml}</td>
           <td>${productName}</td>
           <td>${days}</td>
           <td>${hwidCell}</td>
           <td>${act}</td><td>${end}</td>
           <td>${paused ? frozenByLabel : '—'}</td>
-          <td style="text-align: right">${actionBtn}</td>
+          <td class="text-right">${actionBtn}</td>
         </tr>`;
       }).join('');
 
       body.querySelectorAll('tr[data-key]').forEach(row => {
         row.addEventListener('click', () => {
-          body.querySelectorAll('tr[data-key]').forEach(r => r.classList.remove('selected'));
-          row.classList.add('selected');
+          body.querySelectorAll('tr[data-key]').forEach(r => r.classList.remove('bg-error/10'));
+          row.classList.add('bg-error/10');
           _selectedKey = row.getAttribute('data-key');
         });
       });
@@ -2369,7 +1098,7 @@
         const productType = getFreezeProduct(key);
         const r = await api('/admin/auth-keys/freeze', { keyValue: key, freeze: freeze, productType });
         toast(r?.StatusMessage || 'Ação realizada com sucesso!');
-        if (document.getElementById('panel-list').classList.contains('active')) {
+        if (!document.getElementById('panel-list').classList.contains('hidden')) {
           doList();
         }
       } catch (e) {
@@ -2381,9 +1110,9 @@
     function toast(msg, isErr) {
       const el = document.getElementById('toast');
       clearTimeout(_toastTimer);
-      el.textContent = msg;
-      el.className = isErr ? 'visible toast-err' : 'visible';
-      _toastTimer = setTimeout(() => el.classList.remove('visible'), 3500);
+      const alertClass = isErr ? 'alert-error' : 'alert-success';
+      el.innerHTML = `<div class="alert ${alertClass} shadow-lg"><span>${msg}</span></div>`;
+      _toastTimer = setTimeout(() => el.innerHTML = '', 3500);
     }
 
     let _confirmResolve = null;
@@ -2391,47 +1120,18 @@
       return new Promise(resolve => {
         _confirmResolve = resolve;
         document.getElementById('confirmMsg').textContent = msg;
-        document.getElementById('confirmModal').style.display = 'flex';
+        document.getElementById('confirmModal').showModal();
       });
     }
     function closeConfirm() {
-      document.getElementById('confirmModal').style.display = 'none';
+      document.getElementById('confirmModal').close();
       if (_confirmResolve) _confirmResolve(false);
     }
     document.getElementById('confirmYes').addEventListener('click', () => {
-      document.getElementById('confirmModal').style.display = 'none';
+      document.getElementById('confirmModal').close();
       if (_confirmResolve) _confirmResolve(true);
     });
     document.getElementById('confirmNo').addEventListener('click', closeConfirm);
-
-    function makeResizable(table) {
-      const cols = table.querySelectorAll('th');
-      cols.forEach(th => {
-        const grip = document.createElement('div');
-        grip.style.cssText = 'position:absolute;top:0;right:-4px;width:8px;height:100%;cursor:col-resize;z-index:2;user-select:none';
-        th.style.position = 'relative';
-        th.appendChild(grip);
-        grip.addEventListener('mousedown', e => {
-          e.preventDefault();
-          const startX = e.clientX;
-          const startW = th.offsetWidth;
-          function onMove(ev) {
-            const diff = ev.clientX - startX;
-            th.style.width = Math.max(40, startW + diff) + 'px';
-            th.style.minWidth = '0';
-            th.style.maxWidth = 'none';
-          }
-          function onUp() {
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
-          }
-          document.addEventListener('mousemove', onMove);
-          document.addEventListener('mouseup', onUp);
-        });
-      });
-    }
-    const tableEl = document.querySelector('.table-wrap table');
-    if (tableEl) makeResizable(tableEl);
 
     loadToken();
     updateCalc();
