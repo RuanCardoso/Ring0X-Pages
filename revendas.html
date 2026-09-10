@@ -178,7 +178,7 @@
           </div>
         </div>
 
-        <div class="divider"></div>
+        <div class="divider my-1"></div>
 
         <!-- API Config -->
         <div>
@@ -188,7 +188,7 @@
               <span class="label-text mono text-[9px] font-bold uppercase tracking-wider">Token admin</span>
             </label>
             <div class="join w-full">
-              <input id="token" type="password" placeholder="Bearer token" class="input input-bordered input-sm join-item flex-1 mono" oninput="onTokenInput()" />
+              <input id="token" type="password" placeholder="Bearer token" class="input input-bordered input-sm join-item flex-1 min-w-0 mono" oninput="onTokenInput()" />
               <button id="btnSaveToken" onclick="saveToken()" class="join-item btn btn-sm btn-error">Salvar</button>
               <button id="btnClearToken" onclick="clearToken()" class="join-item btn btn-sm btn-neutral hidden">✕</button>
             </div>
