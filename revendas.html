@@ -388,15 +388,15 @@
                     <table class="table table-xs table-fixed">
                       <thead>
                         <tr>
-                          <th class="w-[28%]">Key</th>
-                          <th class="w-[10%]">Status</th>
-                          <th class="w-[12%]">Produto</th>
-                          <th class="w-[6%]">Dias</th>
-                          <th class="w-[14%]">HWID</th>
-                          <th class="w-[10%]">Ativada em</th>
-                          <th class="w-[10%]">Termina em</th>
-                          <th class="w-[6%]">Congelado por</th>
-                          <th class="w-[4%] text-right">Ação</th>
+                          <th class="w-[22%]">Key</th>
+                          <th>Status</th>
+                          <th>Produto</th>
+                          <th>Dias</th>
+                          <th>HWID</th>
+                          <th>Ativada em</th>
+                          <th>Termina em</th>
+                          <th>Congelado por</th>
+                          <th class="w-[6%] text-right">Ação</th>
                         </tr>
                       </thead>
                       <tbody id="keysBody">
@@ -428,7 +428,7 @@
         </div>
 
         <!-- Billing Notice -->
-        <div class="border-t border-base-content/10 p-6 bg-base-300 shrink-0">
+        <div id="billingNotice" class="border-t border-base-content/10 p-6 bg-base-300 shrink-0">
           <div class="max-w-[1100px] flex flex-col gap-3">
             <div class="display text-sm font-bold tracking-tight">Política de cobrança</div>
             <ul class="text-sm text-base-content/60 space-y-1.5 list-disc list-inside marker:text-error">
@@ -639,6 +639,7 @@
           panel.classList.remove('block');
         }
       });
+      document.getElementById('billingNotice').classList.toggle('hidden', t !== 'admin');
     }
 
     function rnd(n) {
@@ -1175,6 +1176,9 @@
           body.querySelectorAll('tr[data-key]').forEach(r => r.classList.remove('bg-error/10'));
           row.classList.add('bg-error/10');
           _selectedKey = row.getAttribute('data-key');
+          navigator.clipboard.writeText(_selectedKey).then(() => {
+            toast('Key copiada!');
+          }).catch(() => {});
         });
       });
     }
