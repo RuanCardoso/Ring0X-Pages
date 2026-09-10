@@ -45,11 +45,22 @@
       width: auto !important;
     }
 
-    #mobileBlock { display: none; }
+    #mobileBlock {
+      display: none;
+    }
 
-    @media (max-width: 1365px), (max-height: 767px) {
-      #appShell, #loginGate, #authLoading { display: none !important; }
-      #mobileBlock { display: flex !important; }
+    @media (max-width: 1365px),
+    (max-height: 767px) {
+
+      #appShell,
+      #loginGate,
+      #authLoading {
+        display: none !important;
+      }
+
+      #mobileBlock {
+        display: flex !important;
+      }
     }
   </style>
 </head>
@@ -57,23 +68,29 @@
 <body class="min-h-screen bg-base-200">
 
   <!-- Mobile Block -->
-  <div id="mobileBlock" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center gap-4 bg-base-300 p-6 text-center">
+  <div id="mobileBlock"
+    class="fixed inset-0 z-[99999] flex flex-col items-center justify-center gap-4 bg-base-300 p-6 text-center">
     <h2 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x</h2>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-error"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
-    <p class="text-sm text-base-content/60 max-w-xs">Este painel só está disponível para <strong>computadores</strong>. Acesse em uma tela de no mínimo <strong>1366×768</strong>.</p>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+      class="w-10 h-10 text-error">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+    </svg>
+    <p class="text-sm text-base-content/60 max-w-xs">Este painel só está disponível para <strong>computadores</strong>.
+      Acesse em uma tela de no mínimo <strong>1366×768</strong>.</p>
   </div>
 
   <script>
-    (function() {
-      var isSmallScreen = window.innerWidth < 1366 || window.innerHeight < 768;
-      var isMobileDevice = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-      if (isSmallScreen || isMobileDevice) {
-        document.getElementById('mobileBlock').style.display = 'flex';
-        document.getElementById('authLoading').style.display = 'none';
-        document.getElementById('loginGate').style.display = 'none';
-        document.getElementById('appShell').style.display = 'none';
-      }
-    })();
+      (function () {
+        var isSmallScreen = window.innerWidth < 1366 || window.innerHeight < 768;
+        var isMobileDevice = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+        if (isSmallScreen || isMobileDevice) {
+          document.getElementById('mobileBlock').style.display = 'flex';
+          document.getElementById('authLoading').style.display = 'none';
+          document.getElementById('loginGate').style.display = 'none';
+          document.getElementById('appShell').style.display = 'none';
+        }
+      })();
   </script>
 
   <!-- Auth Loading -->
@@ -122,8 +139,13 @@
       </div>
       <p class="text-xs text-base-content/60 font-medium hidden sm:block"> Painel de revenda · chaves de acesso</p>
       <div class="ml-auto flex items-center gap-2">
-        <button onclick="clearToken()" class="btn btn-sm btn-error gap-1 mono text-[10px] font-medium uppercase tracking-wider">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
+        <button onclick="clearToken()"
+          class="btn btn-sm btn-error gap-1 mono text-[10px] font-medium uppercase tracking-wider">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-3.5 h-3.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
           Sair
         </button>
       </div>
@@ -753,9 +775,9 @@
       }
     }
 
-    function onTokenInput() {}
+    function onTokenInput() { }
 
-    function saveToken() {}
+    function saveToken() { }
 
     function clearToken() {
       localStorage.removeItem(TOKEN_KEY);
