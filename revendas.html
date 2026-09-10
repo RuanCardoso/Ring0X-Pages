@@ -26,6 +26,7 @@
   <style>
     .mono { font-family: 'JetBrains Mono', monospace; }
     .display { font-family: 'Space Grotesk', sans-serif; }
+    .tabs-boxed .tab { flex: none !important; width: auto !important; justify-content: flex-start !important; }
   </style>
 </head>
 <body class="min-h-screen bg-base-200">
@@ -205,8 +206,8 @@
 
           <!-- Tabs -->
           <div class="tabs tabs-boxed mb-6">
-            <a class="tab tab-active" onclick="switchTab('admin')" id="tab-admin" style="flex:none !important; width:auto !important">Gerar</a>
-            <a class="tab" onclick="switchTab('list')" id="tab-list" style="flex:none !important; width:auto !important">Listar</a>
+            <a class="tab tab-active" onclick="switchTab('admin')" id="tab-admin">Gerar</a>
+            <a class="tab" onclick="switchTab('list')" id="tab-list">Listar</a>
           </div>
 
           <!-- Admin Panel -->
