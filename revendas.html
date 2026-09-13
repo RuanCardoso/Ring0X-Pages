@@ -1126,17 +1126,25 @@
       setLoading('btnList', false);
     }
 
+    function parseUtcDate(v) {
+      if (!v) return null;
+      // Backend grava/serializa TIMESTAMP sem timezone (ex: "2026-09-13T00:20:59.98").
+      // O valor já É UTC, mas sem o 'Z' o navegador assumiria hora local, deslocando a
+      // comparação pelo fuso do usuário. Forçamos UTC quando não há Z nem offset explícito.
+      const hasTz = /Z$|[+-]\d{2}:\d{2}$/.test(v);
+      const d = new Date(hasTz ? v : v + 'Z');
+      return isNaN(d) ? null : d;
+    }
+
     function fmtDate(v) {
-      if (!v) return '—';
-      const d = new Date(v);
-      return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR');
+      const d = parseUtcDate(v);
+      return d ? d.toLocaleDateString('pt-BR') : (v ? String(v) : '—');
     }
 
     function getStatusKey(i) {
       const ok = Boolean(i.is_active ?? i.IsActive);
       const paused = Boolean(i.is_paused ?? i.IsPaused);
-      const endsAt = i.ends_at ?? i.EndsAt;
-      const endDate = endsAt ? new Date(endsAt) : null;
+      const endDate = parseUtcDate(i.ends_at ?? i.EndsAt);
       const isExpired = endDate && endDate < new Date();
       if (paused) return 'congelada';
       if (ok) return isExpired ? 'expirado' : 'ativa';
@@ -1215,10 +1223,8 @@
         const productName = pt !== null && pt !== undefined ? productLabel(ptCode) : '—';
 
         // Check if key is expired
-        const endsAt = i.ends_at ?? i.EndsAt;
-        const endDate = endsAt ? new Date(endsAt) : null;
-        const now = new Date();
-        const isExpired = endDate && endDate < now;
+        const endDate = parseUtcDate(i.ends_at ?? i.EndsAt);
+        const isExpired = endDate && endDate < new Date();
 
         let statusHtml = '';
         let actionBtn = '';
