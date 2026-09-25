@@ -433,6 +433,7 @@
                   </div>
 
                   <button class="btn btn-error w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
+                  <button class="btn btn-success w-full font-bold hidden" id="btnCopyCreated" onclick="copyCreatedKeys()">Copiar chaves geradas</button>
 
                 </div>
               </div>
@@ -646,6 +647,7 @@
   <script>
     let _selectedKey = '';
     let _allKeyItems = [];
+    let _lastCreatedKeys = [];
 
     const PRICES = {
       PB: { diaria: 3, semanal: 10, mensal: 17 },
@@ -1051,10 +1053,12 @@
 
       setLoading('btnCreate', true);
 
+      const createdKeys = [];
       let ok = 0, fail = 0;
 
       for (let i = 0; i < qty; i++) {
         const keyValue = qty > 1 ? `${baseKey}-${rnd(4)}${rnd(4)}` : baseKey;
+        createdKeys.push(keyValue);
         try {
           await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
           ok++;
@@ -1064,6 +1068,9 @@
       }
 
       if (ok > 0) {
+        _lastCreatedKeys = createdKeys;
+        const btnCopy = document.getElementById('btnCopyCreated');
+        if (btnCopy) btnCopy.classList.remove('hidden');
         toast(`${ok} key${ok > 1 ? 's' : ''} criada${ok > 1 ? 's' : ''} com sucesso!`);
         loadDebtBalance();
         doList();
@@ -1304,6 +1311,18 @@
       }).catch(() => {
         toast('Erro ao copiar.', true);
       });
+    }
+
+    function copyCreatedKeys() {
+      if (!_lastCreatedKeys.length) { toast('Nenhuma chave gerada.', true); return; }
+      navigator.clipboard.writeText(_lastCreatedKeys.join('\n')).then(() => {
+        toast(`${_lastCreatedKeys.length} chave${_lastCreatedKeys.length > 1 ? 's' : ''} copiada${_lastCreatedKeys.length > 1 ? 's' : ''}!`);
+      }).catch(() => {
+        toast('Erro ao copiar.', true);
+      });
+      _lastCreatedKeys = [];
+      const btnCopy = document.getElementById('btnCopyCreated');
+      if (btnCopy) btnCopy.classList.add('hidden');
     }
 
     function getFreezeProduct(key) {
