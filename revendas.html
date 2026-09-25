@@ -450,6 +450,7 @@
                     <button class="btn btn-outline btn-error" onclick="copySelected()">Revogar selecionada</button>
                     <button class="btn btn-outline btn-warning" onclick="copySelectedToHwid()">Reset HWID da
                       selecionada</button>
+                    <button class="btn btn-outline btn-success" onclick="copyAllKeys()">Copiar todas as chaves</button>
                   </div>
 
                   <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -1293,6 +1294,16 @@
       if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
       document.getElementById('resetHwidKey').value = _selectedKey;
       document.getElementById('modalResetHwid').showModal();
+    }
+
+    function copyAllKeys() {
+      const keys = _allKeyItems.map(i => i.key_value || i.KeyValue || '').filter(k => k);
+      if (!keys.length) { toast('Nenhuma chave na lista.', true); return; }
+      navigator.clipboard.writeText(keys.join('\n')).then(() => {
+        toast(`${keys.length} chave${keys.length > 1 ? 's' : ''} copiada${keys.length > 1 ? 's' : ''}!`);
+      }).catch(() => {
+        toast('Erro ao copiar.', true);
+      });
     }
 
     function getFreezeProduct(key) {
