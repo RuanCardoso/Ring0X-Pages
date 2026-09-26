@@ -346,7 +346,7 @@
                       </svg>
                       Revogar
                     </a></li>
-                  <li><a onclick="document.getElementById('modalDelete').showModal()">
+                  <li id="menuItemDelete" class="hidden"><a onclick="document.getElementById('modalDelete').showModal()">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-error">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -464,7 +464,7 @@
                   <div class="flex gap-2 mb-4">
                     <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
                     <button class="btn btn-outline btn-error" onclick="copySelected()">Revogar selecionada</button>
-                    <button class="btn btn-outline btn-error" onclick="copySelectedToDelete()">Deletar selecionada</button>
+                    <button id="btnDeleteSelected" class="btn btn-outline btn-error hidden" onclick="copySelectedToDelete()">Deletar selecionada</button>
                     <button class="btn btn-outline btn-warning" onclick="copySelectedToHwid()">Reset HWID da
                       selecionada</button>
                     <button class="btn btn-outline btn-success" onclick="copyAllKeys()">Copiar todas as chaves</button>
@@ -795,6 +795,16 @@
       const payload = parseJwt(val);
       _fingerprint = (payload && (payload.fingerprint ?? payload.Fingerprint)) || '';
       updateKeyPreview();
+      updateDeleteVisibility();
+    }
+
+    // A opção de Deletar key só aparece para o fingerprint ADMINSTORE
+    function updateDeleteVisibility() {
+      const isAdmin = _fingerprint === 'ADMINSTORE';
+      const menuItem = document.getElementById('menuItemDelete');
+      const btn = document.getElementById('btnDeleteSelected');
+      if (menuItem) menuItem.classList.toggle('hidden', !isAdmin);
+      if (btn) btn.classList.toggle('hidden', !isAdmin);
     }
 
     const TOKEN_KEY = 'ring_admin_token';
@@ -903,6 +913,7 @@
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
       _fingerprint = '';
+      updateDeleteVisibility();
       showLogin();
     }
 
