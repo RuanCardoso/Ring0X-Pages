@@ -346,6 +346,14 @@
                       </svg>
                       Revogar
                     </a></li>
+                  <li><a onclick="document.getElementById('modalDelete').showModal()">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4 text-error">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                      </svg>
+                      Deletar
+                    </a></li>
                   <li><a onclick="document.getElementById('modalResetHwid').showModal()">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-warning">
@@ -456,6 +464,7 @@
                   <div class="flex gap-2 mb-4">
                     <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
                     <button class="btn btn-outline btn-error" onclick="copySelected()">Revogar selecionada</button>
+                    <button class="btn btn-outline btn-error" onclick="copySelectedToDelete()">Deletar selecionada</button>
                     <button class="btn btn-outline btn-warning" onclick="copySelectedToHwid()">Reset HWID da
                       selecionada</button>
                     <button class="btn btn-outline btn-success" onclick="copyAllKeys()">Copiar todas as chaves</button>
@@ -573,6 +582,24 @@
       <div class="flex flex-col gap-3">
         <input id="revokeKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
         <button class="btn btn-error w-full" id="btnRevoke" onclick="doRevoke()">Revogar</button>
+      </div>
+      <div class="modal-action">
+        <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Modal: Deletar Key -->
+  <dialog id="modalDelete" class="modal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <h3 class="font-bold text-lg">Deletar Key</h3>
+      <p class="text-sm text-base-content/60 py-2">A key é removida permanentemente da base. Diferente da revogação,
+        essa ação não pode ser desfeita.</p>
+      <div class="flex flex-col gap-3">
+        <input id="deleteKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
+        <button class="btn btn-error w-full" id="btnDelete" onclick="doDelete()">Deletar</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -1177,6 +1204,25 @@
       setLoading('btnRevoke', false);
     }
 
+    async function doDelete() {
+      const k = document.getElementById('deleteKey').value.trim();
+      if (!k) { toast('Informe a key.', true); return; }
+      if (!await confirmModal('Deseja realmente deletar essa key permanentemente? Essa ação não pode ser desfeita.')) return;
+
+      setLoading('btnDelete', true);
+      try {
+        const r = await api('/admin/auth-keys/delete', { keyValue: k });
+        toast(r?.StatusMessage || 'Key deletada com sucesso!');
+        document.getElementById('modalDelete').close();
+        if (!document.getElementById('panel-list').classList.contains('hidden')) {
+          doList();
+        }
+      } catch (e) {
+        toast('Erro: ' + e.message, true);
+      }
+      setLoading('btnDelete', false);
+    }
+
     async function doResetHwid() {
       setLoading('btnResetHwid', true);
       try {
@@ -1379,6 +1425,12 @@
       if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
       document.getElementById('revokeKey').value = _selectedKey;
       document.getElementById('modalRevoke').showModal();
+    }
+
+    function copySelectedToDelete() {
+      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
+      document.getElementById('deleteKey').value = _selectedKey;
+      document.getElementById('modalDelete').showModal();
     }
 
     function copySelectedToHwid() {
