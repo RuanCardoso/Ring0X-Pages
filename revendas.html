@@ -354,6 +354,14 @@
                       </svg>
                       Deletar
                     </a></li>
+                  <li id="menuItemTransfer" class="hidden"><a onclick="document.getElementById('modalTransfer').showModal()">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4 text-info">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-9L21 3m0 0-4.5 4.5M21 3H7.5" />
+                      </svg>
+                      Transferir
+                    </a></li>
                   <li><a onclick="document.getElementById('modalResetHwid').showModal()">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-warning">
@@ -465,6 +473,7 @@
                     <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
                     <button class="btn btn-outline btn-error" onclick="copySelected()">Revogar selecionada</button>
                     <button id="btnDeleteSelected" class="btn btn-outline btn-error hidden" onclick="copySelectedToDelete()">Deletar selecionada</button>
+                    <button id="btnTransferSelected" class="btn btn-outline btn-info hidden" onclick="copySelectedToTransfer()">Transferir selecionada</button>
                     <button class="btn btn-outline btn-warning" onclick="copySelectedToHwid()">Reset HWID da
                       selecionada</button>
                     <button class="btn btn-outline btn-success" onclick="copyAllKeys()">Copiar todas as chaves</button>
@@ -600,6 +609,26 @@
       <div class="flex flex-col gap-3">
         <input id="deleteKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
         <button class="btn btn-error w-full" id="btnDelete" onclick="doDelete()">Deletar</button>
+      </div>
+      <div class="modal-action">
+        <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Modal: Transferir Key -->
+  <dialog id="modalTransfer" class="modal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <h3 class="font-bold text-lg">Transferir Key</h3>
+      <p class="text-sm text-base-content/60 py-2">A key passa a pertencer à loja do token de destino. O fingerprint da
+        loja destino é extraído automaticamente pelo sistema.</p>
+      <div class="flex flex-col gap-3">
+        <input id="transferKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full mono" />
+        <input id="transferTargetToken" type="password" placeholder="Bearer token da loja destino"
+          class="input input-bordered input-sm w-full mono" />
+        <button class="btn btn-info w-full" id="btnTransfer" onclick="doTransfer()">Transferir</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -795,16 +824,17 @@
       const payload = parseJwt(val);
       _fingerprint = (payload && (payload.fingerprint ?? payload.Fingerprint)) || '';
       updateKeyPreview();
-      updateDeleteVisibility();
+      updateAdminOnlyVisibility();
     }
 
-    // A opção de Deletar key só aparece para o fingerprint ADMINSTORE
-    function updateDeleteVisibility() {
+    // Deletar e Transferir key só aparecem para o fingerprint ADMINSTORE
+    function updateAdminOnlyVisibility() {
       const isAdmin = _fingerprint === 'ADMINSTORE';
-      const menuItem = document.getElementById('menuItemDelete');
-      const btn = document.getElementById('btnDeleteSelected');
-      if (menuItem) menuItem.classList.toggle('hidden', !isAdmin);
-      if (btn) btn.classList.toggle('hidden', !isAdmin);
+      const ids = ['menuItemDelete', 'btnDeleteSelected', 'menuItemTransfer', 'btnTransferSelected'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', !isAdmin);
+      });
     }
 
     const TOKEN_KEY = 'ring_admin_token';
@@ -913,7 +943,7 @@
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
       _fingerprint = '';
-      updateDeleteVisibility();
+      updateAdminOnlyVisibility();
       showLogin();
     }
 
@@ -1234,6 +1264,28 @@
       setLoading('btnDelete', false);
     }
 
+    async function doTransfer() {
+      const k = document.getElementById('transferKey').value.trim();
+      const targetToken = document.getElementById('transferTargetToken').value.trim();
+      if (!k) { toast('Informe a key.', true); return; }
+      if (!targetToken) { toast('Informe o token da loja destino.', true); return; }
+      if (!await confirmModal('Deseja realmente transferir essa key para a loja destino?')) return;
+
+      setLoading('btnTransfer', true);
+      try {
+        const r = await api('/admin/auth-keys/transfer', { keyValue: k, targetToken });
+        toast(r?.StatusMessage || 'Key transferida com sucesso!');
+        document.getElementById('modalTransfer').close();
+        document.getElementById('transferTargetToken').value = '';
+        if (!document.getElementById('panel-list').classList.contains('hidden')) {
+          doList();
+        }
+      } catch (e) {
+        toast('Erro: ' + e.message, true);
+      }
+      setLoading('btnTransfer', false);
+    }
+
     async function doResetHwid() {
       setLoading('btnResetHwid', true);
       try {
@@ -1442,6 +1494,12 @@
       if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
       document.getElementById('deleteKey').value = _selectedKey;
       document.getElementById('modalDelete').showModal();
+    }
+
+    function copySelectedToTransfer() {
+      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
+      document.getElementById('transferKey').value = _selectedKey;
+      document.getElementById('modalTransfer').showModal();
     }
 
     function copySelectedToHwid() {
