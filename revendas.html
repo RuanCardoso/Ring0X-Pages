@@ -383,9 +383,15 @@
                   <div class="form-control mb-4">
                     <label class="label">
                       <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Key</span>
-                      <span
-                        class="label-text-alt text-[10px] text-base-content/60 font-normal normal-case tracking-normal"
-                        id="createKeyNote">(gerada automaticamente: fingerprint + duração + prefixo aleatório)</span>
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="label-text-alt text-[10px] text-base-content/60 font-normal normal-case tracking-normal"
+                          id="createKeyNote">(gerada automaticamente: fingerprint + duração + prefixo aleatório)</span>
+                        <button type="button" onclick="toggleManualKey()" id="btnManualKey"
+                          class="label-text-alt text-[10px] font-semibold normal-case tracking-normal text-base-content/40 hover:text-info transition-colors underline decoration-dotted underline-offset-2">
+                          editar manualmente
+                        </button>
+                      </span>
                     </label>
                     <input id="createKey" type="text" readonly tabindex="-1"
                       placeholder="Selecione a duração para gerar"
@@ -1051,12 +1057,41 @@
 
     // Atualiza o campo (somente leitura) com um preview do padrão que será gerado
     function updateKeyPreview() {
+      if (_manualKeyMode) return;
       const field = document.getElementById('createKey');
       if (!field) return;
       const d = Number(document.getElementById('createDays').value);
       const dc = DURATION_CODE[d];
       const fp = _fingerprint || 'FINGERPRINT';
       field.value = dc ? `${fp}-${dc}-XXXXXX` : '';
+    }
+
+    // Alterna entre key gerada automaticamente e digitação manual (casos especiais)
+    let _manualKeyMode = false;
+    function toggleManualKey() {
+      _manualKeyMode = !_manualKeyMode;
+      const field = document.getElementById('createKey');
+      const note = document.getElementById('createKeyNote');
+      const btn = document.getElementById('btnManualKey');
+
+      if (_manualKeyMode) {
+        field.readOnly = false;
+        field.removeAttribute('tabindex');
+        field.value = '';
+        field.placeholder = 'Digite a key manualmente';
+        field.classList.remove('cursor-not-allowed', 'opacity-70');
+        note.textContent = '(modo manual — use com cautela em casos especiais)';
+        btn.textContent = 'usar automático';
+        field.focus();
+      } else {
+        field.readOnly = true;
+        field.setAttribute('tabindex', '-1');
+        field.placeholder = 'Selecione a duração para gerar';
+        field.classList.add('cursor-not-allowed', 'opacity-70');
+        note.textContent = '(gerada automaticamente: fingerprint + duração + prefixo aleatório)';
+        btn.textContent = 'editar manualmente';
+        updateKeyPreview();
+      }
     }
 
     function setLoading(id, on) {
@@ -1087,9 +1122,16 @@
       const productType = document.getElementById('createProduct').value;
       const durationCode = DURATION_CODE[d];
 
-      if (!_fingerprint) { toast('Fingerprint não encontrado no token. Faça login novamente.', true); return; }
       if (!productType) { toast('Selecione um produto.', true); return; }
       if (!durationCode) { toast('Selecione uma duração válida.', true); return; }
+
+      let manualBase = '';
+      if (_manualKeyMode) {
+        manualBase = document.getElementById('createKey').value.trim();
+        if (!manualBase) { toast('Digite a key manualmente ou desative o modo manual.', true); return; }
+      } else if (!_fingerprint) {
+        toast('Fingerprint não encontrado no token. Faça login novamente.', true); return;
+      }
 
       setLoading('btnCreate', true);
 
@@ -1097,7 +1139,9 @@
       let ok = 0, fail = 0;
 
       for (let i = 0; i < qty; i++) {
-        const keyValue = buildKeyValue(durationCode);
+        const keyValue = _manualKeyMode
+          ? (qty > 1 ? `${manualBase}-${rnd(4)}${rnd(4)}` : manualBase)
+          : buildKeyValue(durationCode);
         createdKeys.push(keyValue);
         try {
           await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
