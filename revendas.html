@@ -385,10 +385,11 @@
                       <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Key</span>
                       <span
                         class="label-text-alt text-[10px] text-base-content/60 font-normal normal-case tracking-normal"
-                        id="createKeyNote">(prefixo — sufixo aleatório ao criar múltiplas)</span>
+                        id="createKeyNote">(gerada automaticamente: fingerprint + duração + prefixo aleatório)</span>
                     </label>
-                    <input id="createKey" type="text" placeholder="ex: RING0X-CLIENTE-7F2A-93KD-2026"
-                      class="input input-bordered w-full" />
+                    <input id="createKey" type="text" readonly tabindex="-1"
+                      placeholder="Selecione a duração para gerar"
+                      class="input input-bordered w-full mono cursor-not-allowed opacity-70" />
                   </div>
 
                   <div class="grid grid-cols-3 gap-3 mb-4">
@@ -396,7 +397,7 @@
                       <label class="label">
                         <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Duração</span>
                       </label>
-                      <select id="createDays" onchange="updateCreateCost()" class="select select-bordered w-full">
+                      <select id="createDays" onchange="updateCreateCost(); updateKeyPreview()" class="select select-bordered w-full">
                         <option value="">Selecione...</option>
                         <option value="1">1 dia (Diária)</option>
                         <option value="7">7 dias (Semanal)</option>
@@ -741,6 +742,28 @@
       return o;
     }
 
+    // Decodifica o payload de um JWT (Bearer token) sem validar assinatura.
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        if (!base64Url) return null;
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const json = decodeURIComponent(
+          atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(json);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    let _fingerprint = '';
+    function setFingerprintFromToken(val) {
+      const payload = parseJwt(val);
+      _fingerprint = (payload && (payload.fingerprint ?? payload.Fingerprint)) || '';
+      updateKeyPreview();
+    }
+
     const TOKEN_KEY = 'ring_admin_token';
 
     function showAuthLoading(msg) {
@@ -807,6 +830,7 @@
       try {
         await validateToken(val);
         applyAuthToken(val);
+        setFingerprintFromToken(val);
         showApp();
         loadDebtBalance();
       } catch (ex) {
@@ -832,6 +856,7 @@
 
       try {
         await validateToken(saved);
+        setFingerprintFromToken(saved);
         showApp();
         loadDebtBalance();
       } catch (ex) {
@@ -844,6 +869,7 @@
     function clearToken() {
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
+      _fingerprint = '';
       showLogin();
     }
 
@@ -1013,6 +1039,26 @@
       document.getElementById('createCost').textContent = fmt(unit * qty);
     }
 
+    // Mapeia dias -> código de duração usado no valor da key (1D / 7D / 30D)
+    const DURATION_CODE = { 1: '1D', 7: '7D', 30: '30D' };
+
+    // Monta o valor final da key: FINGERPRINT-DURACAO-PREFIXOALEATORIO
+    function buildKeyValue(durationCode) {
+      const fp = _fingerprint || 'FINGERPRINT';
+      const dc = durationCode || 'XD';
+      return `${fp}-${dc}-${rnd(6)}`;
+    }
+
+    // Atualiza o campo (somente leitura) com um preview do padrão que será gerado
+    function updateKeyPreview() {
+      const field = document.getElementById('createKey');
+      if (!field) return;
+      const d = Number(document.getElementById('createDays').value);
+      const dc = DURATION_CODE[d];
+      const fp = _fingerprint || 'FINGERPRINT';
+      field.value = dc ? `${fp}-${dc}-XXXXXX` : '';
+    }
+
     function setLoading(id, on) {
       const b = document.getElementById(id);
       if (!b) return;
@@ -1024,14 +1070,11 @@
 
     function onQtyChange() {
       const qty = Number(document.getElementById('createQty').value);
-      const note = document.getElementById('createKeyNote');
       const btn = document.getElementById('btnCreate');
       if (qty > 1) {
-        note.classList.remove('hidden');
         btn.setAttribute('data-orig', `Criar ${qty} keys`);
         btn.textContent = `Criar ${qty} keys`;
       } else {
-        note.classList.add('hidden');
         btn.setAttribute('data-orig', 'Criar key');
         btn.textContent = 'Criar key';
       }
@@ -1040,16 +1083,13 @@
 
     async function doCreate() {
       const qty = Math.max(1, Math.min(100, Number(document.getElementById('createQty').value) || 1));
-      let baseKey = document.getElementById('createKey').value.trim();
       const d = Number(document.getElementById('createDays').value);
       const productType = document.getElementById('createProduct').value;
+      const durationCode = DURATION_CODE[d];
 
-      if (!baseKey) {
-        baseKey = `RING0X-KEY-${rnd(6)}-${rnd(6)}-${new Date().getFullYear()}`;
-        document.getElementById('createKey').value = baseKey;
-      }
+      if (!_fingerprint) { toast('Fingerprint não encontrado no token. Faça login novamente.', true); return; }
       if (!productType) { toast('Selecione um produto.', true); return; }
-      if (!d || d < 1) { toast('Duração deve ser maior que 0.', true); return; }
+      if (!durationCode) { toast('Selecione uma duração válida.', true); return; }
 
       setLoading('btnCreate', true);
 
@@ -1057,7 +1097,7 @@
       let ok = 0, fail = 0;
 
       for (let i = 0; i < qty; i++) {
-        const keyValue = qty > 1 ? `${baseKey}-${rnd(4)}${rnd(4)}` : baseKey;
+        const keyValue = buildKeyValue(durationCode);
         createdKeys.push(keyValue);
         try {
           await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
