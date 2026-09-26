@@ -237,6 +237,24 @@
                 <span class="mono text-sm font-semibold text-error" id="priceMensal">R$ 60</span>
               </div>
             </li>
+            <li>
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-sm font-semibold">Trimestral</span>
+                  <span class="mono text-[10px] text-base-content/60 tracking-wider">90 dias</span>
+                </div>
+                <span class="mono text-sm font-semibold text-error" id="priceTrimestral">R$ 150</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-sm font-semibold">Lifetime</span>
+                  <span class="mono text-[10px] text-base-content/60 tracking-wider">Acesso vitalício</span>
+                </div>
+                <span class="mono text-sm font-semibold text-error" id="priceAnual">R$ 520</span>
+              </div>
+            </li>
           </ul>
 
           <!-- Calculator -->
@@ -261,6 +279,14 @@
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Mensal</span>
                 <span class="mono text-[11px] text-error font-medium" id="calcMensal">R$ 60,00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[11px] text-base-content/60">Trimestral</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcTrimestral">R$ 150,00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[11px] text-base-content/60">Lifetime</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcAnual">R$ 520,00</span>
               </div>
             </div>
           </div>
@@ -424,6 +450,8 @@
                         <option value="1">1 dia (Diária)</option>
                         <option value="7">7 dias (Semanal)</option>
                         <option value="30">30 dias (Mensal)</option>
+                        <option value="90">90 dias (Trimestral)</option>
+                        <option value="365">Lifetime (Acesso vitalício)</option>
                       </select>
                     </div>
                     <div class="form-control">
@@ -713,12 +741,12 @@
     let _lastCreatedKeys = [];
 
     const PRICES = {
-      PB: { diaria: 3, semanal: 10, mensal: 17 },
-      FAIRLIGHT: { diaria: 5, semanal: 15, mensal: 30 },
+      PB: { diaria: 3, semanal: 10, mensal: 17, trimestral: 45, anual: 200 },
+      FAIRLIGHT: { diaria: 5, semanal: 15, mensal: 30, trimestral: 75, anual: 350 },
       /* Full = ESP+Macro (pacote). Avulsos somam mais caro → Full vale a pena. */
-      PUBG: { diaria: 8, semanal: 30, mensal: 60 },
-      PUBGESP: { diaria: 5, semanal: 18, mensal: 35 },
-      PUBGMACRO: { diaria: 4, semanal: 15, mensal: 30 }
+      PUBG: { diaria: 8, semanal: 30, mensal: 60, trimestral: 150, anual: 520 },
+      PUBGESP: { diaria: 5, semanal: 18, mensal: 35, trimestral: 90, anual: 420 },
+      PUBGMACRO: { diaria: 4, semanal: 15, mensal: 30, trimestral: 75, anual: 350 }
     };
     let _calcQty = 1;
     let _calcProduct = 'PUBG';
@@ -764,9 +792,13 @@
       document.getElementById('calcDiaria').textContent = fmt(p.diaria * _calcQty);
       document.getElementById('calcSemanal').textContent = fmt(p.semanal * _calcQty);
       document.getElementById('calcMensal').textContent = fmt(p.mensal * _calcQty);
+      document.getElementById('calcTrimestral').textContent = fmt(p.trimestral * _calcQty);
+      document.getElementById('calcAnual').textContent = fmt(p.anual * _calcQty);
       document.getElementById('priceDiaria').textContent = 'R$ ' + p.diaria.toFixed(2).replace('.', ',');
       document.getElementById('priceSemanal').textContent = 'R$ ' + p.semanal.toFixed(2).replace('.', ',');
       document.getElementById('priceMensal').textContent = 'R$ ' + p.mensal.toFixed(2).replace('.', ',');
+      document.getElementById('priceTrimestral').textContent = 'R$ ' + p.trimestral.toFixed(2).replace('.', ',');
+      document.getElementById('priceAnual').textContent = 'R$ ' + p.anual.toFixed(2).replace('.', ',');
     }
 
     function changeQty(d) {
@@ -1108,13 +1140,13 @@
       const days = Number(document.getElementById('createDays').value) || 0;
       const product = document.getElementById('createProduct').value;
       const prices = PRICES[product];
-      const priceMap = { 1: 'diaria', 7: 'semanal', 30: 'mensal' };
+      const priceMap = { 1: 'diaria', 7: 'semanal', 30: 'mensal', 90: 'trimestral', 365: 'anual' };
       const unit = prices ? (prices[priceMap[days]] || 0) : 0;
       document.getElementById('createCost').textContent = fmt(unit * qty);
     }
 
     // Mapeia dias -> código de duração usado no valor da key (1D / 7D / 30D)
-    const DURATION_CODE = { 1: '1D', 7: '7D', 30: '30D' };
+    const DURATION_CODE = { 1: '1D', 7: '7D', 30: '30D', 90: '90D', 365: '365D' };
 
     // Monta o valor final da key: FINGERPRINT-DURACAO-PREFIXOALEATORIO
     function buildKeyValue(durationCode) {
