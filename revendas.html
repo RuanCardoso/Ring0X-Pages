@@ -716,6 +716,9 @@
                       </table>
                     </div>
                   </div>
+                  <div class="flex justify-center mt-4">
+                    <button id="btnLoadMore" class="btn btn-sm btn-outline hidden" onclick="loadMoreKeys()">Carregar mais</button>
+                  </div>
                 </div>
               </div>
 
@@ -898,7 +901,11 @@
     let _listLoadedAt = 0;
     let _listRevision = 0;
     let _listRequest = null;
+    let _visibleKeyCount = 0;
     const LIST_MAX_AGE_MS = 60 * 1000;
+    const MOBILE_KEY_BATCH = 20;
+    const DESKTOP_KEY_BATCH = 50;
+    const mobileKeysMedia = window.matchMedia('(max-width: 767px)');
 
     const PRICES = {
       PB: { diaria: 3, semanal: 10, mensal: 17, trimestral: 45, anual: 200 },
@@ -993,6 +1000,7 @@
       _listLoadedAt = 0;
       _allKeyItems = [];
       _selectedKey = '';
+      _visibleKeyCount = 0;
       applyFilters();
     }
 
@@ -1618,7 +1626,16 @@
       }).map(({ item }) => item);
     }
 
-    function applyFilters() {
+    function keyBatchSize() {
+      return mobileKeysMedia.matches ? MOBILE_KEY_BATCH : DESKTOP_KEY_BATCH;
+    }
+
+    function loadMoreKeys() {
+      _visibleKeyCount += keyBatchSize();
+      applyFilters(false);
+    }
+
+    function applyFilters(resetLimit = true) {
       const q = (document.getElementById('filterSearch').value || '').trim().toLowerCase();
       const statusFilter = document.getElementById('filterStatus').value;
       const productFilter = document.getElementById('filterProduct').value;
@@ -1638,12 +1655,25 @@
         return true;
       });
 
-      renderTable(filtered);
+      if (resetLimit) _selectedKey = '';
+      if (resetLimit || !_visibleKeyCount) _visibleKeyCount = keyBatchSize();
+      const visible = filtered.slice(0, _visibleKeyCount);
+      renderTable(visible);
 
       const countEl = document.getElementById('filterCount');
       if (countEl) {
-        countEl.textContent = _allKeyItems.length ? `${filtered.length} de ${_allKeyItems.length}` : '';
+        const total = _allKeyItems.length;
+        countEl.textContent = total
+          ? (filtered.length === total
+            ? `${visible.length} de ${total} exibidas`
+            : `${visible.length} de ${filtered.length} filtradas · ${total} no total`)
+          : '';
       }
+
+      const btnLoadMore = document.getElementById('btnLoadMore');
+      const remaining = filtered.length - visible.length;
+      btnLoadMore.classList.toggle('hidden', remaining <= 0);
+      if (remaining > 0) btnLoadMore.textContent = `Carregar mais ${Math.min(keyBatchSize(), remaining)} chaves`;
     }
 
     function clearFilters() {
@@ -1738,9 +1768,13 @@
         </tr>`;
       }).join('');
 
-      body.querySelectorAll('tr[data-key]').forEach(row => {
+      const rows = body.querySelectorAll('tr[data-key]');
+      rows.forEach(row => {
+        if (row.getAttribute('data-key') === _selectedKey) {
+          row.classList.add('bg-error/10', 'ring-1', 'ring-error/30');
+        }
         row.addEventListener('click', () => {
-          body.querySelectorAll('tr[data-key]').forEach(r => r.classList.remove('bg-error/10', 'ring-1', 'ring-error/30'));
+          rows.forEach(r => r.classList.remove('bg-error/10', 'ring-1', 'ring-error/30'));
           row.classList.add('bg-error/10', 'ring-1', 'ring-error/30');
           _selectedKey = row.getAttribute('data-key');
           navigator.clipboard.writeText(_selectedKey).then(() => {
@@ -1846,6 +1880,10 @@
       if (_confirmResolve) _confirmResolve(true);
     });
     document.getElementById('confirmNo').addEventListener('click', closeConfirm);
+
+    mobileKeysMedia.addEventListener('change', () => {
+      if (_listLoaded) applyFilters();
+    });
 
     loadToken();
     updateCalc();
