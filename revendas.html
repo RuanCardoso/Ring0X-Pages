@@ -1448,7 +1448,6 @@
         if (btnCopy) btnCopy.classList.remove('hidden');
         toast(`${ok} key${ok > 1 ? 's' : ''} criada${ok > 1 ? 's' : ''} com sucesso!`);
         loadDebtBalance();
-        doList();
         invalidateList();
       }
       if (fail > 0) toast(`${fail} erro${fail > 1 ? 's' : ''} ao criar key${fail > 1 ? 's' : ''}.`, true);
@@ -1480,9 +1479,6 @@
         const r = await api('/admin/auth-keys/delete', { keyValue: k });
         toast(r?.StatusMessage || 'Key deletada com sucesso!');
         document.getElementById('modalDelete').close();
-        if (!document.getElementById('panel-list').classList.contains('hidden')) {
-          doList();
-        }
         invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
@@ -1503,9 +1499,6 @@
         toast(r?.StatusMessage || 'Key transferida com sucesso!');
         document.getElementById('modalTransfer').close();
         document.getElementById('transferTargetToken').value = '';
-        if (!document.getElementById('panel-list').classList.contains('hidden')) {
-          doList();
-        }
         invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
@@ -1543,7 +1536,6 @@
       setLoading('btnActivate', false);
     }
 
-    async function doList() {
     async function doList(force = true) {
       if (_listRequest) return _listRequest;
       if (!force && _listLoaded && !_listDirty && Date.now() - _listLoadedAt < LIST_MAX_AGE_MS) return;
@@ -1551,15 +1543,6 @@
       const revision = _listRevision;
       const tokenAtStart = document.getElementById('token').value;
       setLoading('btnList', true);
-      try {
-        const d = await api('/admin/auth-keys/list', {});
-        const items = d?.Result || d?.result || [];
-        _allKeyItems = items;
-        applyFilters();
-      } catch (e) {
-        toast('Erro: ' + e.message, true);
-      }
-      setLoading('btnList', false);
       _listRequest = (async () => {
         try {
           const d = await api('/admin/auth-keys/list', {});
@@ -1831,9 +1814,6 @@
         const productType = getFreezeProduct(key);
         const r = await api('/admin/auth-keys/freeze', { keyValue: key, freeze: freeze, productType });
         toast(r?.StatusMessage || 'Ação realizada com sucesso!');
-        if (!document.getElementById('panel-list').classList.contains('hidden')) {
-          doList();
-        }
         invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
