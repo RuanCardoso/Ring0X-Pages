@@ -893,6 +893,12 @@
     let _selectedKey = '';
     let _allKeyItems = [];
     let _lastCreatedKeys = [];
+    let _listLoaded = false;
+    let _listDirty = true;
+    let _listLoadedAt = 0;
+    let _listRevision = 0;
+    let _listRequest = null;
+    const LIST_MAX_AGE_MS = 60 * 1000;
 
     const PRICES = {
       PB: { diaria: 3, semanal: 10, mensal: 17, trimestral: 45, anual: 200 },
@@ -969,6 +975,27 @@
       button.setAttribute('aria-expanded', String(isOpen));
     }
 
+    function isListVisible() {
+      return !document.getElementById('appShell').classList.contains('hidden') &&
+        !document.getElementById('panel-list').classList.contains('hidden');
+    }
+
+    function invalidateList() {
+      _listDirty = true;
+      _listRevision++;
+      if (isListVisible()) doList(false);
+    }
+
+    function resetListState() {
+      _listRevision++;
+      _listLoaded = false;
+      _listDirty = true;
+      _listLoadedAt = 0;
+      _allKeyItems = [];
+      _selectedKey = '';
+      applyFilters();
+    }
+
     function switchTab(t) {
       document.querySelectorAll('.tab').forEach((b, i) => {
         if (TAB_IDS[i] === t) {
@@ -988,6 +1015,7 @@
         }
       });
       document.getElementById('billingNotice').classList.toggle('hidden', t !== 'admin');
+      if (t === 'list') doList(false);
     }
 
     function rnd(n) {
@@ -1064,6 +1092,7 @@
       document.getElementById('loginGate').classList.add('hidden');
       document.getElementById('appShell').classList.remove('hidden');
       document.body.classList.remove('overflow-hidden');
+      if (isListVisible()) doList(false);
     }
 
     function applyAuthToken(val) {
@@ -1136,6 +1165,7 @@
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
       _fingerprint = '';
+      resetListState();
       updateAdminOnlyVisibility();
       showLogin();
     }
@@ -1419,6 +1449,7 @@
         toast(`${ok} key${ok > 1 ? 's' : ''} criada${ok > 1 ? 's' : ''} com sucesso!`);
         loadDebtBalance();
         doList();
+        invalidateList();
       }
       if (fail > 0) toast(`${fail} erro${fail > 1 ? 's' : ''} ao criar key${fail > 1 ? 's' : ''}.`, true);
 
@@ -1432,6 +1463,7 @@
         if (!k) throw new Error('Informe a key.');
         const r = await api('/admin/auth-keys/revoke', { keyValue: k });
         toast(r?.StatusMessage || 'Key revogada com sucesso!');
+        invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
       }
@@ -1451,6 +1483,7 @@
         if (!document.getElementById('panel-list').classList.contains('hidden')) {
           doList();
         }
+        invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
       }
@@ -1473,6 +1506,7 @@
         if (!document.getElementById('panel-list').classList.contains('hidden')) {
           doList();
         }
+        invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
       }
@@ -1486,6 +1520,7 @@
         if (!k) throw new Error('Informe a key.');
         const r = await api('/admin/auth-keys/reset-hwid', { keyValue: k });
         toast(r?.StatusMessage || 'HWID reset habilitado com sucesso!');
+        invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
       }
@@ -1501,6 +1536,7 @@
         const activateProduct = document.getElementById('activateProduct').value;
         const r = await api('/user/auth-keys/activate', { keyValue: k, hwid: testHwid, productType: activateProduct });
         toast(r?.StatusMessage || 'Key ativada com sucesso!');
+        invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
       }
@@ -1508,6 +1544,12 @@
     }
 
     async function doList() {
+    async function doList(force = true) {
+      if (_listRequest) return _listRequest;
+      if (!force && _listLoaded && !_listDirty && Date.now() - _listLoadedAt < LIST_MAX_AGE_MS) return;
+
+      const revision = _listRevision;
+      const tokenAtStart = document.getElementById('token').value;
       setLoading('btnList', true);
       try {
         const d = await api('/admin/auth-keys/list', {});
@@ -1518,6 +1560,27 @@
         toast('Erro: ' + e.message, true);
       }
       setLoading('btnList', false);
+      _listRequest = (async () => {
+        try {
+          const d = await api('/admin/auth-keys/list', {});
+          if (tokenAtStart !== document.getElementById('token').value || revision !== _listRevision) return;
+          _allKeyItems = sortKeys(d?.Result || d?.result || []);
+          _selectedKey = '';
+          _listLoaded = true;
+          _listLoadedAt = Date.now();
+          _listDirty = revision !== _listRevision;
+          applyFilters();
+        } catch (e) {
+          if (tokenAtStart === document.getElementById('token').value && revision === _listRevision) {
+            toast('Erro: ' + e.message, true);
+          }
+        } finally {
+          setLoading('btnList', false);
+          _listRequest = null;
+          if (revision !== _listRevision && isListVisible()) doList(false);
+        }
+      })();
+      return _listRequest;
     }
 
     function parseUtcDate(v) {
@@ -1543,6 +1606,33 @@
       if (paused) return 'congelada';
       if (ok) return isExpired ? 'expirado' : 'ativa';
       return 'inativa';
+    }
+
+    function sortKeys(items) {
+      const statusOrder = { ativa: 0, congelada: 1, inativa: 2, expirado: 3 };
+      return items.map((item, index) => ({ item, index })).sort((a, b) => {
+        const aStatus = getStatusKey(a.item);
+        const bStatus = getStatusKey(b.item);
+        if (aStatus !== bStatus) return statusOrder[aStatus] - statusOrder[bStatus];
+
+        const aEnd = parseUtcDate(a.item.ends_at ?? a.item.EndsAt);
+        const bEnd = parseUtcDate(b.item.ends_at ?? b.item.EndsAt);
+        if (aStatus !== 'inativa') {
+          if (aEnd && !bEnd) return -1;
+          if (!aEnd && bEnd) return 1;
+          if (aEnd && bEnd) {
+            const endOrder = aStatus === 'expirado' ? bEnd - aEnd : aEnd - bEnd;
+            if (endOrder) return endOrder;
+          }
+        }
+
+        const aCreated = parseUtcDate(a.item.created_at ?? a.item.CreatedAt);
+        const bCreated = parseUtcDate(b.item.created_at ?? b.item.CreatedAt);
+        if (aCreated && !bCreated) return -1;
+        if (!aCreated && bCreated) return 1;
+        if (aCreated && bCreated) return bCreated - aCreated || a.index - b.index;
+        return a.index - b.index;
+      }).map(({ item }) => item);
     }
 
     function applyFilters() {
@@ -1744,6 +1834,7 @@
         if (!document.getElementById('panel-list').classList.contains('hidden')) {
           doList();
         }
+        invalidateList();
       } catch (e) {
         toast('Erro: ' + e.message, true);
       }
