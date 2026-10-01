@@ -211,6 +211,11 @@
         border-bottom: 1px solid oklch(var(--bc) / 0.06);
       }
 
+      #keysBody tr.key-row td.mobile-extra,
+      #keysBody tr.key-row td[data-label="Ação"]:empty {
+        display: none;
+      }
+
       #keysBody tr.key-row td:last-child {
         border-bottom: 0;
       }
@@ -470,7 +475,7 @@
 
             <div id="qrWrap" class="hidden mt-3 bg-white p-3 text-center border border-base-content/20">
               <div id="qrImg" class="flex justify-center mb-2"></div>
-              <button class="btn btn-sm btn-outline w-full" onclick="copyPixCode()">Copiar Código PIX</button>
+              <button class="btn btn-sm btn-error w-full font-bold" onclick="copyPixCode()">Copiar Código PIX</button>
             </div>
           </div>
         </div>
@@ -1635,8 +1640,8 @@
 
         const hwid = i.hwid || i.Hwid || '';
         const hwidCell = hwid
-          ? `<td data-label="HWID" class="mono text-[10px] text-base-content/70 truncate max-w-0 overflow-hidden" title="${hwid}">${hwid}</td>`
-          : `<td data-label="HWID" class="text-base-content/30 text-[10px]">—</td>`;
+          ? `<td data-label="HWID" class="mobile-extra mono text-[10px] text-base-content/70 truncate max-w-0 overflow-hidden" title="${hwid}">${hwid}</td>`
+          : `<td data-label="HWID" class="mobile-extra text-base-content/30 text-[10px]">—</td>`;
 
         const fb = i.frozen_by || i.FrozenBy || '';
         const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
@@ -1651,11 +1656,11 @@
           </td>
           <td data-label="Status">${statusHtml}</td>
           <td data-label="Produto" class="text-sm font-medium">${productName}</td>
-          <td data-label="Dias" class="text-center mono text-xs text-base-content/70">${days}</td>
+          <td data-label="Dias" class="mobile-extra text-center mono text-xs text-base-content/70">${days}</td>
           ${hwidCell}
-          <td data-label="Ativada em" class="text-xs text-base-content/60">${act}</td>
-          <td data-label="Termina em" class="text-xs text-base-content/60">${end}</td>
-          <td data-label="Congelado por" class="text-xs text-base-content/60">${paused ? frozenByLabel : '—'}</td>
+          <td data-label="Ativada em" class="mobile-extra text-xs text-base-content/60">${act}</td>
+          <td data-label="Termina em" class="mobile-extra text-xs text-base-content/60">${end}</td>
+          <td data-label="Congelado por" class="mobile-extra text-xs text-base-content/60">${paused ? frozenByLabel : '—'}</td>
           <td data-label="Ação" class="text-right pr-5">${actionBtn}</td>
         </tr>`;
       }).join('');
