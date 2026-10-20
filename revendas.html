@@ -506,6 +506,7 @@
               <div class="tabs tabs-boxed">
                 <a class="tab tab-active" onclick="switchTab('admin')" id="tab-admin">Gerar</a>
                 <a class="tab" onclick="switchTab('list')" id="tab-list">Listar</a>
+                <a class="tab" onclick="switchTab('finance')" id="tab-finance">Finanças</a>
               </div>
               <div class="dropdown dropdown-end ml-auto">
                 <div tabindex="0" role="button" class="btn btn-sm btn-outline gap-1">
@@ -722,6 +723,57 @@
                 </div>
               </div>
 
+            </div>
+
+            <!-- Finance Panel -->
+            <div id="panel-finance" class="hidden">
+              <div class="card bg-base-100 border border-base-content/10 shadow-xl">
+                <div class="card-body gap-6">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/50 mb-2">Visão financeira</div>
+                      <h2 class="display text-2xl font-bold tracking-tight">Pagamentos de chaves</h2>
+                      <p class="text-sm text-base-content/60 mt-1">Valores pagos à Ring0x para quitar débitos de chaves.</p>
+                    </div>
+                    <span id="financeStoreLabel" class="badge badge-outline border-base-content/20 mono text-[10px] font-semibold px-3 py-3">LOJA</span>
+                  </div>
+
+                  <form id="financeFilters" onsubmit="event.preventDefault(); loadFinances()"
+                    class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end rounded-2xl border border-base-content/10 bg-base-200 p-4">
+                    <div class="form-control">
+                      <label class="label" for="financeStartDate"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">De</span></label>
+                      <input id="financeStartDate" type="date" required onchange="markFinanceDirty()" class="input input-bordered w-full" />
+                    </div>
+                    <div class="form-control">
+                      <label class="label" for="financeEndDate"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Até</span></label>
+                      <input id="financeEndDate" type="date" required onchange="markFinanceDirty()" class="input input-bordered w-full" />
+                    </div>
+                    <button id="btnFinances" type="submit" class="btn btn-neutral w-full sm:w-auto">Consultar</button>
+                  </form>
+
+                  <p id="financeStatus" role="status" class="text-xs text-base-content/50">Selecione o período para consultar.</p>
+
+                  <div id="financeMetrics" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="rounded-2xl border border-base-content/10 bg-base-200 p-5">
+                      <div class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/50">Total pago</div>
+                      <div id="financeRevenue" class="display text-2xl font-bold mt-3 text-success">R$ 0,00</div>
+                    </div>
+                    <div class="rounded-2xl border border-base-content/10 bg-base-200 p-5">
+                      <div class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/50">Pagamentos</div>
+                      <div id="financeSales" class="display text-2xl font-bold mt-3">0</div>
+                    </div>
+                    <div class="rounded-2xl border border-base-content/10 bg-base-200 p-5">
+                      <div class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/50">Média por pagamento</div>
+                      <div id="financeAverage" class="display text-2xl font-bold mt-3">R$ 0,00</div>
+                    </div>
+                  </div>
+
+                  <div id="financeEmpty" class="hidden rounded-2xl border border-dashed border-base-content/15 bg-base-200 p-8 text-center text-sm text-base-content/50">
+                    Nenhum pagamento de chaves encontrado para esta loja no período.
+                  </div>
+                  <p class="text-[11px] text-base-content/40">Período calculado pelas datas registradas no servidor (UTC).</p>
+                </div>
+              </div>
             </div>
 
           </main>
@@ -973,7 +1025,78 @@
       updateCalc();
     }
 
-    const TAB_IDS = ['admin', 'list'];
+    const TAB_IDS = ['admin', 'list', 'finance'];
+    let _financesLoaded = false;
+    let _financeRequestRevision = 0;
+
+    function initFinanceDates() {
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('financeStartDate').value = today.slice(0, 7) + '-01';
+      document.getElementById('financeEndDate').value = today;
+    }
+
+    function markFinanceDirty() {
+      _financesLoaded = false;
+      _financeRequestRevision++;
+      document.getElementById('financeMetrics').classList.add('hidden');
+      document.getElementById('financeEmpty').classList.add('hidden');
+      document.getElementById('financeStatus').textContent = 'Período alterado. Clique em Consultar.';
+      const btn = document.getElementById('btnFinances');
+      btn.disabled = false;
+      btn.textContent = 'Consultar';
+    }
+
+    function resetFinanceState() {
+      markFinanceDirty();
+      document.getElementById('financeStoreLabel').textContent = _fingerprint || 'LOJA';
+      document.getElementById('financeStatus').textContent = 'Selecione o período para consultar.';
+    }
+
+    async function loadFinances() {
+      const status = document.getElementById('financeStatus');
+      const btn = document.getElementById('btnFinances');
+      const startDate = document.getElementById('financeStartDate').value;
+      const endDate = document.getElementById('financeEndDate').value;
+      if (!_fingerprint) { status.textContent = 'Token sem fingerprint de loja.'; return; }
+      if (!startDate || !endDate) { status.textContent = 'Selecione as duas datas.'; return; }
+      if (startDate > endDate) { status.textContent = 'A data inicial deve ser anterior ou igual à final.'; return; }
+
+      const revision = ++_financeRequestRevision;
+      btn.disabled = true;
+      btn.textContent = 'Consultando…';
+      status.textContent = 'Consultando pagamentos da loja…';
+      document.getElementById('financeMetrics').classList.add('hidden');
+      document.getElementById('financeEmpty').classList.add('hidden');
+
+      try {
+        const data = await api('/admin/finance/get-finances', {
+          startDate, endDate, type: 'Keys', fingerprint: _fingerprint
+        });
+        if (revision !== _financeRequestRevision) return;
+
+        const revenue = Number(data.TotalRevenue ?? data.totalRevenue ?? 0);
+        const sales = Number(data.TotalSales ?? data.totalSales ?? 0);
+        const average = Number(data.AverageTicket ?? data.averageTicket ?? 0);
+        if (![revenue, sales, average].every(Number.isFinite)) throw new Error('Resposta financeira inválida.');
+
+        document.getElementById('financeRevenue').textContent = fmt(revenue);
+        document.getElementById('financeSales').textContent = sales.toLocaleString('pt-BR');
+        document.getElementById('financeAverage').textContent = fmt(average);
+        document.getElementById('financeMetrics').classList.remove('hidden');
+        document.getElementById('financeEmpty').classList.toggle('hidden', sales !== 0);
+        status.textContent = `Pagamentos de ${_fingerprint} no período selecionado.`;
+        _financesLoaded = true;
+      } catch (e) {
+        if (revision !== _financeRequestRevision) return;
+        status.textContent = e.message || 'Não foi possível consultar as finanças.';
+        _financesLoaded = false;
+      } finally {
+        if (revision === _financeRequestRevision) {
+          btn.disabled = false;
+          btn.textContent = 'Consultar';
+        }
+      }
+    }
 
     function toggleSidebar() {
       const sidebar = document.getElementById('pricingSidebar');
@@ -1005,7 +1128,7 @@
     }
 
     function switchTab(t) {
-      document.querySelectorAll('.tab').forEach((b, i) => {
+      document.querySelectorAll('#panelTabs .tab').forEach((b, i) => {
         if (TAB_IDS[i] === t) {
           b.classList.add('tab-active');
         } else {
@@ -1024,6 +1147,7 @@
       });
       document.getElementById('billingNotice').classList.toggle('hidden', t !== 'admin');
       if (t === 'list') doList(false);
+      if (t === 'finance' && !_financesLoaded) loadFinances();
     }
 
     function rnd(n) {
@@ -1054,6 +1178,7 @@
       _fingerprint = (payload && (payload.fingerprint ?? payload.Fingerprint)) || '';
       updateKeyPreview();
       updateAdminOnlyVisibility();
+      resetFinanceState();
     }
 
     // Deletar e Transferir key só aparecem para o fingerprint ADMINSTORE
@@ -1101,6 +1226,7 @@
       document.getElementById('appShell').classList.remove('hidden');
       document.body.classList.remove('overflow-hidden');
       if (isListVisible()) doList(false);
+      if (!document.getElementById('panel-finance').classList.contains('hidden') && !_financesLoaded) loadFinances();
     }
 
     function applyAuthToken(val) {
@@ -1174,6 +1300,7 @@
       document.getElementById('token').value = '';
       _fingerprint = '';
       resetListState();
+      resetFinanceState();
       updateAdminOnlyVisibility();
       showLogin();
     }
@@ -1885,6 +2012,7 @@
       if (_listLoaded) applyFilters();
     });
 
+    initFinanceDates();
     loadToken();
     updateCalc();
     updateCreateCost();
