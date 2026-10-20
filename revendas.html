@@ -458,6 +458,11 @@
               <span class="mono font-semibold text-error" id="debtValue">R$ 0,00</span>
             </div>
 
+            <div id="debtDeadlineWrap" class="hidden flex flex-wrap items-center justify-between gap-1 border-t border-base-content/10 pt-2 mb-3 text-xs">
+              <span class="text-base-content/60">Bloqueio em</span>
+              <span id="debtCountdown" role="timer" aria-live="off" class="mono font-semibold text-warning whitespace-nowrap">—</span>
+            </div>
+
             <div class="join w-full mb-2" id="paySeg">
               <button id="btnMethodPix" onclick="setPayMethod('pix')"
                 class="join-item btn btn-sm btn-error">PIX</button>
@@ -741,7 +746,8 @@
                     <div>
                       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/50 mb-2">Visão financeira</div>
                       <h2 class="display text-2xl font-bold tracking-tight">Pagamentos de chaves</h2>
-                      <p class="text-sm text-base-content/60 mt-1">Valores pagos à Ring0x para quitar débitos de chaves.</p>
+                      <p class="text-sm text-base-content/60 mt-1">Pagamentos de chaves e entradas manuais desta loja.</p>
+                      <p class="text-xs text-base-content/50 mt-3">Primeiro pagamento registrado: <span id="financeFirstPayment" class="font-semibold text-base-content/80">Aguardando consulta</span></p>
                     </div>
                     <span id="financeStoreLabel" class="badge badge-outline border-base-content/20 mono text-[10px] font-semibold px-3 py-3">LOJA</span>
                   </div>
@@ -1102,6 +1108,7 @@
     function resetFinanceState() {
       markFinanceDirty();
       document.getElementById('financeStoreLabel').textContent = _fingerprint || 'LOJA';
+      document.getElementById('financeFirstPayment').textContent = 'Aguardando consulta';
       document.getElementById('financeStatus').textContent = 'Selecione o período para consultar.';
     }
 
@@ -1135,6 +1142,11 @@
         document.getElementById('financeRevenue').textContent = fmt(revenue);
         document.getElementById('financeSales').textContent = sales.toLocaleString('pt-BR');
         document.getElementById('financeAverage').textContent = fmt(average);
+        const firstPayment = data.FirstPaymentDate ?? data.firstPaymentDate;
+        const firstDateOnly = firstPayment ? String(firstPayment).slice(0, 10) : '';
+        document.getElementById('financeFirstPayment').textContent = /^\d{4}-\d{2}-\d{2}$/.test(firstDateOnly)
+          ? firstDateOnly.split('-').reverse().join('/')
+          : 'Nenhum pagamento registrado';
         document.getElementById('financeMetrics').classList.remove('hidden');
         document.getElementById('financeEmpty').classList.toggle('hidden', sales !== 0);
         status.textContent = `Pagamentos de ${_fingerprint} no período selecionado.`;
@@ -1260,6 +1272,8 @@
     }
 
     function showLogin(errorMsg) {
+      stopDebtCountdown();
+      _debtBalanceRevision++;
       hideAuthLoading();
       document.getElementById('loginGate').classList.remove('hidden');
       document.getElementById('appShell').classList.add('hidden');
@@ -1349,6 +1363,8 @@
     }
 
     function clearToken() {
+      stopDebtCountdown();
+      _debtBalanceRevision++;
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
       _fingerprint = '';
@@ -1388,6 +1404,58 @@
       return d;
     }
 
+    let _debtCountdownInterval = null;
+    let _debtBalanceRevision = 0;
+
+    function stopDebtCountdown() {
+      if (_debtCountdownInterval !== null) clearInterval(_debtCountdownInterval);
+      _debtCountdownInterval = null;
+      document.getElementById('debtDeadlineWrap').classList.add('hidden');
+    }
+
+    function startDebtCountdown(secondsUntilOverdue, isOverdue) {
+      stopDebtCountdown();
+      if (secondsUntilOverdue == null) return;
+      const seconds = Number(secondsUntilOverdue);
+      if (!Number.isFinite(seconds)) return;
+
+      const wrap = document.getElementById('debtDeadlineWrap');
+      const countdown = document.getElementById('debtCountdown');
+      wrap.classList.remove('hidden');
+      if (isOverdue || seconds <= 0) {
+        countdown.textContent = 'Prazo vencido';
+        countdown.classList.replace('text-warning', 'text-error');
+        if (!isOverdue && document.getElementById('token').value.trim()) {
+          setTimeout(loadDebtBalance, 2000);
+        }
+        return;
+      }
+
+      countdown.classList.replace('text-error', 'text-warning');
+      const deadline = performance.now() + seconds * 1000;
+      function update() {
+        const remaining = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+        if (remaining === 0) {
+          countdown.textContent = 'Prazo vencido';
+          countdown.classList.replace('text-warning', 'text-error');
+          document.getElementById('debtStatusLabel').textContent = 'Débito vencido!';
+          clearInterval(_debtCountdownInterval);
+          _debtCountdownInterval = null;
+          setTimeout(() => {
+            if (document.getElementById('token').value.trim()) loadDebtBalance();
+          }, 2000);
+          return;
+        }
+        const days = Math.floor(remaining / 86400);
+        const hours = Math.floor((remaining % 86400) / 3600);
+        const minutes = Math.floor((remaining % 3600) / 60);
+        const secs = remaining % 60;
+        countdown.textContent = `${days}d ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+      _debtCountdownInterval = setInterval(update, 1000);
+      update();
+    }
+
     async function loadDebtBalance() {
       const btn = document.getElementById('btnPayDebt');
       const val = document.getElementById('debtValue');
@@ -1395,9 +1463,12 @@
 
       if (!btn || !val || !lbl) return;
 
+      const revision = ++_debtBalanceRevision;
+
       document.getElementById('qrWrap').classList.add('hidden');
 
       if (!document.getElementById('token').value.trim()) {
+        stopDebtCountdown();
         lbl.textContent = 'Sem token';
         val.textContent = 'R$ 0,00';
         btn.disabled = true;
@@ -1409,11 +1480,14 @@
         val.classList.remove('text-error', 'text-success');
         val.classList.add('text-base-content/60');
         const res = await api('/admin/auth-keys/debt-balance', {});
+        if (revision !== _debtBalanceRevision) return;
         const data = res.Result || {};
         const debt = parseFloat(data.Balance ?? data.balance) || 0;
         const isOverdue = data.IsOverdue === true || data.isOverdue === true;
 
         val.textContent = fmt(debt);
+        if (debt > 0) startDebtCountdown(data.SecondsUntilOverdue ?? data.secondsUntilOverdue, isOverdue);
+        else stopDebtCountdown();
 
         if (isOverdue) {
           lbl.textContent = 'Débito vencido!';
@@ -1432,6 +1506,8 @@
           btn.disabled = true;
         }
       } catch (e) {
+        if (revision !== _debtBalanceRevision) return;
+        stopDebtCountdown();
         lbl.textContent = 'Erro ao ler';
         val.textContent = 'R$ 0,00';
         val.classList.remove('text-base-content/60', 'text-success');
