@@ -370,7 +370,7 @@
                   <span class="text-sm font-semibold">Diária</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">1 dia</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceDiaria">R$ 8</span>
+                <span class="mono text-sm font-semibold text-error" id="priceDiaria">—</span>
               </div>
             </li>
             <li>
@@ -379,7 +379,7 @@
                   <span class="text-sm font-semibold">Semanal</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">7 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceSemanal">R$ 30</span>
+                <span class="mono text-sm font-semibold text-error" id="priceSemanal">—</span>
               </div>
             </li>
             <li>
@@ -388,7 +388,7 @@
                   <span class="text-sm font-semibold">Mensal</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">30 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceMensal">R$ 60</span>
+                <span class="mono text-sm font-semibold text-error" id="priceMensal">—</span>
               </div>
             </li>
             <li>
@@ -397,16 +397,16 @@
                   <span class="text-sm font-semibold">Trimestral</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">90 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceTrimestral">R$ 150</span>
+                <span class="mono text-sm font-semibold text-error" id="priceTrimestral">—</span>
               </div>
             </li>
             <li>
               <div class="flex items-center justify-between">
                 <div class="flex flex-col">
-                  <span class="text-sm font-semibold">Lifetime</span>
-                  <span class="mono text-[10px] text-base-content/60 tracking-wider">Acesso vitalício</span>
+                  <span class="text-sm font-semibold">Anual</span>
+                  <span class="mono text-[10px] text-base-content/60 tracking-wider">365 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceAnual">R$ 520</span>
+                <span class="mono text-sm font-semibold text-error" id="priceAnual">—</span>
               </div>
             </li>
           </ul>
@@ -424,23 +424,23 @@
             <div class="flex flex-col gap-1">
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Diária</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcDiaria">R$ 8,00</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcDiaria">—</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Semanal</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcSemanal">R$ 30,00</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcSemanal">—</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Mensal</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcMensal">R$ 60,00</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcMensal">—</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Trimestral</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcTrimestral">R$ 150,00</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcTrimestral">—</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-[11px] text-base-content/60">Lifetime</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcAnual">R$ 520,00</span>
+                <span class="text-[11px] text-base-content/60">Anual</span>
+                <span class="mono text-[11px] text-error font-medium" id="calcAnual">—</span>
               </div>
             </div>
           </div>
@@ -619,7 +619,7 @@
                         <option value="7">7 dias (Semanal)</option>
                         <option value="30">30 dias (Mensal)</option>
                         <option value="90">90 dias (Trimestral)</option>
-                        <option value="365">Lifetime (Acesso vitalício)</option>
+                        <option value="365">Anual (365 dias)</option>
                       </select>
                     </div>
                     <div class="form-control">
@@ -647,7 +647,7 @@
                   <div class="alert bg-base-200 border border-base-content/20 mb-4">
                     <div class="flex items-center gap-3 w-full justify-between">
                       <span class="text-sm text-base-content/60">Custo total</span>
-                      <span class="mono text-xl font-semibold text-error" id="createCost">R$ 0,00</span>
+                      <span class="mono text-xl font-semibold text-error" id="createCost">—</span>
                     </div>
                   </div>
 
@@ -1019,14 +1019,8 @@
     const DESKTOP_KEY_BATCH = 50;
     const mobileKeysMedia = window.matchMedia('(max-width: 767px)');
 
-    const PRICES = {
-      PB: { diaria: 3, semanal: 10, mensal: 17, trimestral: 45, anual: 200 },
-      FAIRLIGHT: { diaria: 5, semanal: 15, mensal: 30, trimestral: 75, anual: 350 },
-      /* Full = ESP+Macro (pacote). Avulsos somam mais caro → Full vale a pena. */
-      PUBG: { diaria: 8, semanal: 30, mensal: 60, trimestral: 150, anual: 520 },
-      PUBGESP: { diaria: 5, semanal: 18, mensal: 35, trimestral: 90, anual: 420 },
-      PUBGMACRO: { diaria: 4, semanal: 15, mensal: 30, trimestral: 75, anual: 350 }
-    };
+    let PRICES = {};
+    const PRICE_DURATIONS = { 1: 'diaria', 7: 'semanal', 30: 'mensal', 90: 'trimestral', 365: 'anual' };
     let _calcQty = 1;
     let _calcProduct = 'PUBG';
 
@@ -1037,6 +1031,27 @@
       PUBGESP: { label: 'PUBG - ESP' },
       PUBGMACRO: { label: 'PUBG - Macro' }
     };
+
+    function applyStoreConfiguration(store) {
+      if (!store?.fingerprint || !store.productPrices) {
+        throw new Error('O servidor não retornou os preços da loja.');
+      }
+      const prices = {};
+      for (const product of Object.keys(PRODUCT_META)) {
+        prices[product] = {};
+        for (const [days, label] of Object.entries(PRICE_DURATIONS)) {
+          const value = store.productPrices[product]?.[days];
+          if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 ||
+              value > 99999999.99 || Math.abs(value * 100 - Math.round(value * 100)) > 0.000001) {
+            throw new Error(`Preço inválido ou ausente para ${productLabel(product)} (${days} dias).`);
+          }
+          prices[product][label] = value;
+        }
+      }
+      PRICES = prices;
+      updateCalc();
+      updateCreateCost();
+    }
 
     /* enum numérico da API + códigos string */
     const PRODUCT_CODES = {
@@ -1068,16 +1083,11 @@
     function updateCalc() {
       const p = PRICES[_calcProduct];
       document.getElementById('calcQtyVal').textContent = _calcQty;
-      document.getElementById('calcDiaria').textContent = fmt(p.diaria * _calcQty);
-      document.getElementById('calcSemanal').textContent = fmt(p.semanal * _calcQty);
-      document.getElementById('calcMensal').textContent = fmt(p.mensal * _calcQty);
-      document.getElementById('calcTrimestral').textContent = fmt(p.trimestral * _calcQty);
-      document.getElementById('calcAnual').textContent = fmt(p.anual * _calcQty);
-      document.getElementById('priceDiaria').textContent = 'R$ ' + p.diaria.toFixed(2).replace('.', ',');
-      document.getElementById('priceSemanal').textContent = 'R$ ' + p.semanal.toFixed(2).replace('.', ',');
-      document.getElementById('priceMensal').textContent = 'R$ ' + p.mensal.toFixed(2).replace('.', ',');
-      document.getElementById('priceTrimestral').textContent = 'R$ ' + p.trimestral.toFixed(2).replace('.', ',');
-      document.getElementById('priceAnual').textContent = 'R$ ' + p.anual.toFixed(2).replace('.', ',');
+      for (const label of Object.values(PRICE_DURATIONS)) {
+        const suffix = label[0].toUpperCase() + label.slice(1);
+        document.getElementById('calc' + suffix).textContent = p ? fmt(p[label] * _calcQty) : '—';
+        document.getElementById('price' + suffix).textContent = p ? fmt(p[label]) : '—';
+      }
     }
 
     function changeQty(d) {
@@ -1307,6 +1317,9 @@
     }
 
     function showLogin(errorMsg) {
+      PRICES = {};
+      updateCalc();
+      updateCreateCost();
       stopDebtCountdown();
       _debtBalanceRevision++;
       hideAuthLoading();
@@ -1338,7 +1351,13 @@
 
     async function validateToken(val) {
       document.getElementById('token').value = val;
-      return api('/admin/auth-keys/debt-balance', {});
+      PRICES = {};
+      updateCalc();
+      updateCreateCost();
+      const response = await api('/admin/stores/current', {});
+      if (document.getElementById('token').value !== val) throw new Error('A sessão foi alterada. Entre novamente.');
+      applyStoreConfiguration(response.Result);
+      return response;
     }
 
     async function doLogin(e) {
@@ -1630,9 +1649,8 @@
       const days = Number(document.getElementById('createDays').value) || 0;
       const product = document.getElementById('createProduct').value;
       const prices = PRICES[product];
-      const priceMap = { 1: 'diaria', 7: 'semanal', 30: 'mensal', 90: 'trimestral', 365: 'anual' };
-      const unit = prices ? (prices[priceMap[days]] || 0) : 0;
-      document.getElementById('createCost').textContent = fmt(unit * qty);
+      const unit = prices?.[PRICE_DURATIONS[days]];
+      document.getElementById('createCost').textContent = unit === undefined ? '—' : fmt(unit * qty);
     }
 
     // Mapeia dias -> código de duração usado no valor da key (1D / 7D / 30D)
@@ -1714,6 +1732,9 @@
 
       if (!productType) { toast('Selecione um produto.', true); return; }
       if (!durationCode) { toast('Selecione uma duração válida.', true); return; }
+      if (PRICES[productType]?.[PRICE_DURATIONS[d]] === undefined) {
+        toast('Os preços da loja não foram carregados. Entre novamente.', true); return;
+      }
 
       let manualBase = '';
       if (_manualKeyMode) {
