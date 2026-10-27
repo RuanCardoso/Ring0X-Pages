@@ -802,16 +802,16 @@
                     <div class="flex items-start justify-between gap-4">
                       <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
-                          <h3 id="estimatedRenewalsTitle" class="display text-lg font-bold">Renovações estimadas</h3>
-                          <span class="badge badge-outline badge-sm text-warning">Estimativa por HWID</span>
+                          <h3 id="estimatedRenewalsTitle" class="display text-lg font-bold">Renovações</h3>
+                          <span class="badge badge-outline badge-sm text-warning">Estimativa</span>
                         </div>
-                        <p id="estimatedRenewalsDescription" class="text-xs text-base-content/50 mt-2">Nova chave do mesmo produto ativada no mesmo HWID, nesta loja, nos últimos 30 dias.</p>
+                        <p id="estimatedRenewalsDescription" class="text-xs text-base-content/50 mt-2">Últimos 30 dias · Mesmo produto e dispositivo.</p>
                       </div>
                       <span id="estimatedRenewalsTotal" class="mono text-3xl font-semibold text-success shrink-0">—</span>
                     </div>
-                    <p class="text-xs leading-relaxed text-base-content/50">Cada combinação de HWID e produto é contada uma vez, pela ativação mais recente. A chave anterior pode estar expirada. HWIDs podem ser compartilhados ou alterados; esta estimativa não confirma identidade nem pagamento.</p>
+                    <p class="text-xs leading-relaxed text-base-content/50">Uma contagem por HWID e produto, nesta loja. O HWID pode mudar ou ser compartilhado; não confirma identidade nem pagamento.</p>
                     <ul id="estimatedRenewalsItems" class="divide-y divide-base-content/10 max-h-[60vh] overflow-y-auto" aria-label="Renovações estimadas pelo HWID"></ul>
-                    <p id="estimatedRenewalsEmpty" class="hidden rounded-xl bg-base-200 p-5 text-sm text-base-content/50">Nenhuma renovação estimada no período.</p>
+                    <p id="estimatedRenewalsEmpty" class="hidden rounded-xl bg-base-200 p-5 text-sm text-base-content/50">Nenhuma renovação no período.</p>
                     <p id="estimatedRenewalsCount" class="mono text-[10px] text-base-content/40"></p>
                   </div>
                 </section>
@@ -1247,9 +1247,9 @@
         const dates = row.querySelector('.insight-dates');
         if (prefix === 'estimatedRenewals') {
           summary.classList.add('text-success');
-          summary.textContent = `Nova chave ativada em ${fmtDate(item.renewedAt)} · Renovação estimada`;
+          summary.textContent = `Renovou em ${fmtDate(item.renewedAt)}`;
           dates.classList.add('break-words');
-          dates.textContent = `Chave anterior: ${item.previousKeyValue} · Vencimento anterior: ${fmtDate(item.previousEndsAt)} · Novo vencimento: ${fmtDate(item.endsAt)}`;
+          dates.textContent = `Anterior: ${item.previousKeyValue} (até ${fmtDate(item.previousEndsAt)}) · Nova válida até ${fmtDate(item.endsAt)}`;
         } else {
           const remaining = insightDayLabel(item.daysRemaining);
           const unused = insightDayLabel(item.daysSinceLastUse);
@@ -1329,14 +1329,14 @@
           renderInsightGroup('renewals', data.priorityRenewals);
           renderInsightGroup('abandonment', data.possibleAbandonment);
           if (data.estimatedRenewals) {
-            document.getElementById('estimatedRenewalsEmpty').textContent = 'Nenhuma renovação estimada no período.';
+            document.getElementById('estimatedRenewalsEmpty').textContent = 'Nenhuma renovação no período.';
             renderInsightGroup('estimatedRenewals', data.estimatedRenewals);
-            document.getElementById('estimatedRenewalsDescription').textContent = `Nova chave do mesmo produto ativada no mesmo HWID, nesta loja, nos últimos ${insightDayLabel(data.estimatedRenewals.periodDays)}.`;
+            document.getElementById('estimatedRenewalsDescription').textContent = `Últimos ${insightDayLabel(data.estimatedRenewals.periodDays)} · Mesmo produto e dispositivo.`;
           } else {
             document.getElementById('estimatedRenewalsItems').replaceChildren();
             document.getElementById('estimatedRenewalsTotal').textContent = '—';
             document.getElementById('estimatedRenewalsCount').textContent = '';
-            document.getElementById('estimatedRenewalsEmpty').textContent = 'Atualize o backend para consultar as renovações estimadas.';
+            document.getElementById('estimatedRenewalsEmpty').textContent = 'Disponível após atualizar o backend.';
             document.getElementById('estimatedRenewalsEmpty').classList.remove('hidden');
           }
           document.getElementById('renewalsDescription').textContent = `Vencem em até ${insightDayLabel(data.renewalWindowDays)} e tiveram uso nos últimos ${insightDayLabel(data.inactivityDays)}.`;
