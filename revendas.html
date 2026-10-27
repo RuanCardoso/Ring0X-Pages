@@ -797,9 +797,27 @@
                     <p id="abandonmentCount" class="mono text-[10px] text-base-content/40"></p>
                   </div>
                 </section>
+                <section class="card min-w-0 bg-base-100 border border-base-content/10 shadow-xl xl:col-span-2" aria-labelledby="estimatedRenewalsTitle">
+                  <div class="card-body gap-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <h3 id="estimatedRenewalsTitle" class="display text-lg font-bold">Renovações estimadas</h3>
+                          <span class="badge badge-outline badge-sm text-warning">Estimativa por HWID</span>
+                        </div>
+                        <p id="estimatedRenewalsDescription" class="text-xs text-base-content/50 mt-2">Nova chave do mesmo produto ativada no mesmo HWID, nesta loja, nos últimos 30 dias.</p>
+                      </div>
+                      <span id="estimatedRenewalsTotal" class="mono text-3xl font-semibold text-success shrink-0">—</span>
+                    </div>
+                    <p class="text-xs leading-relaxed text-base-content/50">Cada combinação de HWID e produto é contada uma vez, pela ativação mais recente. A chave anterior pode estar expirada. HWIDs podem ser compartilhados ou alterados; esta estimativa não confirma identidade nem pagamento.</p>
+                    <ul id="estimatedRenewalsItems" class="divide-y divide-base-content/10 max-h-[60vh] overflow-y-auto" aria-label="Renovações estimadas pelo HWID"></ul>
+                    <p id="estimatedRenewalsEmpty" class="hidden rounded-xl bg-base-200 p-5 text-sm text-base-content/50">Nenhuma renovação estimada no período.</p>
+                    <p id="estimatedRenewalsCount" class="mono text-[10px] text-base-content/40"></p>
+                  </div>
+                </section>
               </div>
 
-              <p class="text-xs leading-relaxed text-base-content/40 mt-5">O uso considera a última autenticação bem-sucedida, não indica se o programa está online. Chaves sem histórico de uso ainda não aparecem nestes insights.</p>
+              <p class="text-xs leading-relaxed text-base-content/40 mt-5">O uso considera a última autenticação bem-sucedida, não indica se o programa está online. Chaves sem histórico de uso não aparecem nos alertas de renovação prioritária e possível abandono. A estimativa de renovação usa as ativações e os HWIDs registrados.</p>
             </div>
 
             <!-- Finance Panel -->
@@ -1183,7 +1201,7 @@
       ['insightsResults', 'insightsLoading', 'insightsError'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById('insightsError').textContent = '';
       document.getElementById('insightsStatus').textContent = 'Abra esta aba para consultar os insights da loja.';
-      ['renewals', 'abandonment'].forEach(prefix => {
+      ['renewals', 'abandonment', 'estimatedRenewals'].forEach(prefix => {
         document.getElementById(prefix + 'Items').replaceChildren();
         document.getElementById(prefix + 'Total').textContent = '—';
         document.getElementById(prefix + 'Count').textContent = '';
@@ -1226,13 +1244,21 @@
         row.querySelector('.insight-product').textContent = productLabel(resolveProductCode(item.productType));
         row.querySelector('.insight-key').textContent = item.keyValue;
         const summary = row.querySelector('.insight-summary');
-        const remaining = insightDayLabel(item.daysRemaining);
-        const unused = insightDayLabel(item.daysSinceLastUse);
-        summary.classList.add(prefix === 'renewals' ? 'text-warning' : 'text-info');
-        summary.textContent = prefix === 'renewals'
-          ? `${item.daysRemaining === 1 ? 'Vence em até 24h' : `Vence em até ${remaining}`} · ${item.daysSinceLastUse === 0 ? 'Uso há menos de 24h' : `Sem uso há ${unused}`}`
-          : `Sem uso há ${unused} · ${remaining} de validade restantes`;
-        row.querySelector('.insight-dates').textContent = `Vencimento: ${fmtDate(item.endsAt)} · Último uso: ${fmtDate(item.lastUsedAt)}`;
+        const dates = row.querySelector('.insight-dates');
+        if (prefix === 'estimatedRenewals') {
+          summary.classList.add('text-success');
+          summary.textContent = `Nova chave ativada em ${fmtDate(item.renewedAt)} · Renovação estimada`;
+          dates.classList.add('break-words');
+          dates.textContent = `Chave anterior: ${item.previousKeyValue} · Vencimento anterior: ${fmtDate(item.previousEndsAt)} · Novo vencimento: ${fmtDate(item.endsAt)}`;
+        } else {
+          const remaining = insightDayLabel(item.daysRemaining);
+          const unused = insightDayLabel(item.daysSinceLastUse);
+          summary.classList.add(prefix === 'renewals' ? 'text-warning' : 'text-info');
+          summary.textContent = prefix === 'renewals'
+            ? `${item.daysRemaining === 1 ? 'Vence em até 24h' : `Vence em até ${remaining}`} · ${item.daysSinceLastUse === 0 ? 'Uso há menos de 24h' : `Sem uso há ${unused}`}`
+            : `Sem uso há ${unused} · ${remaining} de validade restantes`;
+          dates.textContent = `Vencimento: ${fmtDate(item.endsAt)} · Último uso: ${fmtDate(item.lastUsedAt)}`;
+        }
         const copy = row.querySelector('button');
         copy.setAttribute('aria-label', `Copiar chave ${item.keyValue}`);
         copy.addEventListener('click', async () => {
@@ -1263,6 +1289,17 @@
           throw new Error('O servidor retornou insights inválidos.');
         }
       }
+      // Older backends can still serve the original two insights during rollout.
+      const estimates = data.estimatedRenewals;
+      if (estimates != null && (estimates.isEstimate !== true || !validDays(estimates.periodDays) ||
+          !Number.isSafeInteger(estimates.total) || estimates.total < 0 || !Array.isArray(estimates.items) ||
+          estimates.items.length !== Math.min(estimates.total, data.limitPerInsight) ||
+          estimates.items.some(item => !item || typeof item.keyValue !== 'string' || !item.keyValue ||
+            typeof item.previousKeyValue !== 'string' || !item.previousKeyValue || !parseUtcDate(item.renewedAt) ||
+            (item.endsAt != null && !parseUtcDate(item.endsAt)) ||
+            (item.previousEndsAt != null && !parseUtcDate(item.previousEndsAt))))) {
+        throw new Error('O servidor retornou estimativas de renovação inválidas.');
+      }
       return data;
     }
 
@@ -1291,6 +1328,17 @@
           const data = validateInsights(response?.Result ?? response?.result);
           renderInsightGroup('renewals', data.priorityRenewals);
           renderInsightGroup('abandonment', data.possibleAbandonment);
+          if (data.estimatedRenewals) {
+            document.getElementById('estimatedRenewalsEmpty').textContent = 'Nenhuma renovação estimada no período.';
+            renderInsightGroup('estimatedRenewals', data.estimatedRenewals);
+            document.getElementById('estimatedRenewalsDescription').textContent = `Nova chave do mesmo produto ativada no mesmo HWID, nesta loja, nos últimos ${insightDayLabel(data.estimatedRenewals.periodDays)}.`;
+          } else {
+            document.getElementById('estimatedRenewalsItems').replaceChildren();
+            document.getElementById('estimatedRenewalsTotal').textContent = '—';
+            document.getElementById('estimatedRenewalsCount').textContent = '';
+            document.getElementById('estimatedRenewalsEmpty').textContent = 'Atualize o backend para consultar as renovações estimadas.';
+            document.getElementById('estimatedRenewalsEmpty').classList.remove('hidden');
+          }
           document.getElementById('renewalsDescription').textContent = `Vencem em até ${insightDayLabel(data.renewalWindowDays)} e tiveram uso nos últimos ${insightDayLabel(data.inactivityDays)}.`;
           document.getElementById('abandonmentDescription').textContent = `Ainda válidas, sem uso há pelo menos ${insightDayLabel(data.inactivityDays)}.`;
           document.getElementById('insightsStatus').textContent = `Atualizado em ${parseUtcDate(data.generatedAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}.`;
