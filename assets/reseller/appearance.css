@@ -1,0 +1,39 @@
+    /* Store appearance: default values below preserve the current Ring0x panel. */
+    :root {
+      --brand: 57% 0.17 19;
+      --brand-content: 98% 0.012 19;
+      --panel-font-body: Inter, sans-serif;
+      --panel-font-heading: Space Grotesk, sans-serif;
+      --panel-font-mono: JetBrains Mono, monospace;
+    }
+    body { font-family: var(--panel-font-body); }
+    .btn-brand {
+      --btn-color: var(--brand);
+      color: oklch(var(--brand-content));
+      outline-color: oklch(var(--brand));
+    }
+    #appShell > .navbar { flex-wrap: wrap; }
+    #panelBrand { min-width: 0; max-width: min(50%, 24rem); }
+    #panelStoreName { min-width: 0; overflow-wrap: anywhere; }
+    #panelLogo { width: 2.25rem; height: 2.25rem; object-fit: contain; flex-shrink: 0; }
+    #pricingSidebar { width: var(--panel-sidebarWidth, 268px); }
+    #mainContent {
+      max-width: var(--panel-contentMaxWidth, 80%);
+      padding: var(--panel-pagePaddingDesktop, 1.5rem);
+    }
+    .card .card-body { padding: var(--panel-cardPaddingDesktop, 2rem); }
+    .card.shadow-xl { box-shadow: var(--panel-card-shadow, 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)); }
+    .input, .select, .textarea { border-radius: var(--panel-radius-input, 0.5rem); }
+    #keysTableFrame { border-radius: var(--panel-radius-table, 1rem); }
+    #keysTableWrap, #insightsResults ul { max-height: var(--panel-tableMaxHeight, 60vh); }
+    :root [class~="text-base-content/60"] { color: oklch(var(--bc) / var(--panel-opacity-textSecondary, 0.6)); }
+    :root [class~="text-base-content/50"] { color: oklch(var(--bc) / var(--panel-opacity-textMuted, 0.5)); }
+    :root [class~="text-base-content/40"] { color: oklch(var(--bc) / var(--panel-opacity-textSubtle, 0.4)); }
+    :root [class~="text-base-content/30"] { color: oklch(var(--bc) / var(--panel-opacity-textDisabled, 0.3)); }
+    :root [class~="border-base-content/10"] { border-color: oklch(var(--bc) / var(--panel-opacity-border, 0.1)); }
+    :root [class~="border-base-content/20"] { border-color: oklch(var(--bc) / var(--panel-opacity-borderStrong, 0.2)); }
+    #keysBody > tr + tr { border-color: oklch(var(--bc) / var(--panel-opacity-tableDivider, 0.06)); }
+    #keysBody .key-row:hover { background-color: oklch(var(--brand) / var(--panel-opacity-tableRowHover, 0.04)); }
+    #keysBody .key-row[class~="bg-brand/10"] { background-color: oklch(var(--brand) / var(--panel-opacity-tableRowSelected, 0.1)); }
+    #keysBody .key-row[class~="ring-brand/30"] { --tw-ring-color: oklch(var(--brand) / var(--panel-opacity-tableRowSelectedRing, 0.3)); }
+

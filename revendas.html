@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ring0x · Painel de Revendedores</title>
+  <link id="panelFavicon" rel="icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -17,15 +18,21 @@
     tailwind.config = {
       theme: {
         extend: {
+          colors: {
+            brand: 'oklch(var(--brand) / <alpha-value>)',
+            'brand-content': 'oklch(var(--brand-content) / <alpha-value>)'
+          },
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-            display: ['Space Grotesk', 'sans-serif'],
+            sans: ['var(--panel-font-body)'],
+            mono: ['var(--panel-font-mono)'],
+            display: ['var(--panel-font-heading)'],
           }
         }
       }
     }
   </script>
+  <link href="assets/reseller/appearance.css" rel="stylesheet" />
+  <link href="assets/reseller/customizer.css" rel="stylesheet" />
   <style>
     /* Para reexibir o plano anual, altere data-show-annual para "true" no elemento html. */
     html[data-show-annual="false"] .annual-plan {
@@ -33,11 +40,11 @@
     }
 
     .mono {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--panel-font-mono);
     }
 
     .display {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--panel-font-heading);
     }
 
     .tabs-boxed {
@@ -137,11 +144,11 @@
 
     @media (max-width: 767px) {
       #mainContent {
-        padding: 1rem;
+        padding: var(--panel-pagePaddingMobile, 1rem);
       }
 
       #mainContent .card-body {
-        padding: 1rem;
+        padding: var(--panel-cardPaddingMobile, 1rem);
       }
 
       #createKeyLabel,
@@ -203,7 +210,7 @@
         display: block;
         margin: 0.75rem;
         border: 1px solid oklch(var(--bc) / 0.12);
-        border-radius: 0.75rem;
+        border-radius: var(--panel-radius-mobile-row, 0.75rem);
         overflow: hidden;
       }
 
@@ -218,7 +225,7 @@
         text-align: right;
         overflow-wrap: anywhere;
         white-space: normal;
-        border-bottom: 1px solid oklch(var(--bc) / 0.06);
+        border-bottom: 1px solid oklch(var(--bc) / var(--panel-opacity-tableDivider, 0.06));
       }
 
       #keysBody tr.key-row td.mobile-extra,
@@ -234,7 +241,7 @@
         content: attr(data-label);
         flex: 0 0 5.5rem;
         color: oklch(var(--bc) / 0.55);
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--panel-font-mono);
         font-size: 0.65rem;
         font-weight: 600;
         text-align: left;
@@ -294,8 +301,8 @@
   <div id="authLoading"
     class="hidden fixed inset-0 z-[10001] flex flex-col items-center justify-center gap-4 bg-base-300">
     <div class="flex flex-col items-center gap-4">
-      <h2 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x</h2>
-      <div class="loading loading-spinner loading-lg text-error"></div>
+      <h2 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-brand">0</span>x</h2>
+      <div class="loading loading-spinner loading-lg text-brand"></div>
       <span class="mono text-xs font-semibold uppercase tracking-widest text-base-content/60"
         id="authLoadingLabel">Validando acesso…</span>
     </div>
@@ -305,9 +312,9 @@
   <div id="loginGate" class="hidden fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-base-300">
     <div class="card bg-base-100 border border-base-content/20 w-full max-w-md shadow-2xl">
       <div class="card-body">
-        <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2">acesso · reseller</div>
+        <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2">acesso · reseller</div>
         <h2 class="display text-3xl font-extrabold uppercase tracking-tighter mb-1">Ring<span
-            class="text-error">0</span>x</h2>
+            class="text-brand">0</span>x</h2>
         <p class="text-sm text-base-content/60 mb-6">Informe o Bearer token de admin para entrar no painel de revenda.
         </p>
         <form id="loginForm" onsubmit="doLogin(event)">
@@ -319,7 +326,7 @@
               class="input input-bordered w-full mono" autofocus />
           </div>
           <div class="text-xs text-error min-h-[18px] mb-4" id="loginError"></div>
-          <button type="submit" class="btn btn-error w-full font-bold" id="btnLogin">Entrar</button>
+          <button type="submit" class="btn btn-brand w-full font-bold" id="btnLogin">Entrar</button>
         </form>
       </div>
     </div>
@@ -332,14 +339,17 @@
     <div class="navbar bg-base-100 border-b border-base-content/10 px-4 md:px-6 min-h-16 gap-3">
       <button id="sidebarToggle" type="button" onclick="toggleSidebar()" aria-controls="pricingSidebar"
         aria-expanded="false" class="btn btn-sm btn-outline lg:hidden">Preços e saldo</button>
-      <div class="flex items-center gap-3">
-        <h1 class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-error">0</span>x
+      <div id="panelBrand" class="flex items-center gap-3 min-w-0 flex-1 sm:flex-none">
+        <img id="panelLogo" class="hidden" alt="" referrerpolicy="no-referrer" />
+        <h1 id="panelStoreName" class="display text-2xl font-extrabold uppercase tracking-tighter">Ring<span class="text-brand">0</span>x
         </h1>
       </div>
-      <p class="text-xs text-base-content/60 font-medium hidden sm:block"> Painel de revenda · chaves de acesso</p>
-      <div class="ml-auto flex items-center gap-2">
+      <p id="panelSubtitle" class="text-xs text-base-content/60 font-medium hidden sm:block">Painel de revenda · chaves de acesso</p>
+      <div class="ml-auto flex items-center gap-2 shrink-0">
+        <button type="button" id="btnPanelCustomize" class="btn btn-sm btn-ghost" onclick="StorePanelCustomizer.open()">Personalizar</button>
+        <a id="panelSupport" class="hidden btn btn-sm btn-ghost" target="_blank" rel="noopener noreferrer">Suporte</a>
         <button onclick="clearToken()"
-          class="btn btn-sm btn-ghost gap-1 mono text-[10px] font-medium uppercase tracking-wider text-base-content/60 hover:text-error hover:bg-error/10">
+          class="btn btn-sm btn-ghost gap-1 mono text-[10px] font-medium uppercase tracking-wider text-base-content/60 hover:text-brand hover:bg-brand/10">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="w-3.5 h-3.5">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -380,7 +390,7 @@
                   <span class="text-sm font-semibold">Diária</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">1 dia</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceDiaria">—</span>
+                <span class="mono text-sm font-semibold text-brand" id="priceDiaria">—</span>
               </div>
             </li>
             <li>
@@ -389,7 +399,7 @@
                   <span class="text-sm font-semibold">Semanal</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">7 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceSemanal">—</span>
+                <span class="mono text-sm font-semibold text-brand" id="priceSemanal">—</span>
               </div>
             </li>
             <li>
@@ -398,7 +408,7 @@
                   <span class="text-sm font-semibold">Mensal</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">30 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceMensal">—</span>
+                <span class="mono text-sm font-semibold text-brand" id="priceMensal">—</span>
               </div>
             </li>
             <li>
@@ -407,7 +417,7 @@
                   <span class="text-sm font-semibold">Trimestral</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">90 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceTrimestral">—</span>
+                <span class="mono text-sm font-semibold text-brand" id="priceTrimestral">—</span>
               </div>
             </li>
             <li class="annual-plan">
@@ -416,7 +426,7 @@
                   <span class="text-sm font-semibold">Anual</span>
                   <span class="mono text-[10px] text-base-content/60 tracking-wider">365 dias</span>
                 </div>
-                <span class="mono text-sm font-semibold text-error" id="priceAnual">—</span>
+                <span class="mono text-sm font-semibold text-brand" id="priceAnual">—</span>
               </div>
             </li>
           </ul>
@@ -434,23 +444,23 @@
             <div class="flex flex-col gap-1">
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Diária</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcDiaria">—</span>
+                <span class="mono text-[11px] text-brand font-medium" id="calcDiaria">—</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Semanal</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcSemanal">—</span>
+                <span class="mono text-[11px] text-brand font-medium" id="calcSemanal">—</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Mensal</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcMensal">—</span>
+                <span class="mono text-[11px] text-brand font-medium" id="calcMensal">—</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-[11px] text-base-content/60">Trimestral</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcTrimestral">—</span>
+                <span class="mono text-[11px] text-brand font-medium" id="calcTrimestral">—</span>
               </div>
               <div class="flex justify-between annual-plan">
                 <span class="text-[11px] text-base-content/60">Anual</span>
-                <span class="mono text-[11px] text-error font-medium" id="calcAnual">—</span>
+                <span class="mono text-[11px] text-brand font-medium" id="calcAnual">—</span>
               </div>
             </div>
           </div>
@@ -475,7 +485,7 @@
 
             <div class="join w-full mb-2" id="paySeg">
               <button id="btnMethodPix" onclick="setPayMethod('pix')"
-                class="join-item btn btn-sm btn-error">PIX</button>
+                class="join-item btn btn-sm btn-brand">PIX</button>
               <button id="btnMethodCredit" onclick="setPayMethod('credit')"
                 class="join-item btn btn-sm btn-neutral">Cartão</button>
             </div>
@@ -485,26 +495,26 @@
                 class="input input-bordered input-sm w-full" />
             </div>
 
-            <button class="btn btn-error btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar
+            <button class="btn btn-brand btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar
               Saldo</button>
 
             <div id="qrWrap" class="hidden mt-3 bg-white p-3 text-center border border-base-content/20">
               <div id="qrImg" class="flex justify-center mb-2"></div>
-              <button class="btn btn-sm btn-error w-full font-bold" onclick="copyPixCode()">Copiar Código PIX</button>
+              <button class="btn btn-sm btn-brand w-full font-bold" onclick="copyPixCode()">Copiar Código PIX</button>
             </div>
           </div>
         </div>
 
         <!-- Download Loader -->
         <div class="mt-auto mb-2">
-          <a href="https://raw.githubusercontent.com/RuanCardoso/Ring0X-Pages/main/MSEDGEWEBVIEW2.zip"
+          <a id="loaderLink" href="https://raw.githubusercontent.com/RuanCardoso/Ring0X-Pages/main/MSEDGEWEBVIEW2.zip"
             class="btn btn-sm btn-outline w-full gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
             </svg>
-            Download Loader
+            <span id="loaderLabel">Download Loader</span>
           </a>
         </div>
 
@@ -658,11 +668,11 @@
                   <div class="alert bg-base-200 border border-base-content/20 mb-4">
                     <div class="flex items-center gap-3 w-full justify-between">
                       <span class="text-sm text-base-content/60">Custo total</span>
-                      <span class="mono text-xl font-semibold text-error" id="createCost">—</span>
+                      <span class="mono text-xl font-semibold text-brand" id="createCost">—</span>
                     </div>
                   </div>
 
-                  <button class="btn btn-error w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
+                  <button class="btn btn-brand w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
                   <button class="btn btn-success w-full font-bold hidden" id="btnCopyCreated" onclick="copyCreatedKeys()">Copiar chaves geradas</button>
 
                 </div>
@@ -708,7 +718,7 @@
                     <span class="mono text-[10px] text-base-content/40 ml-auto" id="filterCount"></span>
                   </div>
 
-                  <div class="rounded-2xl border border-base-content/10 bg-base-100 shadow-inner overflow-hidden">
+                  <div id="keysTableFrame" class="rounded-2xl border border-base-content/10 bg-base-100 shadow-inner overflow-hidden">
                     <div id="keysTableWrap" class="overflow-x-auto overflow-y-auto max-h-[60vh]">
                       <table id="keysTable" class="table w-full">
                         <thead class="sticky top-0 z-10 bg-base-200/95 backdrop-blur border-b border-base-content/10">
@@ -880,7 +890,7 @@
         <div id="billingNotice" class="border-t border-base-content/10 p-6 bg-base-300 shrink-0">
           <div class="flex flex-col gap-3">
             <div class="display text-sm font-bold tracking-tight">Política de cobrança</div>
-            <ul class="text-sm text-base-content/60 space-y-1.5 list-disc list-inside marker:text-error">
+            <ul class="text-sm text-base-content/60 space-y-1.5 list-disc list-inside marker:text-brand">
               <li>O débito é gerado no momento da criação da chave, independentemente de ativação ou uso.</li>
               <li>Keys revogadas, expiradas ou não ativadas continuam gerando débito.</li>
               <li>O saldo devedor tem vencimento de 7 dias corridos.</li>
@@ -901,6 +911,94 @@
   <!-- Toast -->
   <div id="toast" class="toast toast-end toast-bottom z-[9999] max-w-[420px]"></div>
 
+  <!-- Store appearance editor: changes remain in the preview until saved. -->
+  <dialog id="panelEditorDialog" class="modal" aria-labelledby="panelEditorTitle">
+    <div class="modal-box w-11/12 max-w-5xl max-h-[92dvh] p-0 overflow-hidden flex flex-col">
+      <div class="flex items-start justify-between gap-4 p-5 border-b border-base-content/10 shrink-0">
+        <div>
+          <h2 id="panelEditorTitle" class="display text-xl font-bold">Personalizar painel</h2>
+          <p class="text-xs text-base-content/50 mt-1">Escolha o visual da sua loja. As alterações só entram em vigor ao salvar.</p>
+        </div>
+        <button type="button" id="panelEditorClose" class="btn btn-sm btn-ghost" onclick="StorePanelCustomizer.close()" aria-label="Fechar personalização">✕</button>
+      </div>
+      <form id="panelEditorForm" class="flex flex-col min-h-0 flex-1" novalidate onsubmit="StorePanelCustomizer.save(event)">
+        <div class="panel-editor-body grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-5 p-5 overflow-y-auto min-h-0">
+          <fieldset id="panelEditorFields" class="min-w-0">
+            <legend class="sr-only">Configurações de aparência</legend>
+            <div class="tabs tabs-boxed mb-5 flex-wrap" aria-label="Seções de personalização">
+              <button type="button" id="panelEditorTab-identity" class="tab tab-active" onclick="StorePanelCustomizer.setTab('identity')">Identidade</button>
+              <button type="button" id="panelEditorTab-colors" class="tab" onclick="StorePanelCustomizer.setTab('colors')">Cores</button>
+              <button type="button" id="panelEditorTab-style" class="tab" onclick="StorePanelCustomizer.setTab('style')">Estilo</button>
+            </div>
+            <section id="panelEditorSection-identity" aria-label="Identidade da loja">
+              <div id="panelEditorIdentity" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </section>
+            <section id="panelEditorSection-colors" class="hidden" aria-label="Cores do painel">
+              <p class="text-xs text-base-content/50 mb-3">Comece com um tema pronto e ajuste as cores como preferir.</p>
+              <div class="flex flex-wrap gap-2 mb-5">
+                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('default')">Atual</button>
+                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('green')">Verde</button>
+                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('blue')">Azul</button>
+                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('purple')">Roxo</button>
+                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('light')">Claro</button>
+              </div>
+              <div id="panelEditorColors" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+              <details class="mt-5 rounded-xl border border-base-content/10 p-4">
+                <summary class="cursor-pointer text-sm font-semibold">Mais cores</summary>
+                <div id="panelEditorExtraColors" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4"></div>
+              </details>
+            </section>
+            <section id="panelEditorSection-style" class="hidden" aria-label="Estilo do painel">
+              <div id="panelEditorStyle" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+              <details class="mt-5 rounded-xl border border-base-content/10 p-4">
+                <summary class="cursor-pointer text-sm font-semibold">Mais opções de estilo</summary>
+                <div id="panelEditorExtraStyle" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4"></div>
+              </details>
+            </section>
+          </fieldset>
+          <aside class="min-w-0 lg:sticky lg:top-0 self-start" aria-label="Prévia da aparência">
+            <p class="mono text-[10px] uppercase tracking-wider text-base-content/50 mb-3">Prévia · dados de exemplo</p>
+            <div id="panelPreview" class="panel-preview rounded-2xl border overflow-hidden">
+              <div class="panel-preview-header flex items-center gap-2 p-3 border-b">
+                <img id="panelPreviewLogo" class="hidden w-7 h-7 object-contain shrink-0" alt="" referrerpolicy="no-referrer" />
+                <div class="min-w-0">
+                  <p id="panelPreviewName" class="font-bold text-sm break-words">Ring0x</p>
+                  <p id="panelPreviewSubtitle" class="text-[10px] opacity-60 break-words">Painel de revenda</p>
+                </div>
+              </div>
+              <div class="flex min-h-[260px]">
+                <div class="panel-preview-sidebar w-16 shrink-0 p-2 text-[9px] space-y-3"><p>Preços</p><p>Saldo</p><p>Loader</p></div>
+                <div class="p-3 min-w-0 flex-1">
+                  <p class="text-[9px] mb-3">Gerar · Listar · Insights</p>
+                  <div id="panelPreviewCard" class="panel-preview-card border p-3">
+                    <p class="text-xs font-bold mb-2">Chaves de acesso</p>
+                    <p class="text-[10px] opacity-60 mb-3">Seu painel, com a identidade da sua loja.</p>
+                    <span id="panelPreviewButton" class="block text-center text-[10px] font-semibold p-2">Criar chave</span>
+                  </div>
+                  <div class="flex flex-wrap gap-2 text-[9px] mt-3"><span id="panelPreviewSuccess">Ativa</span><span id="panelPreviewWarning">Atenção</span><span id="panelPreviewError">Erro</span></div>
+                </div>
+              </div>
+            </div>
+            <p class="text-[11px] text-base-content/40 leading-relaxed mt-3">Cores e textos são ilustrativos nesta prévia. O painel completo mantém suas abas e funções.</p>
+          </aside>
+        </div>
+        <div class="p-5 border-t border-base-content/10 shrink-0">
+          <p id="panelEditorError" role="alert" class="hidden text-sm text-error mb-3"></p>
+          <p id="panelEditorStatus" role="status" aria-live="polite" class="text-xs text-base-content/50 mb-3">Personalização válida somente para esta loja.</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="panelEditorReset" class="btn btn-sm btn-ghost" onclick="StorePanelCustomizer.resetDraft()">Restaurar padrão</button>
+            <div class="flex gap-2 ml-auto">
+              <button type="button" id="panelEditorCancel" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.close()">Cancelar</button>
+              <button type="submit" id="panelEditorSave" class="btn btn-sm btn-brand">Salvar aparência</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-backdrop"><button type="button" onclick="StorePanelCustomizer.close()" aria-label="Cancelar personalização"></button></div>
+  </dialog>
+
+
   <!-- Confirm Modal -->
   <dialog id="confirmModal" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -918,7 +1016,7 @@
   <!-- Modal: Revogar Key -->
   <dialog id="modalRevoke" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Revogar Key</h3>
       <p class="text-sm text-base-content/60 py-2">A key é invalidada permanentemente. A dívida permanece no saldo mesmo
         após revogação.</p>
@@ -936,7 +1034,7 @@
   <!-- Modal: Deletar Key -->
   <dialog id="modalDelete" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Deletar Key</h3>
       <p class="text-sm text-base-content/60 py-2">A key é removida permanentemente da base. Diferente da revogação,
         essa ação não pode ser desfeita.</p>
@@ -954,7 +1052,7 @@
   <!-- Modal: Transferir Key -->
   <dialog id="modalTransfer" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Transferir Key</h3>
       <p class="text-sm text-base-content/60 py-2">A key passa a pertencer à loja do token de destino. O fingerprint da
         loja destino é extraído automaticamente pelo sistema.</p>
@@ -1019,7 +1117,7 @@
   <!-- Modal: Reset HWID -->
   <dialog id="modalResetHwid" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Reset HWID</h3>
       <p class="text-sm text-base-content/60 py-2">Permite que a key seja ativada em um novo dispositivo. O HWID será
         atualizado automaticamente.</p>
@@ -1037,7 +1135,7 @@
   <!-- Modal: Simular Ativação -->
   <dialog id="modalSimulate" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Simular Ativação</h3>
       <p class="text-sm text-base-content/60 py-2">Simula a ativação pelo cliente. Use para validar a key antes de
         enviar.</p>
@@ -1062,7 +1160,7 @@
   <!-- Modal: Congelar em Lote -->
   <dialog id="modalFreeze" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-error mb-2.5">Ferramentas</div>
+      <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Congelar em Lote</h3>
       <p class="text-sm text-base-content/60 py-2">Congela ou descongela todas as keys de um produto específico de uma
         vez.</p>
@@ -1086,6 +1184,9 @@
     <form method="dialog" class="modal-backdrop"><button>close</button></form>
   </dialog>
 
+  <script src="assets/reseller/appearance.js"></script>
+  <script src="assets/reseller/customizer-fields.js"></script>
+  <script src="assets/reseller/customizer.js"></script>
   <script>
     let _selectedKey = '';
     let _allKeyItems = [];
@@ -1114,6 +1215,7 @@
       PUBGMACRO: { label: 'PUBG - Macro' }
     };
 
+
     function applyStoreConfiguration(store) {
       if (!store?.fingerprint || !store.productPrices) {
         throw new Error('O servidor não retornou os preços da loja.');
@@ -1131,6 +1233,7 @@
         }
       }
       PRICES = prices;
+      StorePanelCustomizer.commit(store.panelSettings);
       updateCalc();
       updateCreateCost();
     }
@@ -1584,6 +1687,7 @@
     }
 
     function showLogin(errorMsg) {
+      StorePanelCustomizer.resetSession();
       resetInsightsState();
       PRICES = {};
       updateCalc();
@@ -1619,6 +1723,7 @@
     }
 
     async function validateToken(val) {
+      StorePanelCustomizer.resetSession();
       document.getElementById('token').value = val;
       PRICES = {};
       updateCalc();
@@ -1848,14 +1953,14 @@
 
       if (m === 'pix') {
         pixBtn.classList.remove('btn-neutral');
-        pixBtn.classList.add('btn-error');
-        creditBtn.classList.remove('btn-error');
+        pixBtn.classList.add('btn-brand');
+        creditBtn.classList.remove('btn-brand');
         creditBtn.classList.add('btn-neutral');
         cpfWrap.classList.remove('hidden');
       } else {
         creditBtn.classList.remove('btn-neutral');
-        creditBtn.classList.add('btn-error');
-        pixBtn.classList.remove('btn-error');
+        creditBtn.classList.add('btn-brand');
+        pixBtn.classList.remove('btn-brand');
         pixBtn.classList.add('btn-neutral');
         cpfWrap.classList.add('hidden');
       }
@@ -2379,13 +2484,13 @@
 
         const fb = i.frozen_by || i.FrozenBy || '';
         const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
-        return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}" class="key-row group hover:bg-error/[0.04] cursor-pointer transition-colors">
+        return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}" class="key-row group hover:bg-brand/[0.04] cursor-pointer transition-colors">
           <td data-label="Key" class="py-3 pl-5">
             <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5 shrink-0 text-base-content/25 group-hover:text-error transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5 shrink-0 text-base-content/25 group-hover:text-brand transition-colors">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
               </svg>
-              <span class="mono text-[11.5px] tracking-[0.02em] truncate max-w-[170px] group-hover:text-error transition-colors" title="${k}">${k}</span>
+              <span class="mono text-[11.5px] tracking-[0.02em] truncate max-w-[170px] group-hover:text-brand transition-colors" title="${k}">${k}</span>
             </div>
           </td>
           <td data-label="Status">${statusHtml}</td>
@@ -2402,11 +2507,11 @@
       const rows = body.querySelectorAll('tr[data-key]');
       rows.forEach(row => {
         if (row.getAttribute('data-key') === _selectedKey) {
-          row.classList.add('bg-error/10', 'ring-1', 'ring-error/30');
+          row.classList.add('bg-brand/10', 'ring-1', 'ring-brand/30');
         }
         row.addEventListener('click', () => {
-          rows.forEach(r => r.classList.remove('bg-error/10', 'ring-1', 'ring-error/30'));
-          row.classList.add('bg-error/10', 'ring-1', 'ring-error/30');
+          rows.forEach(r => r.classList.remove('bg-brand/10', 'ring-1', 'ring-brand/30'));
+          row.classList.add('bg-brand/10', 'ring-1', 'ring-brand/30');
           _selectedKey = row.getAttribute('data-key');
           navigator.clipboard.writeText(_selectedKey).then(() => {
             toast('Key copiada!');
@@ -2516,6 +2621,12 @@
       if (_listLoaded) applyFilters();
     });
 
+    StorePanelCustomizer.init({
+      getSession: () => ({ token: document.getElementById('token').value, store: _fingerprint }),
+      isAuthenticated: () => !document.getElementById('appShell').classList.contains('hidden'),
+      save: panelSettings => api('/admin/stores/panel-settings', { panelSettings }),
+      onSaved: () => toast('Aparência salva!')
+    });
     initFinanceDates();
     loadToken();
     updateCalc();
