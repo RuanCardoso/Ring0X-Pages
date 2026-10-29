@@ -886,19 +886,47 @@
           </main>
         </div>
 
-        <!-- Billing Notice -->
-        <div id="billingNotice" class="border-t border-base-content/10 p-6 bg-base-300 shrink-0">
-          <div class="flex flex-col gap-3">
-            <div class="display text-sm font-bold tracking-tight">Política de cobrança</div>
-            <ul class="text-sm text-base-content/60 space-y-1.5 list-disc list-inside marker:text-brand">
-              <li>O débito é gerado no momento da criação da chave, independentemente de ativação ou uso.</li>
-              <li>Keys revogadas, expiradas ou não ativadas continuam gerando débito.</li>
-              <li>O saldo devedor tem vencimento de 5 dias corridos.</li>
-              <li>Em caso de atraso, todas as keys ativas do revendedor são congeladas automaticamente até a
-                regularização.</li>
-            </ul>
+        <!-- Billing policy: native disclosure, collapsed by default. -->
+        <details id="billingNotice" class="border-t border-base-content/10 p-6 bg-base-300 shrink-0">
+          <summary class="cursor-pointer min-h-[44px] py-2 text-brand">
+            <span class="display text-sm font-bold tracking-tight text-base-content">Política de cobrança e uso</span>
+            <span class="block text-xs text-base-content/60 mt-1">Consulte as regras de chaves, prazos, pagamentos e finanças.</span>
+          </summary>
+          <div class="mt-4 max-h-[45vh] overflow-y-auto overscroll-contain pr-2" tabindex="0" role="region" aria-label="Regras de cobrança e uso">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-base-content/60 leading-relaxed">
+              <section aria-labelledby="billingCreationTitle">
+                <h3 id="billingCreationTitle" class="font-semibold text-base-content mb-2">Criação e valor da chave</h3>
+                <p>Cada chave criada gera um débito pelo preço da sua loja, produto e duração naquele momento. A cobrança não depende de venda, ativação ou uso pelo cliente.</p>
+                <p class="mt-2">Não ativar, deixar expirar, congelar ou revogar uma chave não cancela o débito. Alterações futuras de preço não recalculam o valor já registrado.</p>
+              </section>
+              <section aria-labelledby="billingDeadlineTitle">
+                <h3 id="billingDeadlineTitle" class="font-semibold text-base-content mb-2">Prazo de 5 dias corridos</h3>
+                <p>O prazo começa na criação de cada chave, inclusive em fins de semana e feriados. Novas chaves não renovam o prazo das anteriores.</p>
+                <p class="mt-2">O contador do saldo devedor acompanha a chave pendente mais antiga. Basta uma dívida ultrapassar 5 dias para o bloqueio financeiro entrar em vigor na loja.</p>
+              </section>
+              <section aria-labelledby="billingBlockTitle">
+                <h3 id="billingBlockTitle" class="font-semibold text-base-content mb-2">O que acontece no atraso</h3>
+                <p>O bloqueio afeta a ativação e a validação das chaves da loja, mesmo as que já foram pagas. Também impede criar, revogar, resetar HWID e descongelar chaves.</p>
+                <p class="mt-2">O bloqueio financeiro não pausa a validade nem repõe os dias sem acesso. Quando não houver mais dívida vencida, ele deixa de se aplicar; chaves expiradas, revogadas ou congeladas manualmente continuam com suas próprias restrições.</p>
+              </section>
+              <section aria-labelledby="billingPaymentTitle">
+                <h3 id="billingPaymentTitle" class="font-semibold text-base-content mb-2">Pagamento e baixa do saldo</h3>
+                <p>O pagamento pelo painel reúne todo o saldo pendente no momento da geração, e não apenas as dívidas vencidas. Gerar um QR Code ou abrir o checkout não quita a cobrança: é necessária a confirmação do pagamento pelo provedor.</p>
+                <p class="mt-2">A baixa cobre as chaves incluídas naquele pagamento. Chaves criadas depois geram novas pendências. Após a confirmação, atualize o saldo no painel para conferir a regularização.</p>
+              </section>
+              <section aria-labelledby="billingUsageTitle">
+                <h3 id="billingUsageTitle" class="font-semibold text-base-content mb-2">Validade, congelamento e HWID</h3>
+                <p>A validade começa na primeira ativação, quando a chave é vinculada ao dispositivo. Resetar o HWID permite uma nova vinculação, sem reiniciar a validade.</p>
+                <p class="mt-2">O congelamento manual é diferente do bloqueio financeiro: ao descongelar, o período pausado é acrescentado ao vencimento. A dívida mantém seu prazo original. O descongelamento em lote afeta apenas as chaves congeladas em lote daquele produto.</p>
+              </section>
+              <section aria-labelledby="billingFinanceTitle">
+                <h3 id="billingFinanceTitle" class="font-semibold text-base-content mb-2">Como ler as finanças</h3>
+                <p>A aba Finanças reúne os pagamentos de chaves registrados para a loja e os lançamentos manuais da administração no período selecionado, pelas datas do servidor em UTC.</p>
+                <p class="mt-2">A quantidade de pagamentos não é a quantidade de chaves. Esses valores não representam as vendas ou o lucro da sua revenda. Um lançamento financeiro manual, por si só, não quita o saldo devedor das chaves.</p>
+              </section>
+            </div>
           </div>
-        </div>
+        </details>
 
       </div>
 
