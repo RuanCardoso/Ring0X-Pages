@@ -698,7 +698,7 @@
 
                   <div id="filterBar" class="flex flex-wrap items-center gap-2 mb-4">
                     <input id="filterSearch" type="text" placeholder="Buscar por key ou HWID..."
-                      oninput="applyFilters()" class="input input-bordered input-sm mono flex-1 min-w-[220px]" />
+                      oninput="applyFilters()" class="input input-bordered input-sm mono flex-1 w-40 min-w-[160px]" />
                     <select id="filterStatus" onchange="applyFilters()" class="select select-bordered select-sm">
                       <option value="">Todos os status</option>
                       <option value="ativa">Ativa</option>
@@ -713,6 +713,14 @@
                       <option value="PUBG">PUBG - Full</option>
                       <option value="PUBGESP">PUBG - ESP</option>
                       <option value="PUBGMACRO">PUBG - Macro</option>
+                    </select>
+                    <select id="filterDuration" aria-label="Filtrar por duração da chave" onchange="applyFilters()" class="select select-bordered select-sm">
+                      <option value="">Todas as durações</option>
+                      <option value="1">1 dia</option>
+                      <option value="7">7 dias</option>
+                      <option value="30">30 dias</option>
+                      <option value="90">90 dias</option>
+                      <option value="365">365 dias</option>
                     </select>
                     <button class="btn btn-ghost btn-sm text-base-content/50" onclick="clearFilters()">Limpar</button>
                     <span class="mono text-[10px] text-base-content/40 ml-auto" id="filterCount"></span>
@@ -2403,9 +2411,11 @@
       const q = (document.getElementById('filterSearch').value || '').trim().toLowerCase();
       const statusFilter = document.getElementById('filterStatus').value;
       const productFilter = document.getElementById('filterProduct').value;
+      const durationFilter = document.getElementById('filterDuration').value;
 
       const filtered = _allKeyItems.filter(i => {
         if (statusFilter && getStatusKey(i) !== statusFilter) return false;
+        if (durationFilter && Number(i.duration_days ?? i.DurationDays) !== Number(durationFilter)) return false;
         if (productFilter) {
           const pt = i.product_type ?? i.ProductType;
           const ptCode = resolveProductCode(pt) || 'PB';
@@ -2444,6 +2454,7 @@
       document.getElementById('filterSearch').value = '';
       document.getElementById('filterStatus').value = '';
       document.getElementById('filterProduct').value = '';
+      document.getElementById('filterDuration').value = '';
       applyFilters();
     }
 
