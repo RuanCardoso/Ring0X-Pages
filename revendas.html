@@ -854,16 +854,53 @@
                   </div>
 
                   <form id="financeFilters" onsubmit="event.preventDefault(); loadFinances()"
-                    class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end rounded-2xl border border-base-content/10 bg-base-200 p-4">
-                    <div class="form-control">
-                      <label class="label" for="financeStartDate"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">De</span></label>
-                      <input id="financeStartDate" type="date" required onchange="markFinanceDirty()" class="input input-bordered w-full" />
+                    class="space-y-3 rounded-2xl border border-base-content/10 bg-base-200 p-4">
+                    <div class="flex flex-wrap gap-2" role="group" aria-label="Período das finanças">
+                      <button id="financePeriod-day" type="button" aria-pressed="false" onclick="setFinancePeriod('day')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Diário</button>
+                      <button id="financePeriod-week" type="button" aria-pressed="false" onclick="setFinancePeriod('week')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Semanal</button>
+                      <button id="financePeriod-month" type="button" aria-pressed="true" onclick="setFinancePeriod('month')" class="btn btn-sm btn-brand min-h-[44px] flex-1 sm:flex-none">Mensal</button>
+                      <button id="financePeriod-year" type="button" aria-pressed="false" onclick="setFinancePeriod('year')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Anual</button>
+                      <button id="financePeriod-all" type="button" aria-pressed="false" onclick="setFinancePeriod('all')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Tudo</button>
                     </div>
-                    <div class="form-control">
-                      <label class="label" for="financeEndDate"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Até</span></label>
-                      <input id="financeEndDate" type="date" required onchange="markFinanceDirty()" class="input input-bordered w-full" />
+                    <div id="financePeriodNavigation" class="flex items-center gap-2 rounded-xl border border-brand/20 p-3">
+                      <button id="financePrevious" type="button" onclick="stepFinancePeriod(-1)" aria-label="Período anterior" class="btn btn-ghost btn-sm min-h-[44px] min-w-[44px] p-2 shrink-0">
+                        <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6" /></svg>
+                      </button>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 items-end gap-2 flex-1 min-w-0">
+                        <div id="financeDateField" class="form-control hidden sm:col-span-2">
+                          <label class="label" for="financeDate"><span id="financeDateLabel" class="label-text mono text-[10px] font-bold uppercase tracking-wider">Data</span></label>
+                          <input id="financeDate" type="date" min="0001-01-01" max="9998-12-25" disabled onchange="updateFinancePeriod()" class="input input-bordered w-full min-w-0" />
+                        </div>
+                        <div id="financeMonthField" class="form-control">
+                          <label class="label" for="financeMonth"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Mês</span></label>
+                          <select id="financeMonth" required onchange="updateFinancePeriod()" class="select select-bordered w-full min-w-0">
+                            <option value="01">Janeiro</option>
+                            <option value="02">Fevereiro</option>
+                            <option value="03">Março</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Maio</option>
+                            <option value="06">Junho</option>
+                            <option value="07">Julho</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
+                          </select>
+                        </div>
+                        <div id="financeYearField" class="form-control">
+                          <label class="label" for="financeYear"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Ano</span></label>
+                          <select id="financeYear" required onchange="updateFinancePeriod()" class="select select-bordered w-full min-w-0"></select>
+                        </div>
+                      </div>
+                      <button id="financeNext" type="button" onclick="stepFinancePeriod(1)" aria-label="Próximo período" class="btn btn-ghost btn-sm min-h-[44px] min-w-[44px] p-2 shrink-0">
+                        <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m9 6 6 6-6 6" /></svg>
+                      </button>
                     </div>
-                    <button id="btnFinances" type="submit" class="btn btn-neutral w-full sm:w-auto">Consultar</button>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <p id="financeRangeLabel" aria-live="polite" class="text-xs text-base-content/60"></p>
+                      <button id="btnFinances" type="submit" class="btn btn-neutral w-full sm:w-auto">Consultar</button>
+                    </div>
                   </form>
 
                   <p id="financeStatus" role="status" class="text-xs text-base-content/50">Selecione o período para consultar.</p>
@@ -1502,10 +1539,120 @@
       return request.promise;
     }
 
+    let _financePeriod = 'month';
+
+    function getFinanceRange() {
+      const today = new Date().toISOString().slice(0, 10);
+      // The existing API requires both dates, including for the complete history.
+      if (_financePeriod === 'all') return { startDate: '0001-01-01', endDate: today };
+      if (_financePeriod === 'day' || _financePeriod === 'week') {
+        const startDate = document.getElementById('financeDate').value;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return null;
+        const end = new Date(startDate + 'T00:00:00Z');
+        if (!Number.isFinite(end.getTime()) || end.toISOString().slice(0, 10) !== startDate) return null;
+        if (_financePeriod === 'week') end.setUTCDate(end.getUTCDate() + 6);
+        if (end.getUTCFullYear() > 9998) return null;
+        return { startDate, endDate: end.toISOString().slice(0, 10) };
+      }
+      const yearText = document.getElementById('financeYear').value;
+      const year = Number(yearText);
+      if (!/^\d{1,4}$/.test(yearText) || !Number.isInteger(year) || year < 1 || year > 9998) return null;
+      const paddedYear = String(year).padStart(4, '0');
+      if (_financePeriod === 'year') return { startDate: paddedYear + '-01-01', endDate: paddedYear + '-12-31' };
+      const month = document.getElementById('financeMonth').value;
+      if (!/^(0[1-9]|1[0-2])$/.test(month)) return null;
+      const startDate = `${paddedYear}-${month}-01`;
+      const end = new Date(startDate + 'T00:00:00Z');
+      end.setUTCMonth(end.getUTCMonth() + 1);
+      end.setUTCDate(0);
+      return { startDate, endDate: end.toISOString().slice(0, 10) };
+    }
+
+    function updateFinancePeriod() {
+      const range = getFinanceRange();
+      const formatDate = date => date.split('-').reverse().join('/');
+      document.getElementById('financeRangeLabel').textContent = !range
+        ? 'Preencha o período para consultar.'
+        : _financePeriod === 'all' ? `Todo o histórico até ${formatDate(range.endDate)} (UTC).`
+        : range.startDate === range.endDate ? `${formatDate(range.startDate)} (UTC).`
+        : `${formatDate(range.startDate)} a ${formatDate(range.endDate)} (UTC).`;
+      markFinanceDirty();
+    }
+
+    function setFinancePeriod(period) {
+      if (!['day', 'week', 'month', 'year', 'all'].includes(period)) return;
+      _financePeriod = period;
+      ['day', 'week', 'month', 'year', 'all'].forEach(value => {
+        const button = document.getElementById('financePeriod-' + value);
+        button.setAttribute('aria-pressed', String(value === period));
+        button.classList.toggle('btn-brand', value === period);
+        button.classList.toggle('btn-outline', value !== period);
+        button.classList.toggle('border-base-content/20', value !== period);
+      });
+      const fields = {
+        Date: period === 'day' || period === 'week',
+        Month: period === 'month',
+        Year: period === 'month' || period === 'year'
+      };
+      Object.entries(fields).forEach(([name, visible]) => {
+        document.getElementById('finance' + name + 'Field').classList.toggle('hidden', !visible);
+        const input = document.getElementById('finance' + name);
+        input.disabled = !visible;
+        input.required = visible;
+      });
+      document.getElementById('financePeriodNavigation').classList.toggle('hidden', period === 'all');
+      document.getElementById('financeYearField').classList.toggle('sm:col-span-2', period === 'year');
+      document.getElementById('financeDateLabel').textContent = period === 'week' ? 'Início dos 7 dias' : 'Data';
+      updateFinancePeriod();
+    }
+
+    function ensureFinanceYear(year, firstYear) {
+      const select = document.getElementById('financeYear');
+      const selected = select.value;
+      const currentYear = new Date().getUTCFullYear();
+      const minimum = Math.min(2000, firstYear || currentYear, year);
+      const maximum = Math.max(currentYear + 1, year);
+      const years = new Set(Array.from(select.options, option => Number(option.value)));
+      for (let value = minimum; value <= maximum; value++) years.add(value);
+      const options = Array.from(years).sort((a, b) => b - a).map(value => {
+        const option = document.createElement('option');
+        option.value = String(value).padStart(4, '0');
+        option.textContent = String(value);
+        return option;
+      });
+      select.replaceChildren(...options);
+      if (selected) select.value = selected;
+    }
+
+    function stepFinancePeriod(direction) {
+      if ((direction !== -1 && direction !== 1) || _financePeriod === 'all') return;
+      const range = getFinanceRange();
+      if (!range) return;
+      const next = new Date(range.startDate + 'T00:00:00Z');
+      if (_financePeriod === 'month') next.setUTCMonth(next.getUTCMonth() + direction);
+      else if (_financePeriod === 'year') next.setUTCFullYear(next.getUTCFullYear() + direction);
+      else next.setUTCDate(next.getUTCDate() + direction * (_financePeriod === 'week' ? 7 : 1));
+      const year = next.getUTCFullYear();
+      if (year < 1 || year > 9998) return;
+      if (_financePeriod === 'day' || _financePeriod === 'week') {
+        const date = next.toISOString().slice(0, 10);
+        if (date > document.getElementById('financeDate').max) return;
+        document.getElementById('financeDate').value = date;
+      } else {
+        ensureFinanceYear(year);
+        document.getElementById('financeYear').value = String(year).padStart(4, '0');
+        document.getElementById('financeMonth').value = String(next.getUTCMonth() + 1).padStart(2, '0');
+      }
+      updateFinancePeriod();
+    }
+
     function initFinanceDates() {
       const today = new Date().toISOString().slice(0, 10);
-      document.getElementById('financeStartDate').value = today.slice(0, 7) + '-01';
-      document.getElementById('financeEndDate').value = today;
+      document.getElementById('financeDate').value = today;
+      document.getElementById('financeMonth').value = today.slice(5, 7);
+      ensureFinanceYear(Number(today.slice(0, 4)));
+      document.getElementById('financeYear').value = today.slice(0, 4);
+      setFinancePeriod('month');
     }
 
     function markFinanceDirty() {
@@ -1562,11 +1709,10 @@
     async function loadFinances() {
       const status = document.getElementById('financeStatus');
       const btn = document.getElementById('btnFinances');
-      const startDate = document.getElementById('financeStartDate').value;
-      const endDate = document.getElementById('financeEndDate').value;
+      const range = getFinanceRange();
       if (!_fingerprint) { status.textContent = 'Token sem fingerprint de loja.'; return; }
-      if (!startDate || !endDate) { status.textContent = 'Selecione as duas datas.'; return; }
-      if (startDate > endDate) { status.textContent = 'A data inicial deve ser anterior ou igual à final.'; return; }
+      if (!range) { status.textContent = 'Selecione um período válido para consultar.'; return; }
+      const { startDate, endDate } = range;
 
       const revision = ++_financeRequestRevision;
       btn.disabled = true;
@@ -1591,6 +1737,7 @@
         document.getElementById('financeAverage').textContent = fmt(average);
         const firstPayment = data.FirstPaymentDate ?? data.firstPaymentDate;
         const firstDateOnly = firstPayment ? String(firstPayment).slice(0, 10) : '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(firstDateOnly)) ensureFinanceYear(Number(document.getElementById('financeYear').value), Number(firstDateOnly.slice(0, 4)));
         document.getElementById('financeFirstPayment').textContent = /^\d{4}-\d{2}-\d{2}$/.test(firstDateOnly)
           ? firstDateOnly.split('-').reverse().join('/')
           : 'Nenhum pagamento registrado';
