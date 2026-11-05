@@ -493,10 +493,9 @@
             <div id="cpfWrap" class="mb-2">
               <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX"
                 class="input input-bordered input-sm w-full" />
-              <label for="pixCoupon" class="label pb-1"><span class="label-text text-xs">Cupom de desconto (opcional)</span></label>
-              <input id="pixCoupon" type="text" maxlength="18" autocomplete="off" autocapitalize="characters" spellcheck="false"
-                placeholder="Digite seu cupom" class="input input-bordered input-sm w-full uppercase" />
-              <p class="text-[11px] text-base-content/50 mt-1">Válido somente no Pix. O desconto será aplicado à cobrança.</p>
+              <input id="pixCoupon" type="hidden" value="" />
+              <button id="btnPixCoupon" type="button" onclick="openPixCouponModal()" aria-haspopup="dialog" aria-controls="modalPixCoupon"
+                class="btn btn-ghost btn-sm w-full text-brand mt-1">Adicionar cupom</button>
             </div>
 
             <button class="btn btn-brand btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar
@@ -1076,6 +1075,27 @@
     <div class="modal-backdrop"><button type="button" onclick="StorePanelCustomizer.close()" aria-label="Cancelar personalização"></button></div>
   </dialog>
 
+
+  <!-- Modal: Cupom do pagamento Pix -->
+  <dialog id="modalPixCoupon" class="modal" aria-labelledby="pixCouponTitle" onclose="document.getElementById('pixCouponDraft').value = ''">
+    <div class="modal-box w-11/12 max-w-md max-h-[90dvh] overflow-y-auto">
+      <h3 id="pixCouponTitle" class="display text-lg font-bold">Cupom de desconto</h3>
+      <p id="pixCouponHelp" class="text-sm text-base-content/60 mt-2">Opcional e exclusivo do Pix. O cupom será validado e o desconto calculado ao gerar a cobrança.</p>
+      <form class="flex flex-col gap-4 mt-4" onsubmit="event.preventDefault(); savePixCoupon()">
+        <div class="form-control min-w-0">
+          <label class="label" for="pixCouponDraft"><span class="label-text text-xs">Código do cupom</span></label>
+          <input id="pixCouponDraft" type="text" maxlength="18" autocomplete="off" autocapitalize="characters" spellcheck="false"
+            aria-describedby="pixCouponHelp" placeholder="Digite seu cupom" class="input input-bordered w-full uppercase mono" />
+        </div>
+        <div class="flex flex-wrap justify-end gap-2">
+          <button id="btnRemovePixCoupon" type="button" onclick="removePixCoupon()" class="btn btn-ghost btn-sm hidden">Remover cupom</button>
+          <button type="button" onclick="document.getElementById('modalPixCoupon').close()" class="btn btn-ghost btn-sm">Cancelar</button>
+          <button type="submit" class="btn btn-brand btn-sm">Usar cupom</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>Fechar</button></form>
+  </dialog>
 
   <!-- Confirm Modal -->
   <dialog id="confirmModal" class="modal">
@@ -1895,6 +1915,8 @@
       stopDebtCountdown();
       _debtBalanceRevision++;
       document.getElementById('pixCoupon').value = '';
+      updatePixCouponButton();
+      if (document.getElementById('modalPixCoupon').open) document.getElementById('modalPixCoupon').close();
       document.getElementById('paymentAmountSummary').classList.add('hidden');
       hideAuthLoading();
       document.getElementById('loginGate').classList.remove('hidden');
@@ -1996,6 +2018,8 @@
       stopDebtCountdown();
       _debtBalanceRevision++;
       document.getElementById('pixCoupon').value = '';
+      updatePixCouponButton();
+      if (document.getElementById('modalPixCoupon').open) document.getElementById('modalPixCoupon').close();
       document.getElementById('paymentAmountSummary').classList.add('hidden');
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
@@ -2148,11 +2172,51 @@
       }
     }
 
+    function updatePixCouponButton() {
+      const coupon = document.getElementById('pixCoupon').value;
+      const button = document.getElementById('btnPixCoupon');
+      button.textContent = coupon ? 'Cupom selecionado · Alterar' : 'Adicionar cupom';
+      button.setAttribute('aria-label', coupon ? `Alterar cupom ${coupon}` : 'Adicionar cupom de desconto');
+    }
+
+    function openPixCouponModal() {
+      if (_payMethod !== 'pix') return;
+      const coupon = document.getElementById('pixCoupon').value;
+      document.getElementById('pixCouponDraft').value = coupon;
+      document.getElementById('btnRemovePixCoupon').classList.toggle('hidden', !coupon);
+      document.getElementById('modalPixCoupon').showModal();
+      document.getElementById('pixCouponDraft').focus();
+    }
+
+    function savePixCoupon() {
+      if (_payMethod !== 'pix') return;
+      const coupon = document.getElementById('pixCouponDraft').value.trim().toUpperCase();
+      if (coupon && coupon.length !== 18) {
+        toast('O cupom deve ter 18 caracteres.', true);
+        return;
+      }
+      if (document.getElementById('pixCoupon').value !== coupon) {
+        document.getElementById('qrWrap').classList.add('hidden');
+        document.getElementById('paymentAmountSummary').classList.add('hidden');
+        _lastPixCode = '';
+      }
+      document.getElementById('pixCoupon').value = coupon;
+      updatePixCouponButton();
+      document.getElementById('modalPixCoupon').close();
+    }
+
+    function removePixCoupon() {
+      document.getElementById('pixCouponDraft').value = '';
+      savePixCoupon();
+    }
+
     let _payMethod = 'pix';
     function setPayMethod(m) {
       _payMethod = m;
       document.getElementById('pixCoupon').disabled = m !== 'pix';
       if (m !== 'pix') document.getElementById('pixCoupon').value = '';
+      updatePixCouponButton();
+      if (m !== 'pix' && document.getElementById('modalPixCoupon').open) document.getElementById('modalPixCoupon').close();
       document.getElementById('paymentAmountSummary').classList.add('hidden');
       document.getElementById('qrWrap').classList.add('hidden');
       _lastPixCode = '';
