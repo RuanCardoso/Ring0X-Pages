@@ -493,10 +493,15 @@
             <div id="cpfWrap" class="mb-2">
               <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX"
                 class="input input-bordered input-sm w-full" />
+              <label for="pixCoupon" class="label pb-1"><span class="label-text text-xs">Cupom de desconto (opcional)</span></label>
+              <input id="pixCoupon" type="text" maxlength="18" autocomplete="off" autocapitalize="characters" spellcheck="false"
+                placeholder="Digite seu cupom" class="input input-bordered input-sm w-full uppercase" />
+              <p class="text-[11px] text-base-content/50 mt-1">Válido somente no Pix. O desconto será aplicado à cobrança.</p>
             </div>
 
             <button class="btn btn-brand btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar
               Saldo</button>
+            <p id="paymentAmountSummary" class="hidden text-xs text-base-content/70 mt-2" role="status"></p>
 
             <div id="qrWrap" class="hidden mt-3 bg-white p-3 text-center border border-base-content/20">
               <div id="qrImg" class="flex justify-center mb-2"></div>
@@ -956,7 +961,7 @@
               </section>
               <section aria-labelledby="billingPaymentTitle">
                 <h3 id="billingPaymentTitle" class="font-semibold text-base-content mb-2">Pagamento e baixa do saldo</h3>
-                <p>O pagamento pelo painel reúne todo o saldo pendente no momento da geração, e não apenas as dívidas vencidas. Gerar um QR Code ou abrir o checkout não quita a cobrança: é necessária a confirmação do pagamento pelo provedor.</p>
+                <p>O pagamento pelo painel reúne todo o saldo pendente no momento da geração, e não apenas as dívidas vencidas. Gerar um QR Code ou abrir o checkout não quita a cobrança: é necessária a confirmação do pagamento pelo provedor. Cupons são opcionais e exclusivos do Pix: reduzem o valor a pagar e, após a confirmação, quitam as chaves incluídas na cobrança. Não se aplicam à baixa manual.</p>
                 <p class="mt-2">A baixa cobre as chaves incluídas naquele pagamento. Chaves criadas depois geram novas pendências. Após a confirmação, atualize o saldo no painel para conferir a regularização.</p>
               </section>
               <section aria-labelledby="billingUsageTitle">
@@ -967,7 +972,7 @@
               <section aria-labelledby="billingFinanceTitle">
                 <h3 id="billingFinanceTitle" class="font-semibold text-base-content mb-2">Como ler as finanças</h3>
                 <p>A aba Finanças reúne os pagamentos de chaves registrados para a loja e os lançamentos manuais da administração no período selecionado, pelas datas do servidor em UTC.</p>
-                <p class="mt-2">A quantidade de pagamentos não é a quantidade de chaves. Esses valores não representam as vendas ou o lucro da sua revenda. Um lançamento financeiro manual, por si só, não quita o saldo devedor das chaves.</p>
+                <p class="mt-2">A quantidade de pagamentos não é a quantidade de chaves. Esses valores não representam as vendas ou o lucro da sua revenda. Por padrão, o lançamento manual não quita dívidas. A administração pode optar pela quitação integral, desde que o valor corresponda exatamente ao saldo pendente da loja.</p>
               </section>
             </div>
           </div>
@@ -1143,12 +1148,14 @@
   </dialog>
 
   <!-- Modal: Entrada financeira manual -->
-  <dialog id="modalManualFinance" class="modal" onclose="document.getElementById('manualFinanceForm').reset()">
+  <dialog id="modalManualFinance" class="modal" oncancel="if (_manualFinanceBusy) event.preventDefault()" onclose="document.getElementById('manualFinanceForm').reset(); updateManualFinanceAction()">
     <div class="modal-box w-11/12 max-w-lg max-h-[90dvh] overflow-y-auto" onclick="event.stopPropagation()">
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-success mb-2.5">Finanças · Admin</div>
       <h3 class="font-bold text-lg">Adicionar entrada manual</h3>
-      <p class="text-sm text-base-content/60 py-2">Registra um pagamento por fora nas finanças da loja de destino. Não quita o saldo devedor das chaves.</p>
+      <p class="text-sm text-base-content/60 py-2">Registre um pagamento recebido por fora. Se necessário, marque a opção abaixo para também quitar o saldo devedor da loja.</p>
       <form id="manualFinanceForm" class="flex flex-col gap-3 mt-3" onsubmit="event.preventDefault(); doAddManualFinance()">
+        <fieldset id="manualFinanceFields" class="flex flex-col gap-3 min-w-0">
+          <legend class="sr-only">Pagamento manual e quitação opcional</legend>
         <div class="form-control min-w-0">
           <label class="label" for="manualFinanceTargetToken"><span class="label-text text-xs">Token da loja de destino</span></label>
           <input id="manualFinanceTargetToken" type="password" required autocomplete="off" placeholder="Cole o token da loja"
@@ -1178,13 +1185,23 @@
           <textarea id="manualFinanceDescription" maxlength="1000" rows="2" placeholder="Detalhes do pagamento"
             class="textarea textarea-bordered w-full min-w-0"></textarea>
         </div>
+        <div class="rounded-xl border border-base-content/10 bg-base-200 p-4">
+          <label for="manualFinanceSettleDebt" class="flex items-start gap-3 cursor-pointer min-h-[44px]">
+            <input id="manualFinanceSettleDebt" type="checkbox" onchange="updateManualFinanceAction()"
+              aria-describedby="manualFinanceSettlementHelp" class="checkbox checkbox-success shrink-0 mt-0.5" />
+            <span class="text-sm font-semibold">Quitar saldo devedor</span>
+          </label>
+          <p id="manualFinanceSettlementHelp" class="text-xs text-base-content/60 leading-relaxed mt-1">Opcional. Desmarcado, registra apenas a entrada financeira. Marcado, quita todas as pendências da loja e exige o valor integral, incluindo os centavos. Se houver diferença, nada será registrado.</p>
+          <p class="text-xs text-base-content/50 leading-relaxed mt-2">Use para pagamentos recebidos por fora. Se o pagamento já entrou pelo gateway, regularize o registro existente para evitar uma entrada duplicada.</p>
+        </div>
         <button id="btnManualFinance" type="submit" class="btn btn-success w-full">Registrar entrada</button>
+        </fieldset>
       </form>
       <div class="modal-action mt-3">
-        <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
+        <form method="dialog"><button id="manualFinanceClose" class="btn btn-sm">Fechar</button></form>
       </div>
     </div>
-    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    <form method="dialog" class="modal-backdrop" onsubmit="if (_manualFinanceBusy) event.preventDefault()"><button>close</button></form>
   </dialog>
 
   <!-- Modal: Reset HWID -->
@@ -1877,6 +1894,8 @@
       updateCreateCost();
       stopDebtCountdown();
       _debtBalanceRevision++;
+      document.getElementById('pixCoupon').value = '';
+      document.getElementById('paymentAmountSummary').classList.add('hidden');
       hideAuthLoading();
       document.getElementById('loginGate').classList.remove('hidden');
       document.getElementById('appShell').classList.add('hidden');
@@ -1976,6 +1995,8 @@
     function clearToken() {
       stopDebtCountdown();
       _debtBalanceRevision++;
+      document.getElementById('pixCoupon').value = '';
+      document.getElementById('paymentAmountSummary').classList.add('hidden');
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById('token').value = '';
       _fingerprint = '';
@@ -2130,6 +2151,11 @@
     let _payMethod = 'pix';
     function setPayMethod(m) {
       _payMethod = m;
+      document.getElementById('pixCoupon').disabled = m !== 'pix';
+      if (m !== 'pix') document.getElementById('pixCoupon').value = '';
+      document.getElementById('paymentAmountSummary').classList.add('hidden');
+      document.getElementById('qrWrap').classList.add('hidden');
+      _lastPixCode = '';
       const pixBtn = document.getElementById('btnMethodPix');
       const creditBtn = document.getElementById('btnMethodCredit');
       const cpfWrap = document.getElementById('cpfWrap');
@@ -2160,22 +2186,42 @@
     }
 
     async function doPayDebt() {
+      if (document.getElementById('btnPayDebt').disabled) return;
+      const method = _payMethod;
       let doc = '';
-      if (_payMethod === 'pix') {
+      const body = { paymentMethod: method, cpf: doc };
+      if (method === 'pix') {
         doc = document.getElementById('pixCpf').value.trim().replace(/\D/g, '');
         if (!doc || doc.length < 11) {
           toast('Digite seu CPF para emitir o PIX.', true);
           return;
         }
+        body.cpf = doc;
+        body.cupom = document.getElementById('pixCoupon').value.trim().toUpperCase();
       }
-
+      const tokenAtStart = document.getElementById('token').value;
+      const isCurrent = () => document.getElementById('token').value === tokenAtStart && _payMethod === method;
+      document.getElementById('qrWrap').classList.add('hidden');
+      document.getElementById('paymentAmountSummary').classList.add('hidden');
+      _lastPixCode = '';
       setLoading('btnPayDebt', true);
       try {
-        const res = await api('/api/gateway/pay-debt', { paymentMethod: _payMethod, cpf: doc });
-        const type = res?.Result?.type || res?.Result?.Type;
-        const raw = res?.Result?.raw || res?.Result?.Raw;
+        const res = await api('/api/gateway/pay-debt', body);
+        if (!isCurrent()) return;
+        const data = res?.Result;
+        const type = data?.type || data?.Type;
+        const raw = data?.raw || data?.Raw;
 
         if (raw) {
+          const total = Number(data.totalAmount ?? data.TotalAmount);
+          const discount = Number(data.discountAmount ?? data.DiscountAmount);
+          if (Number.isFinite(total) && total > 0) {
+            const summary = document.getElementById('paymentAmountSummary');
+            summary.textContent = Number.isFinite(discount) && discount > 0
+              ? `Desconto: ${fmt(discount)} · Total a pagar: ${fmt(total)}`
+              : `Total a pagar: ${fmt(total)}`;
+            summary.classList.remove('hidden');
+          }
           if (type === 'qr') {
             _lastPixCode = raw;
             document.getElementById('qrWrap').classList.remove('hidden');
@@ -2196,9 +2242,10 @@
           toast("Gateway não retornou URL/QR Code.", true);
         }
       } catch (e) {
-        toast("Erro: " + e.message, true);
+        if (isCurrent()) toast("Erro: " + e.message, true);
+      } finally {
+        setLoading('btnPayDebt', false);
       }
-      setLoading('btnPayDebt', false);
     }
 
     function updateCreateCost() {
@@ -2399,37 +2446,65 @@
         `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
     }
 
+    let _manualFinanceBusy = false;
+
+    function updateManualFinanceAction() {
+      if (_manualFinanceBusy) return;
+      document.getElementById('btnManualFinance').textContent = document.getElementById('manualFinanceSettleDebt').checked
+        ? 'Registrar e quitar' : 'Registrar entrada';
+    }
+
     async function doAddManualFinance() {
+      if (_manualFinanceBusy) return;
       if (_fingerprint !== 'ADMINSTORE') { toast('Acesso restrito ao administrador.', true); return; }
       const targetToken = document.getElementById('manualFinanceTargetToken').value.trim();
       const amount = document.getElementById('manualFinanceAmount').value.trim();
       const paymentDate = document.getElementById('manualFinanceDate').value;
       const reference = document.getElementById('manualFinanceReference').value.trim();
       const description = document.getElementById('manualFinanceDescription').value.trim();
+      const settleDebt = document.getElementById('manualFinanceSettleDebt').checked;
       const targetPayload = parseJwt(targetToken);
-      const targetFingerprint = targetPayload?.fingerprint ?? targetPayload?.Fingerprint;
+      const targetFingerprint = String(targetPayload?.fingerprint ?? targetPayload?.Fingerprint ?? '').trim().toUpperCase();
 
       if (!targetToken || !targetFingerprint) { toast('Informe um token válido da loja de destino.', true); return; }
       if (!/^\d+(?:\.\d{1,2})?$/.test(amount) || Number(amount) <= 0 || Number(amount) > 9999999999.99) {
         toast('Informe um valor positivo em reais, com até duas casas decimais.', true); return;
       }
       if (!paymentDate || !reference) { toast('Informe a data e a referência.', true); return; }
-      if (!await confirmModal(`Registrar ${fmt(Number(amount))} em ${targetFingerprint} no dia ${paymentDate}? Isso altera apenas as finanças.`)) return;
+      const tokenAtStart = document.getElementById('token').value;
+      const isCurrent = () => document.getElementById('token').value === tokenAtStart && _fingerprint === 'ADMINSTORE';
+      const message = `Registrar ${fmt(Number(amount))} em ${targetFingerprint} no dia ${paymentDate}? ` + (settleDebt
+        ? 'Isso também quitará o saldo devedor integral da loja. Se o valor não conferir, nada será registrado.'
+        : 'Isso altera apenas as finanças, sem quitar dívidas.');
 
+      _manualFinanceBusy = true;
+      document.getElementById('manualFinanceFields').disabled = true;
+      document.getElementById('manualFinanceClose').disabled = true;
       setLoading('btnManualFinance', true);
       try {
-        const result = await api('/admin/finance/add-manual-entry', { targetToken, amount, paymentDate, reference, description });
-        toast(result?.StatusMessage || 'Entrada financeira registrada.');
+        if (!await confirmModal(message) || !isCurrent()) return;
+        const result = await api('/admin/finance/add-manual-entry', { targetToken, amount, paymentDate, reference, description, settleDebt });
+        if (!isCurrent()) return;
+        toast(result?.StatusMessage || (settleDebt ? 'Entrada registrada e saldo devedor quitado.' : 'Entrada financeira registrada.'));
         document.getElementById('manualFinanceAmount').value = '';
         document.getElementById('manualFinanceReference').value = '';
         document.getElementById('manualFinanceDescription').value = '';
+        document.getElementById('manualFinanceSettleDebt').checked = false;
         _financesLoaded = false;
         if (!document.getElementById('panel-finance').classList.contains('hidden')) loadFinances();
-        document.getElementById('manualFinanceAmount').focus();
+        if (settleDebt && targetFingerprint === _fingerprint) {
+          invalidateList();
+          loadDebtBalance();
+        }
       } catch (e) {
-        toast('Erro: ' + e.message, true);
+        if (isCurrent()) toast('Erro: ' + e.message, true);
       } finally {
+        _manualFinanceBusy = false;
+        document.getElementById('manualFinanceFields').disabled = false;
+        document.getElementById('manualFinanceClose').disabled = false;
         setLoading('btnManualFinance', false);
+        updateManualFinanceAction();
+        if (isCurrent() && document.getElementById('modalManualFinance').open) document.getElementById('manualFinanceAmount').focus();
       }
     }
 
@@ -2793,15 +2868,22 @@
         document.getElementById('confirmModal').showModal();
       });
     }
-    function closeConfirm() {
+    function closeConfirm(accepted = false) {
+      const resolve = _confirmResolve;
+      _confirmResolve = null;
       document.getElementById('confirmModal').close();
-      if (_confirmResolve) _confirmResolve(false);
+      if (resolve) resolve(accepted === true);
     }
-    document.getElementById('confirmYes').addEventListener('click', () => {
-      document.getElementById('confirmModal').close();
-      if (_confirmResolve) _confirmResolve(true);
+    document.getElementById('confirmYes').addEventListener('click', () => closeConfirm(true));
+    document.getElementById('confirmNo').addEventListener('click', () => closeConfirm());
+    document.getElementById('confirmModal').addEventListener('cancel', event => {
+      event.preventDefault();
+      closeConfirm();
     });
-    document.getElementById('confirmNo').addEventListener('click', closeConfirm);
+    document.querySelector('#confirmModal .modal-backdrop').addEventListener('submit', event => {
+      event.preventDefault();
+      closeConfirm();
+    });
 
     mobileKeysMedia.addEventListener('change', () => {
       if (_listLoaded) applyFilters();
