@@ -31,9 +31,7 @@ function toast(msg, isErr) {
 }
 
 let _confirmResolve = null;
-function confirmModal(msg, { accept = 'Confirmar', cancel = 'Cancelar' } = {}) {
-  document.getElementById('confirmYes').textContent = accept;
-  document.getElementById('confirmNo').textContent = cancel;
+function confirmModal(msg) {
   return new Promise(resolve => {
     _confirmResolve = resolve;
     document.getElementById('confirmMsg').textContent = msg;
