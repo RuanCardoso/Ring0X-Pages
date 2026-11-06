@@ -644,9 +644,10 @@
                         </button>
                       </span>
                     </label>
-                    <input id="createKey" type="text" readonly tabindex="-1"
+                    <input id="createKey" type="text" readonly tabindex="-1" oninput="updateKeyDurationWarning()" aria-describedby="createKeyDurationWarning"
                       placeholder="Selecione a duração para gerar"
                       class="input input-bordered w-full mono cursor-not-allowed opacity-70" />
+                    <p id="createKeyDurationWarning" class="hidden text-xs text-warning mt-2" role="status"></p>
                   </div>
 
                   <div id="createFields" class="grid grid-cols-3 gap-3 mb-4">
@@ -692,7 +693,7 @@
                     </div>
                   </div>
 
-                  <button class="btn btn-brand w-full font-bold" id="btnCreate" onclick="doCreate()">Criar key</button>
+                  <button class="btn btn-brand w-full font-bold" id="btnCreate" onclick="doCreate()">Revisar criação</button>
                   <button class="btn btn-success w-full font-bold hidden" id="btnCopyCreated" onclick="copyCreatedKeys()">Copiar chaves geradas</button>
 
                 </div>
@@ -1116,7 +1117,7 @@
   <!-- Confirm Modal -->
   <dialog id="confirmModal" class="modal">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <p id="confirmMsg" class="py-4"></p>
+      <p id="confirmMsg" class="py-4 whitespace-pre-line break-words"></p>
       <div class="modal-action">
         <button id="confirmNo" class="btn btn-ghost">Cancelar</button>
         <button id="confirmYes" class="btn btn-warning">Confirmar</button>
@@ -2329,12 +2330,13 @@
     }
 
     function updateCreateCost() {
-      const qty = Number(document.getElementById('createQty').value) || 1;
+      const qty = Number(document.getElementById('createQty').value);
       const days = Number(document.getElementById('createDays').value) || 0;
       const product = document.getElementById('createProduct').value;
       const prices = PRICES[product];
       const unit = prices?.[PRICE_DURATIONS[days]];
-      document.getElementById('createCost').textContent = unit === undefined ? '—' : fmt(unit * qty);
+      const validQty = Number.isInteger(qty) && qty >= 1 && qty <= 100;
+      document.getElementById('createCost').textContent = unit === undefined || !validQty ? '—' : fmt(unit * qty);
     }
 
     // Mapeia dias -> código de duração usado no valor da key (1D / 7D / 30D)
@@ -2348,7 +2350,23 @@
     }
 
     // Atualiza o campo (somente leitura) com um preview do padrão que será gerado
+    function getKeyDurationWarning(key, days) {
+      const match = key.match(/(?:^|[-_])(\d+)D(?=[-_]|$)/i);
+      return match && days && Number(match[1]) !== days
+        ? `O código contém ${match[1]}D, mas a duração selecionada é ${days} ${days === 1 ? 'dia' : 'dias'}.`
+        : '';
+    }
+
+    function updateKeyDurationWarning() {
+      const warning = document.getElementById('createKeyDurationWarning');
+      warning.textContent = _manualKeyMode
+        ? getKeyDurationWarning(document.getElementById('createKey').value.trim(), Number(document.getElementById('createDays').value))
+        : '';
+      warning.classList.toggle('hidden', !warning.textContent);
+    }
+
     function updateKeyPreview() {
+      updateKeyDurationWarning();
       if (_manualKeyMode) return;
       const field = document.getElementById('createKey');
       if (!field) return;
@@ -2382,8 +2400,8 @@
         field.classList.add('cursor-not-allowed', 'opacity-70');
         note.textContent = '(gerada automaticamente: fingerprint + duração + prefixo aleatório)';
         btn.textContent = 'editar manualmente';
-        updateKeyPreview();
       }
+      updateKeyPreview();
     }
 
     function setLoading(id, on) {
@@ -2398,65 +2416,92 @@
     function onQtyChange() {
       const qty = Number(document.getElementById('createQty').value);
       const btn = document.getElementById('btnCreate');
-      if (qty > 1) {
-        btn.setAttribute('data-orig', `Criar ${qty} keys`);
-        btn.textContent = `Criar ${qty} keys`;
-      } else {
-        btn.setAttribute('data-orig', 'Criar key');
-        btn.textContent = 'Criar key';
-      }
+      const label = Number.isInteger(qty) && qty > 1 && qty <= 100 ? `Revisar ${qty} chaves` : 'Revisar criação';
+      btn.setAttribute('data-orig', label);
+      if (!btn.disabled) btn.textContent = label;
       updateCreateCost();
     }
 
     async function doCreate() {
-      const qty = Math.max(1, Math.min(100, Number(document.getElementById('createQty').value) || 1));
+      const button = document.getElementById('btnCreate');
+      if (button.disabled) return;
+      const qty = Number(document.getElementById('createQty').value);
       const d = Number(document.getElementById('createDays').value);
-      const productType = document.getElementById('createProduct').value;
+      const product = document.getElementById('createProduct');
+      const productType = product.value;
       const durationCode = DURATION_CODE[d];
+      const unit = PRICES[productType]?.[PRICE_DURATIONS[d]];
 
       if (!productType) { toast('Selecione um produto.', true); return; }
       if (!durationCode) { toast('Selecione uma duração válida.', true); return; }
-      if (PRICES[productType]?.[PRICE_DURATIONS[d]] === undefined) {
+      if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
+        toast('Informe uma quantidade inteira de 1 a 100.', true); return;
+      }
+      if (unit === undefined) {
         toast('Os preços da loja não foram carregados. Entre novamente.', true); return;
       }
-
-      let manualBase = '';
-      if (_manualKeyMode) {
-        manualBase = document.getElementById('createKey').value.trim();
-        if (!manualBase) { toast('Digite a key manualmente ou desative o modo manual.', true); return; }
-      } else if (!_fingerprint) {
+      if (!_fingerprint) {
         toast('Fingerprint não encontrado no token. Faça login novamente.', true); return;
       }
 
-      setLoading('btnCreate', true);
+      const manual = _manualKeyMode;
+      const manualBase = manual ? document.getElementById('createKey').value.trim() : '';
+      if (manual && !manualBase) {
+        toast('Digite a chave manualmente ou volte ao modo automático.', true); return;
+      }
+      const pattern = manual
+        ? (qty > 1 ? `${manualBase}-XXXXXXXX` : manualBase)
+        : `${_fingerprint}-${durationCode}-XXXXXX`;
+      const warning = manual ? getKeyDurationWarning(manualBase, d) : '';
+      const message = [
+        `${qty} ${qty === 1 ? 'chave' : 'chaves'} de ${product.selectedOptions[0].textContent.trim()}`,
+        `Validade de ${d} ${d === 1 ? 'dia' : 'dias'} a partir da ativação`,
+        `${manual ? 'Modo manual' : 'Modo automático'} · ${pattern}`,
+        `Custo total de ${fmt(unit * qty)}`
+      ];
+      if (warning) message.push('', warning);
 
-      const createdKeys = [];
-      let ok = 0, fail = 0;
+      const token = document.getElementById('token');
+      const tokenAtStart = token.value;
+      button.disabled = true;
+      try {
+        const accepted = await confirmModal(message.join('\n'), {
+          accept: qty === 1 ? 'Gerar 1 chave' : `Gerar ${qty} chaves`,
+          cancel: 'Voltar e corrigir'
+        });
+        if (!accepted || token.value !== tokenAtStart) return;
 
-      for (let i = 0; i < qty; i++) {
-        const keyValue = _manualKeyMode
-          ? (qty > 1 ? `${manualBase}-${rnd(4)}${rnd(4)}` : manualBase)
-          : buildKeyValue(durationCode);
-        createdKeys.push(keyValue);
-        try {
-          await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
-          ok++;
-        } catch (e) {
-          fail++;
+        setLoading('btnCreate', true);
+        const createdKeys = [];
+        let failed = 0;
+        for (let i = 0; i < qty && token.value === tokenAtStart; i++) {
+          const keyValue = manual
+            ? (qty > 1 ? `${manualBase}-${rnd(4)}${rnd(4)}` : manualBase)
+            : buildKeyValue(durationCode);
+          try {
+            await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
+            createdKeys.push(keyValue);
+          } catch {
+            failed++;
+          }
         }
-      }
 
-      if (ok > 0) {
+        if (token.value !== tokenAtStart) return;
         _lastCreatedKeys = createdKeys;
-        const btnCopy = document.getElementById('btnCopyCreated');
-        if (btnCopy) btnCopy.classList.remove('hidden');
-        toast(`${ok} key${ok > 1 ? 's' : ''} criada${ok > 1 ? 's' : ''} com sucesso!`);
-        loadDebtBalance();
-        invalidateList();
+        document.getElementById('btnCopyCreated').classList.toggle('hidden', !createdKeys.length);
+        if (createdKeys.length) {
+          loadDebtBalance();
+          invalidateList();
+        }
+        if (failed) {
+          toast(`${createdKeys.length} de ${qty} chaves criadas. Falharam ${failed}.`, true);
+        } else {
+          toast(qty === 1 ? '1 chave criada com sucesso!' : `${qty} chaves criadas com sucesso!`);
+        }
+      } finally {
+        button.disabled = false;
+        onQtyChange();
       }
-      if (fail > 0) toast(`${fail} erro${fail > 1 ? 's' : ''} ao criar key${fail > 1 ? 's' : ''}.`, true);
-
-      setLoading('btnCreate', false);
     }
 
     async function doRevoke() {
@@ -2955,7 +3000,9 @@
     }
 
     let _confirmResolve = null;
-    function confirmModal(msg) {
+    function confirmModal(msg, { accept = 'Confirmar', cancel = 'Cancelar' } = {}) {
+      document.getElementById('confirmYes').textContent = accept;
+      document.getElementById('confirmNo').textContent = cancel;
       return new Promise(resolve => {
         _confirmResolve = resolve;
         document.getElementById('confirmMsg').textContent = msg;
