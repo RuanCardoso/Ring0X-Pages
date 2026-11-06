@@ -1,0 +1,269 @@
+/* Para reexibir o plano anual, altere data-show-annual para "true" no elemento html. */
+html[data-show-annual="false"] .annual-plan {
+  display: none !important;
+}
+
+.mono {
+  font-family: var(--panel-font-mono);
+}
+
+.display {
+  font-family: var(--panel-font-heading);
+}
+
+.tabs-boxed {
+  display: inline-flex !important;
+  width: fit-content !important;
+}
+
+.tabs-boxed .tab {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+
+#panelTabs .tabs-boxed {
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+/* ---- Ring0x custom palette (overrides daisyUI's stock "dark" theme) ---- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* backgrounds — deep, cohesive graphite instead of flat/plain dark */
+  --b3: 12% 0.006 260;
+  /* sidebar / navbar / chrome */
+  --b2: 14.5% 0.007 260;
+  /* page background */
+  --b1: 18.5% 0.008 260;
+  /* card surfaces */
+  --bc: 89% 0.006 260;
+  /* body text — soft off-white, not stark white */
+
+  /* neutral — secondary actions */
+  --n: 25% 0.012 260;
+  --nc: 90% 0.006 260;
+
+  /* brand red — reserved for destructive / permanent actions */
+  --er: 57% 0.17 19;
+  --erc: 98% 0.012 19;
+
+  /* amber — freeze / caution actions */
+  --wa: 76% 0.13 75;
+  --wac: 17% 0.02 75;
+
+  /* green — resume / positive actions */
+  --su: 67% 0.13 152;
+  --suc: 14% 0.02 152;
+
+  /* blue — informational / test actions */
+  --in: 66% 0.10 230;
+  --inc: 14% 0.02 230;
+}
+
+/* Native popover keeps notices above modal dialogs without blocking their controls. */
+#toast {
+  position: fixed;
+  inset: auto 0 0 auto;
+  margin: 0;
+  border: 0;
+  padding: 1rem;
+  width: fit-content;
+  max-width: min(420px, calc(100vw - 1rem));
+  background: transparent;
+  color: inherit;
+  pointer-events: none;
+}
+#toast .alert { overflow-wrap: anywhere; }
+#toast::backdrop { background: transparent; pointer-events: none; }
+
+@media (max-width: 1365px) {
+  #mainContent {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1023px) {
+  #appShell {
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  #mainLayout {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  #pricingSidebar {
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid oklch(var(--bc) / 0.1);
+  }
+
+  #pricingSidebar.is-open {
+    display: flex;
+  }
+
+  #contentArea,
+  #contentScroller {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  #mainContent {
+    max-width: 100%;
+  }
+
+  #createCard {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 767px) {
+  #mainContent {
+    padding: var(--panel-pagePaddingMobile, 1rem);
+  }
+
+  #mainContent .card-body {
+    padding: var(--panel-cardPaddingMobile, 1rem);
+  }
+
+  #panelTabs {
+    flex-wrap: wrap;
+  }
+
+  #createFields {
+    grid-template-columns: 1fr;
+  }
+
+  #listActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #listActions .btn {
+    height: auto;
+    min-height: 2.75rem;
+    white-space: normal;
+  }
+
+  #filterBar > input,
+  #filterBar > select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #keysTable,
+  #keysTable tbody {
+    display: block;
+    width: 100%;
+  }
+
+  #keysTable thead {
+    display: none;
+  }
+
+  #keysTableWrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  #keysBody > tr:not(.key-row) {
+    display: block;
+    width: 100%;
+  }
+
+  #keysBody > tr:not(.key-row) td {
+    display: block;
+    width: 100%;
+  }
+
+  #keysBody tr.key-row {
+    display: block;
+    margin: 0.75rem;
+    border: 1px solid oklch(var(--bc) / 0.12);
+    border-radius: var(--panel-radius-mobile-row, 0.75rem);
+    overflow: hidden;
+  }
+
+  #keysBody tr.key-row td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: none;
+    padding: 0.65rem 0.85rem;
+    text-align: right;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    border-bottom: 1px solid oklch(var(--bc) / var(--panel-opacity-tableDivider, 0.06));
+  }
+
+  #keysBody tr.key-row td.mobile-extra,
+  #keysBody tr.key-row td[data-label="Ação"]:empty {
+    display: none;
+  }
+
+  #keysBody tr.key-row td:last-child {
+    border-bottom: 0;
+  }
+
+  #keysBody tr.key-row td::before {
+    content: attr(data-label);
+    flex: 0 0 5.5rem;
+    color: oklch(var(--bc) / 0.55);
+    font-family: var(--panel-font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  #keysBody tr.key-row td:first-child span {
+    max-width: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  #keysBody tr.key-row td:first-child > div {
+    min-width: 0;
+  }
+
+  #keysBody tr.key-row td .btn {
+    min-height: 2.25rem;
+  }
+
+  #billingNotice {
+    padding: 1rem;
+  }
+
+  .modal-box {
+    width: calc(100vw - 2rem);
+    max-height: calc(100dvh - 2rem);
+  }
+
+  #toast {
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+@media (max-width: 479px) {
+  #appShell > .navbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  #listActions {
+    grid-template-columns: 1fr;
+  }
+
+  #freezeActions {
+    flex-direction: column;
+  }
+}

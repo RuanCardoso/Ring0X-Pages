@@ -14,306 +14,15 @@
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: 'oklch(var(--brand) / <alpha-value>)',
-            'brand-content': 'oklch(var(--brand-content) / <alpha-value>)'
-          },
-          fontFamily: {
-            sans: ['var(--panel-font-body)'],
-            mono: ['var(--panel-font-mono)'],
-            display: ['var(--panel-font-heading)'],
-          }
-        }
-      }
-    }
-  </script>
+  <script src="revendas/tailwind-config.js"></script>
   <link href="revendas/appearance.css" rel="stylesheet" />
   <link href="revendas/customizer.css" rel="stylesheet" />
-  <style>
-    /* Para reexibir o plano anual, altere data-show-annual para "true" no elemento html. */
-    html[data-show-annual="false"] .annual-plan {
-      display: none !important;
-    }
-
-    .mono {
-      font-family: var(--panel-font-mono);
-    }
-
-    .display {
-      font-family: var(--panel-font-heading);
-    }
-
-    .tabs-boxed {
-      display: inline-flex !important;
-      width: fit-content !important;
-    }
-
-    .tabs-boxed .tab {
-      flex: 0 0 auto !important;
-      width: auto !important;
-    }
-
-    #panelTabs .tabs-boxed {
-      max-width: 100%;
-      flex-wrap: wrap;
-    }
-
-    /* ---- Ring0x custom palette (overrides daisyUI's stock "dark" theme) ---- */
-    [data-theme="dark"] {
-      color-scheme: dark;
-
-      /* backgrounds — deep, cohesive graphite instead of flat/plain dark */
-      --b3: 12% 0.006 260;
-      /* sidebar / navbar / chrome */
-      --b2: 14.5% 0.007 260;
-      /* page background */
-      --b1: 18.5% 0.008 260;
-      /* card surfaces */
-      --bc: 89% 0.006 260;
-      /* body text — soft off-white, not stark white */
-
-      /* neutral — secondary actions */
-      --n: 25% 0.012 260;
-      --nc: 90% 0.006 260;
-
-      /* brand red — reserved for destructive / permanent actions */
-      --er: 57% 0.17 19;
-      --erc: 98% 0.012 19;
-
-      /* amber — freeze / caution actions */
-      --wa: 76% 0.13 75;
-      --wac: 17% 0.02 75;
-
-      /* green — resume / positive actions */
-      --su: 67% 0.13 152;
-      --suc: 14% 0.02 152;
-
-      /* blue — informational / test actions */
-      --in: 66% 0.10 230;
-      --inc: 14% 0.02 230;
-    }
-
-    /* Native popover keeps notices above modal dialogs without blocking their controls. */
-    #toast {
-      position: fixed;
-      inset: auto 0 0 auto;
-      margin: 0;
-      border: 0;
-      padding: 1rem;
-      width: fit-content;
-      max-width: min(420px, calc(100vw - 1rem));
-      background: transparent;
-      color: inherit;
-      pointer-events: none;
-    }
-    #toast .alert { overflow-wrap: anywhere; }
-    #toast::backdrop { background: transparent; pointer-events: none; }
-
-    @media (max-width: 1365px) {
-      #mainContent {
-        max-width: 100%;
-      }
-    }
-
-    @media (max-width: 1023px) {
-      #appShell {
-        height: auto;
-        min-height: 100dvh;
-      }
-
-      #mainLayout {
-        flex-direction: column;
-        overflow: visible;
-      }
-
-      #pricingSidebar {
-        width: 100%;
-        max-height: none;
-        overflow: visible;
-        border-right: 0;
-        border-bottom: 1px solid oklch(var(--bc) / 0.1);
-      }
-
-      #pricingSidebar.is-open {
-        display: flex;
-      }
-
-      #contentArea,
-      #contentScroller {
-        min-height: 0;
-        overflow: visible;
-      }
-
-      #mainContent {
-        max-width: 100%;
-      }
-
-      #createCard {
-        max-height: none;
-        overflow: visible;
-      }
-    }
-
-    @media (max-width: 767px) {
-      #mainContent {
-        padding: var(--panel-pagePaddingMobile, 1rem);
-      }
-
-      #mainContent .card-body {
-        padding: var(--panel-cardPaddingMobile, 1rem);
-      }
-
-      #createKeyLabel,
-      #panelTabs {
-        flex-wrap: wrap;
-      }
-
-      #createKeyLabel > span:last-child {
-        flex-wrap: wrap;
-      }
-
-      #createFields {
-        grid-template-columns: 1fr;
-      }
-
-      #listActions {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      #listActions .btn {
-        height: auto;
-        min-height: 2.75rem;
-        white-space: normal;
-      }
-
-      #filterBar > input,
-      #filterBar > select {
-        width: 100%;
-        min-width: 0;
-      }
-
-      #keysTable,
-      #keysTable tbody {
-        display: block;
-        width: 100%;
-      }
-
-      #keysTable thead {
-        display: none;
-      }
-
-      #keysTableWrap {
-        max-height: none;
-        overflow: visible;
-      }
-
-      #keysBody > tr:not(.key-row) {
-        display: block;
-        width: 100%;
-      }
-
-      #keysBody > tr:not(.key-row) td {
-        display: block;
-        width: 100%;
-      }
-
-      #keysBody tr.key-row {
-        display: block;
-        margin: 0.75rem;
-        border: 1px solid oklch(var(--bc) / 0.12);
-        border-radius: var(--panel-radius-mobile-row, 0.75rem);
-        overflow: hidden;
-      }
-
-      #keysBody tr.key-row td {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        width: 100%;
-        max-width: none;
-        padding: 0.65rem 0.85rem;
-        text-align: right;
-        overflow-wrap: anywhere;
-        white-space: normal;
-        border-bottom: 1px solid oklch(var(--bc) / var(--panel-opacity-tableDivider, 0.06));
-      }
-
-      #keysBody tr.key-row td.mobile-extra,
-      #keysBody tr.key-row td[data-label="Ação"]:empty {
-        display: none;
-      }
-
-      #keysBody tr.key-row td:last-child {
-        border-bottom: 0;
-      }
-
-      #keysBody tr.key-row td::before {
-        content: attr(data-label);
-        flex: 0 0 5.5rem;
-        color: oklch(var(--bc) / 0.55);
-        font-family: var(--panel-font-mono);
-        font-size: 0.65rem;
-        font-weight: 600;
-        text-align: left;
-        text-transform: uppercase;
-      }
-
-      #keysBody tr.key-row td:first-child span {
-        max-width: none;
-        white-space: normal;
-        overflow-wrap: anywhere;
-      }
-
-      #keysBody tr.key-row td:first-child > div {
-        min-width: 0;
-      }
-
-      #keysBody tr.key-row td .btn {
-        min-height: 2.25rem;
-      }
-
-      #billingNotice {
-        padding: 1rem;
-      }
-
-      .modal-box {
-        width: calc(100vw - 2rem);
-        max-height: calc(100dvh - 2rem);
-      }
-
-      #toast {
-        max-width: calc(100vw - 1rem);
-      }
-    }
-
-    @media (max-width: 479px) {
-      #appShell > .navbar {
-        flex-wrap: wrap;
-        height: auto;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-      }
-
-      #listActions {
-        grid-template-columns: 1fr;
-      }
-
-      #freezeActions {
-        flex-direction: column;
-      }
-    }
-  </style>
+  <link href="revendas/panel.css" rel="stylesheet" />
 </head>
 
 <body class="min-h-screen bg-base-200">
 
-  <!-- Auth Loading -->
+  <!-- Carregamento da sessão -->
   <div id="authLoading"
     class="hidden fixed inset-0 z-[10001] flex flex-col items-center justify-center gap-4 bg-base-300">
     <div class="flex flex-col items-center gap-4">
@@ -324,7 +33,7 @@
     </div>
   </div>
 
-  <!-- Login Gate -->
+  <!-- Login -->
   <div id="loginGate" class="hidden fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-base-300">
     <div class="card bg-base-100 border border-base-content/20 w-full max-w-md shadow-2xl">
       <div class="card-body">
@@ -333,7 +42,7 @@
             class="text-brand">0</span>x</h2>
         <p class="text-sm text-base-content/60 mb-6">Informe o Bearer token de admin para entrar no painel de revenda.
         </p>
-        <form id="loginForm" onsubmit="doLogin(event)">
+        <form id="loginForm">
           <div class="form-control mb-4">
             <label class="label">
               <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Bearer token</span>
@@ -348,12 +57,12 @@
     </div>
   </div>
 
-  <!-- App Shell -->
+  <!-- Painel da loja -->
   <div id="appShell" class="hidden flex flex-col h-screen min-h-0">
 
-    <!-- Header -->
+    <!-- Cabeçalho -->
     <div class="navbar bg-base-100 border-b border-base-content/10 px-4 md:px-6 min-h-16 gap-3">
-      <button id="sidebarToggle" type="button" onclick="toggleSidebar()" aria-controls="pricingSidebar"
+      <button id="sidebarToggle" type="button" aria-controls="pricingSidebar"
         aria-expanded="false" class="btn btn-sm btn-outline lg:hidden">Preços e saldo</button>
       <div id="panelBrand" class="flex items-center gap-3 min-w-0 flex-1 sm:flex-none">
         <img id="panelLogo" class="hidden" alt="" referrerpolicy="no-referrer" />
@@ -362,9 +71,9 @@
       </div>
       <p id="panelSubtitle" class="text-xs text-base-content/60 font-medium hidden sm:block">Painel de revenda · chaves de acesso</p>
       <div class="ml-auto flex items-center gap-2 shrink-0">
-        <button type="button" id="btnPanelCustomize" class="btn btn-sm btn-ghost" onclick="StorePanelCustomizer.open()">Personalizar</button>
+        <button type="button" id="btnPanelCustomize" class="btn btn-sm btn-ghost">Personalizar</button>
         <a id="panelSupport" class="hidden btn btn-sm btn-ghost" target="_blank" rel="noopener noreferrer">Suporte</a>
-        <button onclick="clearToken()"
+        <button id="btnLogout"
           class="btn btn-sm btn-ghost gap-1 mono text-[10px] font-medium uppercase tracking-wider text-base-content/60 hover:text-brand hover:bg-brand/10">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="w-3.5 h-3.5">
@@ -378,18 +87,18 @@
 
     <input id="token" type="hidden" value="" />
 
-    <!-- Main Layout -->
+    <!-- Layout do painel -->
     <div id="mainLayout" class="flex flex-1 min-h-0 overflow-hidden">
 
-      <!-- Left Sidebar -->
+      <!-- Preços e saldo -->
       <aside id="pricingSidebar"
         class="w-[268px] bg-base-300 border-r border-base-content/10 overflow-y-auto flex flex-col gap-3 p-4 hidden lg:flex">
 
-        <!-- Product Selection -->
+        <!-- Seleção de produto -->
         <div>
           <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Revenda · por
             key</div>
-          <select id="prodSelect" onchange="setCalcProduct(this.value)"
+          <select id="prodSelect"
             class="select select-bordered select-sm w-full mb-2">
             <option value="PB">PB</option>
             <option value="FAIRLIGHT">Fairlight</option>
@@ -398,7 +107,7 @@
             <option value="PUBGMACRO">PUBG Macro</option>
           </select>
 
-          <!-- Pricing Plans -->
+          <!-- Preços por plano -->
           <ul class="menu bg-base-200 rounded-box p-1">
             <li>
               <div class="flex items-center justify-between">
@@ -447,14 +156,14 @@
             </li>
           </ul>
 
-          <!-- Calculator -->
+          <!-- Calculadora -->
           <div class="card bg-base-200 border border-base-content/10 mt-2 p-3">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs text-base-content/60">Calcular para</span>
               <div class="join">
-                <button class="join-item btn btn-xs btn-outline" onclick="changeQty(-1)">−</button>
+                <button id="btnCalcDecrease" class="join-item btn btn-xs btn-outline">−</button>
                 <span class="join-item btn btn-xs btn-disabled mono font-semibold" id="calcQtyVal">1</span>
-                <button class="join-item btn btn-xs btn-outline" onclick="changeQty(1)">+</button>
+                <button id="btnCalcIncrease" class="join-item btn btn-xs btn-outline">+</button>
               </div>
             </div>
             <div class="flex flex-col gap-1">
@@ -484,7 +193,7 @@
 
         <div class="divider my-1"></div>
 
-        <!-- Debt Balance -->
+        <!-- Saldo devedor -->
         <div>
           <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-base-content/60 mb-2.5">Meu Saldo
             Devedor</div>
@@ -500,9 +209,9 @@
             </div>
 
             <div class="join w-full mb-2" id="paySeg">
-              <button id="btnMethodPix" onclick="setPayMethod('pix')"
+              <button id="btnMethodPix"
                 class="join-item btn btn-sm btn-brand">PIX</button>
-              <button id="btnMethodCredit" onclick="setPayMethod('credit')"
+              <button id="btnMethodCredit"
                 class="join-item btn btn-sm btn-neutral">Cartão</button>
             </div>
 
@@ -510,17 +219,17 @@
               <input id="pixCpf" type="text" placeholder="Seu CPF para o PIX"
                 class="input input-bordered input-sm w-full" />
               <input id="pixCoupon" type="hidden" value="" />
-              <button id="btnPixCoupon" type="button" onclick="openPixCouponModal()" aria-haspopup="dialog" aria-controls="modalPixCoupon"
+              <button id="btnPixCoupon" type="button" aria-haspopup="dialog" aria-controls="modalPixCoupon"
                 class="btn btn-ghost btn-sm w-full text-brand mt-1">Adicionar cupom</button>
             </div>
 
-            <button class="btn btn-brand btn-sm w-full" id="btnPayDebt" onclick="doPayDebt()" disabled>Pagar
+            <button class="btn btn-brand btn-sm w-full" id="btnPayDebt" disabled>Pagar
               Saldo</button>
             <p id="paymentAmountSummary" class="hidden text-xs text-base-content/70 mt-2" role="status"></p>
 
             <div id="qrWrap" class="hidden mt-3 bg-white p-3 text-center border border-base-content/20">
               <div id="qrImg" class="flex justify-center mb-2"></div>
-              <button class="btn btn-sm btn-brand w-full font-bold" onclick="copyPixCode()">Copiar Código PIX</button>
+              <button id="btnCopyPix" class="btn btn-sm btn-brand w-full font-bold">Copiar Código PIX</button>
             </div>
           </div>
         </div>
@@ -540,19 +249,19 @@
 
       </aside>
 
-      <!-- Main Content Area -->
+      <!-- Conteúdo principal -->
       <div id="contentArea" class="flex-1 min-w-0 flex flex-col min-h-0 bg-base-200">
 
         <div id="contentScroller" class="flex-1 min-h-0 overflow-y-auto">
           <main id="mainContent" class="p-6 max-w-[80%] mx-auto w-full">
 
-            <!-- Tabs -->
+            <!-- Navegação -->
             <div id="panelTabs" class="flex items-center mb-6 gap-3">
               <div class="tabs tabs-boxed">
-                <a class="tab tab-active" onclick="switchTab('admin')" id="tab-admin">Gerar</a>
-                <a class="tab" onclick="switchTab('list')" id="tab-list">Listar</a>
-                <a class="tab" onclick="switchTab('insights')" id="tab-insights">Insights</a>
-                <a class="tab" onclick="switchTab('finance')" id="tab-finance">Finanças</a>
+                <a class="tab tab-active" id="tab-admin">Gerar</a>
+                <a class="tab" id="tab-list">Listar</a>
+                <a class="tab" id="tab-insights">Insights</a>
+                <a class="tab" id="tab-finance">Finanças</a>
               </div>
               <div class="dropdown dropdown-end ml-auto">
                 <div tabindex="0" role="button" class="btn btn-sm btn-outline gap-1">
@@ -565,7 +274,7 @@
                 </div>
                 <ul tabindex="0"
                   class="dropdown-content menu bg-base-200 border border-base-content/10 rounded-box z-[1] w-52 p-2 shadow-lg mt-2">
-                  <li><a onclick="document.getElementById('modalRevoke').showModal()">
+                  <li><a data-open-dialog="modalRevoke">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-error">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -573,7 +282,7 @@
                       </svg>
                       Revogar
                     </a></li>
-                  <li id="menuItemDelete" class="hidden"><a onclick="document.getElementById('modalDelete').showModal()">
+                  <li id="menuItemDelete" class="hidden"><a data-open-dialog="modalDelete">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-error">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -581,7 +290,7 @@
                       </svg>
                       Deletar
                     </a></li>
-                  <li id="menuItemTransfer" class="hidden"><a onclick="document.getElementById('modalTransfer').showModal()">
+                  <li id="menuItemTransfer" class="hidden"><a data-open-dialog="modalTransfer">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-info">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -589,7 +298,7 @@
                       </svg>
                       Transferir
                     </a></li>
-                  <li id="menuItemManualFinance" class="hidden"><a onclick="openManualFinanceModal()">
+                  <li id="menuItemManualFinance" class="hidden"><a id="btnOpenManualFinance">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-success">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -597,7 +306,7 @@
                       </svg>
                       Entrada financeira
                     </a></li>
-                  <li><a onclick="document.getElementById('modalResetHwid').showModal()">
+                  <li><a data-open-dialog="modalResetHwid">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-warning">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -605,7 +314,7 @@
                       </svg>
                       Resetar HWID
                     </a></li>
-                  <li><a onclick="document.getElementById('modalSimulate').showModal()">
+                  <li><a data-open-dialog="modalSimulate">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-info">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -613,7 +322,7 @@
                       </svg>
                       Testar Ativação
                     </a></li>
-                  <li><a onclick="document.getElementById('modalFreeze').showModal()">
+                  <li><a data-open-dialog="modalFreeze">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-4 h-4 text-warning">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -625,29 +334,38 @@
               </div>
             </div>
 
-            <!-- Admin Panel -->
+            <!-- Criação de chaves -->
             <div id="panel-admin" class="block">
 
               <div id="createCard" class="card bg-base-100 border border-base-content/10 shadow-xl mb-4 max-h-[50vh] overflow-y-auto">
                 <div class="card-body">
 
-                  <div class="form-control mb-4">
-                    <label id="createKeyLabel" class="label">
-                      <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Key</span>
-                      <span class="flex items-center gap-2">
-                        <span
-                          class="label-text-alt text-[10px] text-base-content/60 font-normal normal-case tracking-normal"
-                          id="createKeyNote">(gerada automaticamente: fingerprint + duração + prefixo aleatório)</span>
-                        <button type="button" onclick="toggleManualKey()" id="btnManualKey"
-                          class="label-text-alt text-[10px] font-semibold normal-case tracking-normal text-base-content/40 hover:text-info transition-colors underline decoration-dotted underline-offset-2">
-                          editar manualmente
-                        </button>
-                      </span>
-                    </label>
-                    <input id="createKey" type="text" readonly tabindex="-1" oninput="updateKeyDurationWarning()" aria-describedby="createKeyDurationWarning"
-                      placeholder="Selecione a duração para gerar"
-                      class="input input-bordered w-full mono cursor-not-allowed opacity-70" />
-                    <p id="createKeyDurationWarning" class="hidden text-xs text-warning mt-2" role="status"></p>
+                  <div class="mb-4 space-y-3">
+                    <fieldset>
+                      <legend class="mono text-[10px] font-bold uppercase tracking-wider text-base-content/60">Prefixo da chave</legend>
+                      <div class="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+                        <label class="flex cursor-pointer items-center gap-2 text-sm">
+                          <input id="createStorePrefix" type="radio" name="createPrefixMode" class="radio radio-sm" checked />
+                          Prefixo da loja
+                        </label>
+                        <label class="flex cursor-pointer items-center gap-2 text-sm">
+                          <input id="createCustomPrefix" type="radio" name="createPrefixMode" class="radio radio-sm" aria-controls="createPrefixField" />
+                          Prefixo personalizado
+                        </label>
+                      </div>
+                    </fieldset>
+                    <div id="createPrefixField" class="form-control hidden">
+                      <label for="createPrefix" class="label"><span class="label-text text-xs">Prefixo personalizado</span></label>
+                      <input id="createPrefix" type="text" maxlength="243" disabled autocomplete="off" spellcheck="false"
+                        placeholder="Ex.: SCRIPT-IA" aria-describedby="createPrefixHelp"
+                        class="input input-bordered w-full mono uppercase" />
+                      <p id="createPrefixHelp" class="mt-1 text-xs text-base-content/60">Use letras e números. Separe as partes com hífens.</p>
+                    </div>
+                    <div class="rounded-lg border border-base-content/10 bg-base-200 px-3 py-2">
+                      <p class="text-xs text-base-content/60">Prévia da chave</p>
+                      <code id="createKeyPreview" class="mt-1 block break-all mono text-sm" aria-live="polite">Selecione a duração</code>
+                      <p class="mt-1 text-xs text-base-content/60">O sufixo aleatório é gerado na criação.</p>
+                    </div>
                   </div>
 
                   <div id="createFields" class="grid grid-cols-3 gap-3 mb-4">
@@ -655,7 +373,7 @@
                       <label class="label">
                         <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Duração</span>
                       </label>
-                      <select id="createDays" onchange="updateCreateCost(); updateKeyPreview()" class="select select-bordered w-full">
+                      <select id="createDays" class="select select-bordered w-full">
                         <option value="">Selecione...</option>
                         <option value="1">1 dia (Diária)</option>
                         <option value="7">7 dias (Semanal)</option>
@@ -668,7 +386,7 @@
                       <label class="label">
                         <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Produto</span>
                       </label>
-                      <select id="createProduct" onchange="updateCreateCost()" class="select select-bordered w-full">
+                      <select id="createProduct" class="select select-bordered w-full">
                         <option value="">Selecione...</option>
                         <option value="PB">PB</option>
                         <option value="FAIRLIGHT" disabled>Fairlight (bloqueado)</option>
@@ -681,7 +399,7 @@
                       <label class="label">
                         <span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Quantidade</span>
                       </label>
-                      <input id="createQty" type="number" min="1" max="100" value="1" oninput="onQtyChange()"
+                      <input id="createQty" type="number" min="1" max="100" value="1"
                         class="input input-bordered w-full" />
                     </div>
                   </div>
@@ -693,41 +411,41 @@
                     </div>
                   </div>
 
-                  <button class="btn btn-brand w-full font-bold" id="btnCreate" onclick="doCreate()">Revisar criação</button>
-                  <button class="btn btn-success w-full font-bold hidden" id="btnCopyCreated" onclick="copyCreatedKeys()">Copiar chaves geradas</button>
+                  <button class="btn btn-brand w-full font-bold" id="btnCreate">Revisar criação</button>
+                  <button class="btn btn-success w-full font-bold hidden" id="btnCopyCreated">Copiar chaves geradas</button>
 
                 </div>
               </div>
 
             </div>
 
-            <!-- List Panel -->
+            <!-- Lista de chaves -->
             <div id="panel-list" class="hidden">
 
               <div class="card bg-base-100 border border-base-content/10 shadow-xl">
                 <div class="card-body">
 
                   <div id="listActions" class="flex flex-wrap gap-2 mb-4">
-                    <button class="btn btn-neutral" id="btnList" onclick="doList()">Atualizar lista</button>
-                    <button class="btn btn-outline btn-error" onclick="copySelected()">Revogar selecionada</button>
-                    <button id="btnDeleteSelected" class="btn btn-outline btn-error hidden" onclick="copySelectedToDelete()">Deletar selecionada</button>
-                    <button id="btnTransferSelected" class="btn btn-outline btn-info hidden" onclick="copySelectedToTransfer()">Transferir selecionada</button>
-                    <button class="btn btn-outline btn-warning" onclick="copySelectedToHwid()">Reset HWID da
+                    <button class="btn btn-neutral" id="btnList">Atualizar lista</button>
+                    <button id="btnRevokeSelected" class="btn btn-outline btn-error">Revogar selecionada</button>
+                    <button id="btnDeleteSelected" class="btn btn-outline btn-error hidden">Deletar selecionada</button>
+                    <button id="btnTransferSelected" class="btn btn-outline btn-info hidden">Transferir selecionada</button>
+                    <button id="btnResetSelectedHwid" class="btn btn-outline btn-warning">Reset HWID da
                       selecionada</button>
-                    <button class="btn btn-outline btn-success" onclick="copyAllKeys()">Copiar todas as chaves</button>
+                    <button id="btnCopyAllKeys" class="btn btn-outline btn-success">Copiar todas as chaves</button>
                   </div>
 
                   <div id="filterBar" class="flex flex-wrap items-center gap-2 mb-4">
                     <input id="filterSearch" type="text" placeholder="Buscar por key ou HWID..."
-                      oninput="applyFilters()" class="input input-bordered input-sm mono flex-1 w-40 min-w-[160px]" />
-                    <select id="filterStatus" onchange="applyFilters()" class="select select-bordered select-sm">
+                      class="input input-bordered input-sm mono flex-1 w-40 min-w-[160px]" />
+                    <select id="filterStatus" class="select select-bordered select-sm">
                       <option value="">Todos os status</option>
                       <option value="ativa">Ativa</option>
                       <option value="congelada">Congelada</option>
                       <option value="expirado">Expirado</option>
                       <option value="inativa">Inativa</option>
                     </select>
-                    <select id="filterProduct" onchange="applyFilters()" class="select select-bordered select-sm">
+                    <select id="filterProduct" class="select select-bordered select-sm">
                       <option value="">Todos os produtos</option>
                       <option value="PB">PB</option>
                       <option value="FAIRLIGHT">Fairlight</option>
@@ -735,7 +453,7 @@
                       <option value="PUBGESP">PUBG - ESP</option>
                       <option value="PUBGMACRO">PUBG - Macro</option>
                     </select>
-                    <select id="filterDuration" aria-label="Filtrar por duração da chave" onchange="applyFilters()" class="select select-bordered select-sm">
+                    <select id="filterDuration" aria-label="Filtrar por duração da chave" class="select select-bordered select-sm">
                       <option value="">Todas as durações</option>
                       <option value="1">1 dia</option>
                       <option value="7">7 dias</option>
@@ -743,7 +461,7 @@
                       <option value="90">90 dias</option>
                       <option value="365">365 dias</option>
                     </select>
-                    <button class="btn btn-ghost btn-sm text-base-content/50" onclick="clearFilters()">Limpar</button>
+                    <button id="btnClearKeyFilters" class="btn btn-ghost btn-sm text-base-content/50">Limpar</button>
                     <span class="mono text-[10px] text-base-content/40 ml-auto" id="filterCount"></span>
                   </div>
 
@@ -781,14 +499,14 @@
                     </div>
                   </div>
                   <div class="flex justify-center mt-4">
-                    <button id="btnLoadMore" class="btn btn-sm btn-outline hidden" onclick="loadMoreKeys()">Carregar mais</button>
+                    <button id="btnLoadMore" class="btn btn-sm btn-outline hidden">Carregar mais</button>
                   </div>
                 </div>
               </div>
 
             </div>
 
-            <!-- Insights Panel -->
+            <!-- Insights -->
             <div id="panel-insights" class="hidden" aria-busy="false">
               <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
                 <div>
@@ -796,7 +514,7 @@
                   <h2 class="display text-2xl font-bold tracking-tight">Insights de chaves</h2>
                   <p class="text-sm text-base-content/60 mt-2">Identifique oportunidades de renovação e sinais de falta de uso.</p>
                 </div>
-                <button id="btnInsights" class="btn btn-neutral btn-sm" onclick="loadInsights()">Atualizar insights</button>
+                <button id="btnInsights" class="btn btn-neutral btn-sm">Atualizar insights</button>
               </div>
 
               <p id="insightsStatus" role="status" aria-live="polite" class="text-xs text-base-content/50 mb-4">Abra esta aba para consultar os insights da loja.</p>
@@ -859,7 +577,7 @@
               <p class="text-xs leading-relaxed text-base-content/40 mt-5">O uso considera a última autenticação bem-sucedida, não indica se o programa está online. Chaves sem histórico de uso não aparecem nos alertas de renovação prioritária e possível abandono. A estimativa de renovação usa as ativações e os HWIDs registrados.</p>
             </div>
 
-            <!-- Finance Panel -->
+            <!-- Finanças -->
             <div id="panel-finance" class="hidden">
               <div class="card bg-base-100 border border-base-content/10 shadow-xl">
                 <div class="card-body gap-6">
@@ -874,27 +592,27 @@
                     <span id="financeStoreLabel" class="badge badge-outline border-base-content/20 mono text-[10px] font-semibold px-3 py-3">LOJA</span>
                   </div>
 
-                  <form id="financeFilters" onsubmit="event.preventDefault(); loadFinances()"
+                  <form id="financeFilters"
                     class="space-y-3 rounded-2xl border border-base-content/10 bg-base-200 p-4">
                     <div class="flex flex-wrap gap-2" role="group" aria-label="Período das finanças">
-                      <button id="financePeriod-day" type="button" aria-pressed="false" onclick="setFinancePeriod('day')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Diário</button>
-                      <button id="financePeriod-week" type="button" aria-pressed="false" onclick="setFinancePeriod('week')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Semanal</button>
-                      <button id="financePeriod-month" type="button" aria-pressed="true" onclick="setFinancePeriod('month')" class="btn btn-sm btn-brand min-h-[44px] flex-1 sm:flex-none">Mensal</button>
-                      <button id="financePeriod-year" type="button" aria-pressed="false" onclick="setFinancePeriod('year')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Anual</button>
-                      <button id="financePeriod-all" type="button" aria-pressed="false" onclick="setFinancePeriod('all')" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Tudo</button>
+                      <button id="financePeriod-day" type="button" aria-pressed="false" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Diário</button>
+                      <button id="financePeriod-week" type="button" aria-pressed="false" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Semanal</button>
+                      <button id="financePeriod-month" type="button" aria-pressed="true" class="btn btn-sm btn-brand min-h-[44px] flex-1 sm:flex-none">Mensal</button>
+                      <button id="financePeriod-year" type="button" aria-pressed="false" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Anual</button>
+                      <button id="financePeriod-all" type="button" aria-pressed="false" class="btn btn-sm btn-outline border-base-content/20 min-h-[44px] flex-1 sm:flex-none">Tudo</button>
                     </div>
                     <div id="financePeriodNavigation" class="flex items-center gap-2 rounded-xl border border-brand/20 p-3">
-                      <button id="financePrevious" type="button" onclick="stepFinancePeriod(-1)" aria-label="Período anterior" class="btn btn-ghost btn-sm min-h-[44px] min-w-[44px] p-2 shrink-0">
+                      <button id="financePrevious" type="button" aria-label="Período anterior" class="btn btn-ghost btn-sm min-h-[44px] min-w-[44px] p-2 shrink-0">
                         <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6" /></svg>
                       </button>
                       <div class="grid grid-cols-1 sm:grid-cols-2 items-end gap-2 flex-1 min-w-0">
                         <div id="financeDateField" class="form-control hidden sm:col-span-2">
                           <label class="label" for="financeDate"><span id="financeDateLabel" class="label-text mono text-[10px] font-bold uppercase tracking-wider">Data</span></label>
-                          <input id="financeDate" type="date" min="0001-01-01" max="9998-12-25" disabled onchange="updateFinancePeriod()" class="input input-bordered w-full min-w-0" />
+                          <input id="financeDate" type="date" min="0001-01-01" max="9998-12-25" disabled class="input input-bordered w-full min-w-0" />
                         </div>
                         <div id="financeMonthField" class="form-control">
                           <label class="label" for="financeMonth"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Mês</span></label>
-                          <select id="financeMonth" required onchange="updateFinancePeriod()" class="select select-bordered w-full min-w-0">
+                          <select id="financeMonth" required class="select select-bordered w-full min-w-0">
                             <option value="01">Janeiro</option>
                             <option value="02">Fevereiro</option>
                             <option value="03">Março</option>
@@ -911,10 +629,10 @@
                         </div>
                         <div id="financeYearField" class="form-control">
                           <label class="label" for="financeYear"><span class="label-text mono text-[10px] font-bold uppercase tracking-wider">Ano</span></label>
-                          <select id="financeYear" required onchange="updateFinancePeriod()" class="select select-bordered w-full min-w-0"></select>
+                          <select id="financeYear" required class="select select-bordered w-full min-w-0"></select>
                         </div>
                       </div>
-                      <button id="financeNext" type="button" onclick="stepFinancePeriod(1)" aria-label="Próximo período" class="btn btn-ghost btn-sm min-h-[44px] min-w-[44px] p-2 shrink-0">
+                      <button id="financeNext" type="button" aria-label="Próximo período" class="btn btn-ghost btn-sm min-h-[44px] min-w-[44px] p-2 shrink-0">
                         <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m9 6 6 6-6 6" /></svg>
                       </button>
                     </div>
@@ -996,13 +714,12 @@
 
       </div>
 
-      <!-- Right Sidebar REMOVED — tools moved to modals -->
 
     </div>
 
   </div>
 
-  <!-- Toast -->
+  <!-- Notificações -->
   <div id="toast" popover="manual" role="status" aria-live="polite" aria-atomic="true" class="toast toast-end toast-bottom z-[9999] max-w-[420px]"></div>
 
   <!-- Store appearance editor: changes remain in the preview until saved. -->
@@ -1013,16 +730,16 @@
           <h2 id="panelEditorTitle" class="display text-xl font-bold">Personalizar painel</h2>
           <p class="text-xs text-base-content/50 mt-1">Escolha o visual da sua loja. As alterações só entram em vigor ao salvar.</p>
         </div>
-        <button type="button" id="panelEditorClose" class="btn btn-sm btn-ghost" onclick="StorePanelCustomizer.close()" aria-label="Fechar personalização">✕</button>
+        <button type="button" id="panelEditorClose" class="btn btn-sm btn-ghost" aria-label="Fechar personalização">✕</button>
       </div>
-      <form id="panelEditorForm" class="flex flex-col min-h-0 flex-1" novalidate onsubmit="StorePanelCustomizer.save(event)">
+      <form id="panelEditorForm" class="flex flex-col min-h-0 flex-1" novalidate>
         <div class="panel-editor-body grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-5 p-5 overflow-y-auto min-h-0">
           <fieldset id="panelEditorFields" class="min-w-0">
             <legend class="sr-only">Configurações de aparência</legend>
             <div class="tabs tabs-boxed mb-5 flex-wrap" aria-label="Seções de personalização">
-              <button type="button" id="panelEditorTab-identity" class="tab tab-active" onclick="StorePanelCustomizer.setTab('identity')">Identidade</button>
-              <button type="button" id="panelEditorTab-colors" class="tab" onclick="StorePanelCustomizer.setTab('colors')">Cores</button>
-              <button type="button" id="panelEditorTab-style" class="tab" onclick="StorePanelCustomizer.setTab('style')">Estilo</button>
+              <button type="button" id="panelEditorTab-identity" class="tab tab-active">Identidade</button>
+              <button type="button" id="panelEditorTab-colors" class="tab">Cores</button>
+              <button type="button" id="panelEditorTab-style" class="tab">Estilo</button>
             </div>
             <section id="panelEditorSection-identity" aria-label="Identidade da loja">
               <div id="panelEditorIdentity" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
@@ -1030,11 +747,11 @@
             <section id="panelEditorSection-colors" class="hidden" aria-label="Cores do painel">
               <p class="text-xs text-base-content/50 mb-3">Comece com um tema pronto e ajuste as cores como preferir.</p>
               <div class="flex flex-wrap gap-2 mb-5">
-                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('default')">Atual</button>
-                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('green')">Verde</button>
-                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('blue')">Azul</button>
-                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('purple')">Roxo</button>
-                <button type="button" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.preset('light')">Claro</button>
+                <button id="panelPreset-default" type="button" class="btn btn-sm btn-outline">Atual</button>
+                <button id="panelPreset-green" type="button" class="btn btn-sm btn-outline">Verde</button>
+                <button id="panelPreset-blue" type="button" class="btn btn-sm btn-outline">Azul</button>
+                <button id="panelPreset-purple" type="button" class="btn btn-sm btn-outline">Roxo</button>
+                <button id="panelPreset-light" type="button" class="btn btn-sm btn-outline">Claro</button>
               </div>
               <div id="panelEditorColors" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
               <details class="mt-5 rounded-xl border border-base-content/10 p-4">
@@ -1080,33 +797,33 @@
           <p id="panelEditorError" role="alert" class="hidden text-sm text-error mb-3"></p>
           <p id="panelEditorStatus" role="status" aria-live="polite" class="text-xs text-base-content/50 mb-3">Personalização válida somente para esta loja.</p>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" id="panelEditorReset" class="btn btn-sm btn-ghost" onclick="StorePanelCustomizer.resetDraft()">Restaurar padrão</button>
+            <button type="button" id="panelEditorReset" class="btn btn-sm btn-ghost">Restaurar padrão</button>
             <div class="flex gap-2 ml-auto">
-              <button type="button" id="panelEditorCancel" class="btn btn-sm btn-outline" onclick="StorePanelCustomizer.close()">Cancelar</button>
+              <button type="button" id="panelEditorCancel" class="btn btn-sm btn-outline">Cancelar</button>
               <button type="submit" id="panelEditorSave" class="btn btn-sm btn-brand">Salvar aparência</button>
             </div>
           </div>
         </div>
       </form>
     </div>
-    <div class="modal-backdrop"><button type="button" onclick="StorePanelCustomizer.close()" aria-label="Cancelar personalização"></button></div>
+    <div class="modal-backdrop"><button id="panelEditorBackdrop" type="button" aria-label="Cancelar personalização"></button></div>
   </dialog>
 
 
   <!-- Modal: Cupom do pagamento Pix -->
-  <dialog id="modalPixCoupon" class="modal" aria-labelledby="pixCouponTitle" onclose="document.getElementById('pixCouponDraft').value = ''">
+  <dialog id="modalPixCoupon" class="modal" aria-labelledby="pixCouponTitle">
     <div class="modal-box w-11/12 max-w-md max-h-[90dvh] overflow-y-auto">
       <h3 id="pixCouponTitle" class="display text-lg font-bold">Cupom de desconto</h3>
       <p id="pixCouponHelp" class="text-sm text-base-content/60 mt-2">Opcional e exclusivo do Pix. O cupom será validado e o desconto calculado ao gerar a cobrança.</p>
-      <form class="flex flex-col gap-4 mt-4" onsubmit="event.preventDefault(); savePixCoupon()">
+      <form id="pixCouponForm" class="flex flex-col gap-4 mt-4">
         <div class="form-control min-w-0">
           <label class="label" for="pixCouponDraft"><span class="label-text text-xs">Código do cupom</span></label>
           <input id="pixCouponDraft" type="text" maxlength="18" autocomplete="off" autocapitalize="characters" spellcheck="false"
             aria-describedby="pixCouponHelp" placeholder="Digite seu cupom" class="input input-bordered w-full uppercase mono" />
         </div>
         <div class="flex flex-wrap justify-end gap-2">
-          <button id="btnRemovePixCoupon" type="button" onclick="removePixCoupon()" class="btn btn-ghost btn-sm hidden">Remover cupom</button>
-          <button type="button" onclick="document.getElementById('modalPixCoupon').close()" class="btn btn-ghost btn-sm">Cancelar</button>
+          <button id="btnRemovePixCoupon" type="button" class="btn btn-ghost btn-sm hidden">Remover cupom</button>
+          <button id="btnCancelPixCoupon" type="button" class="btn btn-ghost btn-sm">Cancelar</button>
           <button type="submit" class="btn btn-brand btn-sm">Usar cupom</button>
         </div>
       </form>
@@ -1154,16 +871,6 @@
         </div>
       </section>
 
-      <div id="createReviewWarning" class="alert alert-warning mt-3 hidden items-start text-sm">
-        <svg aria-hidden="true" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M10.3 4.8 3.4 17a2 2 0 0 0 1.7 3h13.8a2 2 0 0 0 1.7-3L13.7 4.8a2 2 0 0 0-3.4 0Z" />
-        </svg>
-        <div>
-          <p class="font-bold">Duração diferente no código</p>
-          <p id="createReviewWarningText" class="mt-1"></p>
-        </div>
-      </div>
-
       <div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-brand/20 bg-brand/10 px-4 py-3">
         <div>
           <p class="text-sm font-semibold">Custo total</p>
@@ -1180,9 +887,9 @@
     <form method="dialog" class="modal-backdrop"><button value="cancel">Fechar revisão</button></form>
   </dialog>
 
-  <!-- Confirm Modal -->
+  <!-- Confirmação genérica -->
   <dialog id="confirmModal" class="modal">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box" data-stop-click>
       <p id="confirmMsg" class="py-4 whitespace-pre-line break-words"></p>
       <div class="modal-action">
         <button id="confirmNo" class="btn btn-ghost">Cancelar</button>
@@ -1196,14 +903,14 @@
 
   <!-- Modal: Revogar Key -->
   <dialog id="modalRevoke" class="modal">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box" data-stop-click>
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Revogar Key</h3>
       <p class="text-sm text-base-content/60 py-2">A key é invalidada permanentemente. A dívida permanece no saldo mesmo
         após revogação.</p>
       <div class="flex flex-col gap-3">
         <input id="revokeKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
-        <button class="btn btn-error w-full" id="btnRevoke" onclick="doRevoke()">Revogar</button>
+        <button class="btn btn-error w-full" id="btnRevoke">Revogar</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -1214,14 +921,14 @@
 
   <!-- Modal: Deletar Key -->
   <dialog id="modalDelete" class="modal">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box" data-stop-click>
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Deletar Key</h3>
       <p class="text-sm text-base-content/60 py-2">A key é removida permanentemente da base. Diferente da revogação,
         essa ação não pode ser desfeita.</p>
       <div class="flex flex-col gap-3">
         <input id="deleteKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
-        <button class="btn btn-error w-full" id="btnDelete" onclick="doDelete()">Deletar</button>
+        <button class="btn btn-error w-full" id="btnDelete">Deletar</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -1232,7 +939,7 @@
 
   <!-- Modal: Transferir Key -->
   <dialog id="modalTransfer" class="modal">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box" data-stop-click>
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Transferir Key</h3>
       <p class="text-sm text-base-content/60 py-2">A key passa a pertencer à loja do token de destino. O fingerprint da
@@ -1241,7 +948,7 @@
         <input id="transferKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full mono" />
         <input id="transferTargetToken" type="password" placeholder="Bearer token da loja destino"
           class="input input-bordered input-sm w-full mono" />
-        <button class="btn btn-info w-full" id="btnTransfer" onclick="doTransfer()">Transferir</button>
+        <button class="btn btn-info w-full" id="btnTransfer">Transferir</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -1251,12 +958,12 @@
   </dialog>
 
   <!-- Modal: Entrada financeira manual -->
-  <dialog id="modalManualFinance" class="modal" oncancel="if (_manualFinanceBusy) event.preventDefault()" onclose="document.getElementById('manualFinanceForm').reset(); updateManualFinanceAction()">
-    <div class="modal-box w-11/12 max-w-lg max-h-[90dvh] overflow-y-auto" onclick="event.stopPropagation()">
+  <dialog id="modalManualFinance" class="modal">
+    <div class="modal-box w-11/12 max-w-lg max-h-[90dvh] overflow-y-auto" data-stop-click>
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-success mb-2.5">Finanças · Admin</div>
       <h3 class="font-bold text-lg">Adicionar entrada manual</h3>
       <p class="text-sm text-base-content/60 py-2">Registre um pagamento recebido por fora. Se necessário, marque a opção abaixo para também quitar o saldo devedor da loja.</p>
-      <form id="manualFinanceForm" class="flex flex-col gap-3 mt-3" onsubmit="event.preventDefault(); doAddManualFinance()">
+      <form id="manualFinanceForm" class="flex flex-col gap-3 mt-3">
         <fieldset id="manualFinanceFields" class="flex flex-col gap-3 min-w-0">
           <legend class="sr-only">Pagamento manual e quitação opcional</legend>
         <div class="form-control min-w-0">
@@ -1280,7 +987,7 @@
           <div class="flex flex-col sm:flex-row gap-2 min-w-0">
             <input id="manualFinanceReference" type="text" maxlength="255" required placeholder="Ex.: comprovante-123"
               class="input input-bordered w-full min-w-0 flex-1" />
-            <button type="button" class="btn btn-outline w-full sm:w-auto" onclick="generateManualFinanceReference()">Gerar GUID</button>
+            <button id="btnGenerateFinanceReference" type="button" class="btn btn-outline w-full sm:w-auto">Gerar GUID</button>
           </div>
         </div>
         <div class="form-control min-w-0">
@@ -1290,7 +997,7 @@
         </div>
         <div class="rounded-xl border border-base-content/10 bg-base-200 p-4">
           <label for="manualFinanceSettleDebt" class="flex items-start gap-3 cursor-pointer min-h-[44px]">
-            <input id="manualFinanceSettleDebt" type="checkbox" onchange="updateManualFinanceAction()"
+            <input id="manualFinanceSettleDebt" type="checkbox"
               aria-describedby="manualFinanceSettlementHelp" class="checkbox checkbox-success shrink-0 mt-0.5" />
             <span class="text-sm font-semibold">Quitar saldo devedor</span>
           </label>
@@ -1304,19 +1011,19 @@
         <form method="dialog"><button id="manualFinanceClose" class="btn btn-sm">Fechar</button></form>
       </div>
     </div>
-    <form method="dialog" class="modal-backdrop" onsubmit="if (_manualFinanceBusy) event.preventDefault()"><button>close</button></form>
+    <form id="manualFinanceBackdrop" method="dialog" class="modal-backdrop"><button>close</button></form>
   </dialog>
 
   <!-- Modal: Reset HWID -->
   <dialog id="modalResetHwid" class="modal">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box" data-stop-click>
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Reset HWID</h3>
       <p class="text-sm text-base-content/60 py-2">Permite que a key seja ativada em um novo dispositivo. O HWID será
         atualizado automaticamente.</p>
       <div class="flex flex-col gap-3">
         <input id="resetHwidKey" type="text" placeholder="Cole a key" class="input input-bordered input-sm w-full" />
-        <button class="btn btn-warning w-full" id="btnResetHwid" onclick="doResetHwid()">Reset HWID</button>
+        <button class="btn btn-warning w-full" id="btnResetHwid">Reset HWID</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -1327,7 +1034,7 @@
 
   <!-- Modal: Simular Ativação -->
   <dialog id="modalSimulate" class="modal">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box" data-stop-click>
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Simular Ativação</h3>
       <p class="text-sm text-base-content/60 py-2">Simula a ativação pelo cliente. Use para validar a key antes de
@@ -1341,7 +1048,7 @@
           <option value="PUBGESP">PUBG - ESP</option>
           <option value="PUBGMACRO">PUBG - Macro</option>
         </select>
-        <button class="btn btn-info w-full" id="btnActivate" onclick="doActivate()">Ativar key</button>
+        <button class="btn btn-info w-full" id="btnActivate">Ativar key</button>
       </div>
       <div class="modal-action">
         <form method="dialog"><button class="btn btn-sm">Fechar</button></form>
@@ -1352,7 +1059,7 @@
 
   <!-- Modal: Congelar em Lote -->
   <dialog id="modalFreeze" class="modal">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box" data-stop-click>
       <div class="mono text-[9px] font-bold uppercase tracking-[0.14em] text-brand mb-2.5">Ferramentas</div>
       <h3 class="font-bold text-lg">Congelar em Lote</h3>
       <p class="text-sm text-base-content/60 py-2">Congela ou descongela todas as keys de um produto específico de uma
@@ -1366,8 +1073,8 @@
           <option value="PUBGMACRO">PUBG - Macro</option>
         </select>
         <div id="freezeActions" class="flex gap-2">
-          <button class="btn btn-warning flex-1" onclick="doFreezeFromModal(true)">Congelar todas</button>
-          <button class="btn btn-success flex-1" onclick="doFreezeFromModal(false)">Descongelar todas</button>
+          <button id="btnFreezeAll" class="btn btn-warning flex-1">Congelar todas</button>
+          <button id="btnUnfreezeAll" class="btn btn-success flex-1">Descongelar todas</button>
         </div>
       </div>
       <div class="modal-action">
@@ -1380,1750 +1087,17 @@
   <script src="revendas/appearance.js"></script>
   <script src="revendas/customizer-fields.js"></script>
   <script src="revendas/customizer.js"></script>
-  <script>
-    let _selectedKey = '';
-    let _allKeyItems = [];
-    let _lastCreatedKeys = [];
-    let _listLoaded = false;
-    let _listDirty = true;
-    let _listLoadedAt = 0;
-    let _listRevision = 0;
-    let _listRequest = null;
-    let _visibleKeyCount = 0;
-    const LIST_MAX_AGE_MS = 60 * 1000;
-    const MOBILE_KEY_BATCH = 20;
-    const DESKTOP_KEY_BATCH = 50;
-    const mobileKeysMedia = window.matchMedia('(max-width: 767px)');
-
-    let PRICES = {};
-    const PRICE_DURATIONS = { 1: 'diaria', 7: 'semanal', 30: 'mensal', 90: 'trimestral', 365: 'anual' };
-    let _calcQty = 1;
-    let _calcProduct = 'PUBG';
-
-    const PRODUCT_META = {
-      PB: { label: 'PB' },
-      FAIRLIGHT: { label: 'Fairlight' },
-      PUBG: { label: 'PUBG - Full' },
-      PUBGESP: { label: 'PUBG - ESP' },
-      PUBGMACRO: { label: 'PUBG - Macro' }
-    };
-
-
-    function applyStoreConfiguration(store) {
-      if (!store?.fingerprint || !store.productPrices) {
-        throw new Error('O servidor não retornou os preços da loja.');
-      }
-      const prices = {};
-      for (const product of Object.keys(PRODUCT_META)) {
-        prices[product] = {};
-        for (const [days, label] of Object.entries(PRICE_DURATIONS)) {
-          const value = store.productPrices[product]?.[days];
-          if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 ||
-              value > 99999999.99 || Math.abs(value * 100 - Math.round(value * 100)) > 0.000001) {
-            throw new Error(`Preço inválido ou ausente para ${productLabel(product)} (${days} dias).`);
-          }
-          prices[product][label] = value;
-        }
-      }
-      PRICES = prices;
-      StorePanelCustomizer.commit(store.panelSettings);
-      updateCalc();
-      updateCreateCost();
-    }
-
-    /* enum numérico da API + códigos string */
-    const PRODUCT_CODES = {
-      0: 'PB', 1: 'FAIRLIGHT', 2: 'PUBG', 3: 'PUBGESP', 4: 'PUBGMACRO',
-      PB: 'PB', FAIRLIGHT: 'FAIRLIGHT', PUBG: 'PUBG',
-      PUBGESP: 'PUBGESP', PUBGMACRO: 'PUBGMACRO',
-      'PUBG - Full': 'PUBG', 'PUBG - ESP': 'PUBGESP', 'PUBG - Macro': 'PUBGMACRO'
-    };
-
-    function resolveProductCode(pt) {
-      if (pt === null || pt === undefined || pt === '') return null;
-      if (PRODUCT_CODES[pt] !== undefined) return PRODUCT_CODES[pt];
-      return String(pt);
-    }
-
-    function productLabel(code) {
-      return PRODUCT_META[code]?.label || code || '—';
-    }
-
-    function fmt(v) {
-      return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function setCalcProduct(p) {
-      _calcProduct = p;
-      updateCalc();
-    }
-
-    function updateCalc() {
-      const p = PRICES[_calcProduct];
-      document.getElementById('calcQtyVal').textContent = _calcQty;
-      for (const label of Object.values(PRICE_DURATIONS)) {
-        const suffix = label[0].toUpperCase() + label.slice(1);
-        document.getElementById('calc' + suffix).textContent = p ? fmt(p[label] * _calcQty) : '—';
-        document.getElementById('price' + suffix).textContent = p ? fmt(p[label]) : '—';
-      }
-    }
-
-    function changeQty(d) {
-      _calcQty = Math.max(1, Math.min(999, _calcQty + d));
-      updateCalc();
-    }
-
-    const TAB_IDS = ['admin', 'list', 'insights', 'finance'];
-    let _financesLoaded = false;
-    let _financeRequestRevision = 0;
-
-    let _insightsLoadedAt = 0;
-    let _insightsDirty = true;
-    let _insightsRevision = 0;
-    let _insightsRequest = null;
-
-    function isInsightsVisible() {
-      return !document.getElementById('appShell').classList.contains('hidden') &&
-        !document.getElementById('panel-insights').classList.contains('hidden');
-    }
-
-    function resetInsightsState() {
-      _insightsRevision++;
-      _insightsRequest = null;
-      _insightsLoadedAt = 0;
-      _insightsDirty = true;
-      setLoading('btnInsights', false);
-      document.getElementById('panel-insights').setAttribute('aria-busy', 'false');
-      ['insightsResults', 'insightsLoading', 'insightsError'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      document.getElementById('insightsError').textContent = '';
-      document.getElementById('insightsStatus').textContent = 'Abra esta aba para consultar os insights da loja.';
-      ['renewals', 'abandonment', 'estimatedRenewals'].forEach(prefix => {
-        document.getElementById(prefix + 'Items').replaceChildren();
-        document.getElementById(prefix + 'Total').textContent = '—';
-        document.getElementById(prefix + 'Count').textContent = '';
-        document.getElementById(prefix + 'Empty').classList.add('hidden');
-      });
-    }
-
-    function invalidateInsights() {
-      _insightsDirty = true;
-      _insightsRevision++;
-      if (isInsightsVisible()) loadInsights(false);
-    }
-
-    function insightDayLabel(value) {
-      return `${value} ${value === 1 ? 'dia' : 'dias'}`;
-    }
-
-    function renderInsightGroup(prefix, group) {
-      const body = document.getElementById(prefix + 'Items');
-      body.replaceChildren();
-      document.getElementById(prefix + 'Total').textContent = group.total.toLocaleString('pt-BR');
-      document.getElementById(prefix + 'Empty').classList.toggle('hidden', group.total !== 0);
-      document.getElementById(prefix + 'Count').textContent = group.total
-        ? `${group.items.length} de ${group.total.toLocaleString('pt-BR')} chaves exibidas`
-        : '';
-
-      group.items.forEach(item => {
-        const row = document.createElement('li');
-        row.className = 'py-4 first:pt-0 last:pb-0';
-        row.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0 flex-1">
-              <p class="insight-product text-xs font-semibold text-base-content/70 mb-1.5"></p>
-              <p class="insight-key mono text-[11px] break-all leading-relaxed"></p>
-            </div>
-            <button type="button" class="btn btn-ghost btn-xs shrink-0">Copiar</button>
-          </div>
-          <p class="insight-summary text-xs font-medium mt-3"></p>
-          <p class="insight-dates text-[11px] text-base-content/50 mt-1.5 leading-relaxed"></p>`;
-        row.querySelector('.insight-product').textContent = productLabel(resolveProductCode(item.productType));
-        row.querySelector('.insight-key').textContent = item.keyValue;
-        const summary = row.querySelector('.insight-summary');
-        const dates = row.querySelector('.insight-dates');
-        if (prefix === 'estimatedRenewals') {
-          summary.classList.add('text-success');
-          summary.textContent = `Renovou em ${fmtDate(item.renewedAt)}`;
-          dates.classList.add('break-words');
-          dates.textContent = `Anterior: ${item.previousKeyValue} (até ${fmtDate(item.previousEndsAt)}) · Nova válida até ${fmtDate(item.endsAt)}`;
-        } else {
-          const remaining = insightDayLabel(item.daysRemaining);
-          const unused = insightDayLabel(item.daysSinceLastUse);
-          summary.classList.add(prefix === 'renewals' ? 'text-warning' : 'text-info');
-          summary.textContent = prefix === 'renewals'
-            ? `${item.daysRemaining === 1 ? 'Vence em até 24h' : `Vence em até ${remaining}`} · ${item.daysSinceLastUse === 0 ? 'Uso há menos de 24h' : `Sem uso há ${unused}`}`
-            : `Sem uso há ${unused} · ${remaining} de validade restantes`;
-          dates.textContent = `Vencimento: ${fmtDate(item.endsAt)} · Último uso: ${fmtDate(item.lastUsedAt)}`;
-        }
-        const copy = row.querySelector('button');
-        copy.setAttribute('aria-label', `Copiar chave ${item.keyValue}`);
-        copy.addEventListener('click', async () => {
-          try {
-            await navigator.clipboard.writeText(item.keyValue);
-            toast('Key copiada!');
-          } catch (e) {
-            toast('Não foi possível copiar a chave.', true);
-          }
-        });
-        body.appendChild(row);
-      });
-    }
-
-    function validateInsights(data) {
-      const validDays = value => Number.isInteger(value) && value > 0;
-      if (!data || !parseUtcDate(data.generatedAt) || !validDays(data.renewalWindowDays) ||
-          !validDays(data.inactivityDays) || !validDays(data.limitPerInsight)) {
-        throw new Error('O servidor retornou insights inválidos.');
-      }
-      for (const group of [data.priorityRenewals, data.possibleAbandonment]) {
-        if (!group || !Number.isSafeInteger(group.total) || group.total < 0 || !Array.isArray(group.items) ||
-            group.items.length !== Math.min(group.total, data.limitPerInsight) ||
-            group.items.some(item => !item || typeof item.keyValue !== 'string' || !item.keyValue ||
-              !parseUtcDate(item.endsAt) || !parseUtcDate(item.lastUsedAt) ||
-              !Number.isInteger(item.daysRemaining) || item.daysRemaining < 1 ||
-              !Number.isInteger(item.daysSinceLastUse) || item.daysSinceLastUse < 0)) {
-          throw new Error('O servidor retornou insights inválidos.');
-        }
-      }
-      // Older backends can still serve the original two insights during rollout.
-      const estimates = data.estimatedRenewals;
-      if (estimates != null && (estimates.isEstimate !== true || !validDays(estimates.periodDays) ||
-          !Number.isSafeInteger(estimates.total) || estimates.total < 0 || !Array.isArray(estimates.items) ||
-          estimates.items.length !== Math.min(estimates.total, data.limitPerInsight) ||
-          estimates.items.some(item => !item || typeof item.keyValue !== 'string' || !item.keyValue ||
-            typeof item.previousKeyValue !== 'string' || !item.previousKeyValue || !parseUtcDate(item.renewedAt) ||
-            (item.endsAt != null && !parseUtcDate(item.endsAt)) ||
-            (item.previousEndsAt != null && !parseUtcDate(item.previousEndsAt))))) {
-        throw new Error('O servidor retornou estimativas de renovação inválidas.');
-      }
-      return data;
-    }
-
-    async function loadInsights(force = true) {
-      const token = document.getElementById('token').value;
-      if (!token || !_fingerprint) return;
-      if (_insightsRequest?.revision === _insightsRevision && _insightsRequest.token === token) return _insightsRequest.promise;
-      if (!force && !_insightsDirty && Date.now() - _insightsLoadedAt < LIST_MAX_AGE_MS) return;
-
-      const request = { revision: _insightsRevision, token, promise: null };
-      _insightsRequest = request;
-      const isCurrent = () => _insightsRequest === request && request.revision === _insightsRevision &&
-        request.token === document.getElementById('token').value;
-      _insightsDirty = true;
-      if (!document.getElementById('btnInsights').disabled) setLoading('btnInsights', true);
-      document.getElementById('panel-insights').setAttribute('aria-busy', 'true');
-      document.getElementById('insightsResults').classList.add('hidden');
-      document.getElementById('insightsError').classList.add('hidden');
-      document.getElementById('insightsLoading').classList.remove('hidden');
-      document.getElementById('insightsStatus').textContent = 'Consultando insights da loja…';
-
-      request.promise = (async () => {
-        try {
-          const response = await api('/admin/auth-keys/insights', {});
-          if (!isCurrent()) return;
-          const data = validateInsights(response?.Result ?? response?.result);
-          renderInsightGroup('renewals', data.priorityRenewals);
-          renderInsightGroup('abandonment', data.possibleAbandonment);
-          if (data.estimatedRenewals) {
-            document.getElementById('estimatedRenewalsEmpty').textContent = 'Nenhuma renovação no período.';
-            renderInsightGroup('estimatedRenewals', data.estimatedRenewals);
-            document.getElementById('estimatedRenewalsDescription').textContent = `Últimos ${insightDayLabel(data.estimatedRenewals.periodDays)} · Mesmo produto e dispositivo.`;
-          } else {
-            document.getElementById('estimatedRenewalsItems').replaceChildren();
-            document.getElementById('estimatedRenewalsTotal').textContent = '—';
-            document.getElementById('estimatedRenewalsCount').textContent = '';
-            document.getElementById('estimatedRenewalsEmpty').textContent = 'Disponível após atualizar o backend.';
-            document.getElementById('estimatedRenewalsEmpty').classList.remove('hidden');
-          }
-          document.getElementById('renewalsDescription').textContent = `Vencem em até ${insightDayLabel(data.renewalWindowDays)} e tiveram uso nos últimos ${insightDayLabel(data.inactivityDays)}.`;
-          document.getElementById('abandonmentDescription').textContent = `Ainda válidas, sem uso há pelo menos ${insightDayLabel(data.inactivityDays)}.`;
-          document.getElementById('insightsStatus').textContent = `Atualizado em ${parseUtcDate(data.generatedAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}.`;
-          document.getElementById('insightsResults').classList.remove('hidden');
-          _insightsLoadedAt = Date.now();
-          _insightsDirty = false;
-        } catch (e) {
-          if (!isCurrent()) return;
-          const error = document.getElementById('insightsError');
-          error.textContent = `${e.message || 'Não foi possível consultar os insights.'} Clique em Atualizar insights para tentar novamente.`;
-          error.classList.remove('hidden');
-          document.getElementById('insightsStatus').textContent = 'Consulta não concluída.';
-        } finally {
-          if (_insightsRequest === request) {
-            _insightsRequest = null;
-            setLoading('btnInsights', false);
-            document.getElementById('panel-insights').setAttribute('aria-busy', 'false');
-            document.getElementById('insightsLoading').classList.add('hidden');
-          }
-        }
-      })();
-      return request.promise;
-    }
-
-    let _financePeriod = 'month';
-
-    function getFinanceRange() {
-      const today = new Date().toISOString().slice(0, 10);
-      // The existing API requires both dates, including for the complete history.
-      if (_financePeriod === 'all') return { startDate: '0001-01-01', endDate: today };
-      if (_financePeriod === 'day' || _financePeriod === 'week') {
-        const startDate = document.getElementById('financeDate').value;
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return null;
-        const end = new Date(startDate + 'T00:00:00Z');
-        if (!Number.isFinite(end.getTime()) || end.toISOString().slice(0, 10) !== startDate) return null;
-        if (_financePeriod === 'week') end.setUTCDate(end.getUTCDate() + 6);
-        if (end.getUTCFullYear() > 9998) return null;
-        return { startDate, endDate: end.toISOString().slice(0, 10) };
-      }
-      const yearText = document.getElementById('financeYear').value;
-      const year = Number(yearText);
-      if (!/^\d{1,4}$/.test(yearText) || !Number.isInteger(year) || year < 1 || year > 9998) return null;
-      const paddedYear = String(year).padStart(4, '0');
-      if (_financePeriod === 'year') return { startDate: paddedYear + '-01-01', endDate: paddedYear + '-12-31' };
-      const month = document.getElementById('financeMonth').value;
-      if (!/^(0[1-9]|1[0-2])$/.test(month)) return null;
-      const startDate = `${paddedYear}-${month}-01`;
-      const end = new Date(startDate + 'T00:00:00Z');
-      end.setUTCMonth(end.getUTCMonth() + 1);
-      end.setUTCDate(0);
-      return { startDate, endDate: end.toISOString().slice(0, 10) };
-    }
-
-    function updateFinancePeriod() {
-      const range = getFinanceRange();
-      const formatDate = date => date.split('-').reverse().join('/');
-      document.getElementById('financeRangeLabel').textContent = !range
-        ? 'Preencha o período para consultar.'
-        : _financePeriod === 'all' ? `Todo o histórico até ${formatDate(range.endDate)} (UTC).`
-        : range.startDate === range.endDate ? `${formatDate(range.startDate)} (UTC).`
-        : `${formatDate(range.startDate)} a ${formatDate(range.endDate)} (UTC).`;
-      markFinanceDirty();
-    }
-
-    function setFinancePeriod(period) {
-      if (!['day', 'week', 'month', 'year', 'all'].includes(period)) return;
-      _financePeriod = period;
-      ['day', 'week', 'month', 'year', 'all'].forEach(value => {
-        const button = document.getElementById('financePeriod-' + value);
-        button.setAttribute('aria-pressed', String(value === period));
-        button.classList.toggle('btn-brand', value === period);
-        button.classList.toggle('btn-outline', value !== period);
-        button.classList.toggle('border-base-content/20', value !== period);
-      });
-      const fields = {
-        Date: period === 'day' || period === 'week',
-        Month: period === 'month',
-        Year: period === 'month' || period === 'year'
-      };
-      Object.entries(fields).forEach(([name, visible]) => {
-        document.getElementById('finance' + name + 'Field').classList.toggle('hidden', !visible);
-        const input = document.getElementById('finance' + name);
-        input.disabled = !visible;
-        input.required = visible;
-      });
-      document.getElementById('financePeriodNavigation').classList.toggle('hidden', period === 'all');
-      document.getElementById('financeYearField').classList.toggle('sm:col-span-2', period === 'year');
-      document.getElementById('financeDateLabel').textContent = period === 'week' ? 'Início dos 7 dias' : 'Data';
-      updateFinancePeriod();
-    }
-
-    function ensureFinanceYear(year, firstYear) {
-      const select = document.getElementById('financeYear');
-      const selected = select.value;
-      const currentYear = new Date().getUTCFullYear();
-      const minimum = Math.min(2000, firstYear || currentYear, year);
-      const maximum = Math.max(currentYear + 1, year);
-      const years = new Set(Array.from(select.options, option => Number(option.value)));
-      for (let value = minimum; value <= maximum; value++) years.add(value);
-      const options = Array.from(years).sort((a, b) => b - a).map(value => {
-        const option = document.createElement('option');
-        option.value = String(value).padStart(4, '0');
-        option.textContent = String(value);
-        return option;
-      });
-      select.replaceChildren(...options);
-      if (selected) select.value = selected;
-    }
-
-    function stepFinancePeriod(direction) {
-      if ((direction !== -1 && direction !== 1) || _financePeriod === 'all') return;
-      const range = getFinanceRange();
-      if (!range) return;
-      const next = new Date(range.startDate + 'T00:00:00Z');
-      if (_financePeriod === 'month') next.setUTCMonth(next.getUTCMonth() + direction);
-      else if (_financePeriod === 'year') next.setUTCFullYear(next.getUTCFullYear() + direction);
-      else next.setUTCDate(next.getUTCDate() + direction * (_financePeriod === 'week' ? 7 : 1));
-      const year = next.getUTCFullYear();
-      if (year < 1 || year > 9998) return;
-      if (_financePeriod === 'day' || _financePeriod === 'week') {
-        const date = next.toISOString().slice(0, 10);
-        if (date > document.getElementById('financeDate').max) return;
-        document.getElementById('financeDate').value = date;
-      } else {
-        ensureFinanceYear(year);
-        document.getElementById('financeYear').value = String(year).padStart(4, '0');
-        document.getElementById('financeMonth').value = String(next.getUTCMonth() + 1).padStart(2, '0');
-      }
-      updateFinancePeriod();
-    }
-
-    function initFinanceDates() {
-      const today = new Date().toISOString().slice(0, 10);
-      document.getElementById('financeDate').value = today;
-      document.getElementById('financeMonth').value = today.slice(5, 7);
-      ensureFinanceYear(Number(today.slice(0, 4)));
-      document.getElementById('financeYear').value = today.slice(0, 4);
-      setFinancePeriod('month');
-    }
-
-    function markFinanceDirty() {
-      _financesLoaded = false;
-      _financeRequestRevision++;
-      document.getElementById('financeMetrics').classList.add('hidden');
-      document.getElementById('financeEmpty').classList.add('hidden');
-      document.getElementById('financeStatus').textContent = 'Período alterado. Clique em Consultar.';
-      const btn = document.getElementById('btnFinances');
-      btn.disabled = false;
-      btn.textContent = 'Consultar';
-    }
-
-    function formatStoreAge(dateOnly) {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) return 'Sem pagamentos registrados';
-      const [year, month, day] = dateOnly.split('-').map(Number);
-      const firstPayment = new Date(year, month - 1, day);
-      if (firstPayment.getFullYear() !== year || firstPayment.getMonth() !== month - 1 || firstPayment.getDate() !== day) return 'Data inválida';
-      const estimatedStart = new Date(year, month - 1, day - 7);
-      const startYear = estimatedStart.getFullYear();
-      const startMonth = estimatedStart.getMonth();
-      const startDay = estimatedStart.getDate();
-
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const days = Math.round((Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(startYear, startMonth, startDay)) / 86400000);
-      if (days < 0) return 'Data futura';
-      if (days === 0) return 'Hoje';
-
-      let months = (today.getFullYear() - startYear) * 12 + today.getMonth() - startMonth;
-      if (today.getDate() < startDay) months--;
-      if (months >= 12) {
-        const years = Math.floor(months / 12);
-        const remainingMonths = months % 12;
-        return `${years} ${years === 1 ? 'ano' : 'anos'}${remainingMonths ? ` e ${remainingMonths} ${remainingMonths === 1 ? 'mês' : 'meses'}` : ''}`;
-      }
-      if (months >= 1) return `${months} ${months === 1 ? 'mês' : 'meses'}`;
-      if (days >= 7) {
-        const weeks = Math.floor(days / 7);
-        const remainingDays = days % 7;
-        return `${weeks} ${weeks === 1 ? 'semana' : 'semanas'}${remainingDays ? ` e ${remainingDays} ${remainingDays === 1 ? 'dia' : 'dias'}` : ''}`;
-      }
-      return `${days} ${days === 1 ? 'dia' : 'dias'}`;
-    }
-
-    function resetFinanceState() {
-      markFinanceDirty();
-      document.getElementById('financeStoreLabel').textContent = _fingerprint || 'LOJA';
-      document.getElementById('financeFirstPayment').textContent = 'Aguardando consulta';
-      document.getElementById('financeStoreAge').textContent = 'Aguardando consulta';
-      document.getElementById('financeStatus').textContent = 'Selecione o período para consultar.';
-    }
-
-    async function loadFinances() {
-      const status = document.getElementById('financeStatus');
-      const btn = document.getElementById('btnFinances');
-      const range = getFinanceRange();
-      if (!_fingerprint) { status.textContent = 'Token sem fingerprint de loja.'; return; }
-      if (!range) { status.textContent = 'Selecione um período válido para consultar.'; return; }
-      const { startDate, endDate } = range;
-
-      const revision = ++_financeRequestRevision;
-      btn.disabled = true;
-      btn.textContent = 'Consultando…';
-      status.textContent = 'Consultando pagamentos da loja…';
-      document.getElementById('financeMetrics').classList.add('hidden');
-      document.getElementById('financeEmpty').classList.add('hidden');
-
-      try {
-        const data = await api('/admin/finance/get-finances', {
-          startDate, endDate, type: 'Keys', fingerprint: _fingerprint
-        });
-        if (revision !== _financeRequestRevision) return;
-
-        const revenue = Number(data.TotalRevenue ?? data.totalRevenue ?? 0);
-        const sales = Number(data.TotalSales ?? data.totalSales ?? 0);
-        const average = Number(data.AverageTicket ?? data.averageTicket ?? 0);
-        if (![revenue, sales, average].every(Number.isFinite)) throw new Error('Resposta financeira inválida.');
-
-        document.getElementById('financeRevenue').textContent = fmt(revenue);
-        document.getElementById('financeSales').textContent = sales.toLocaleString('pt-BR');
-        document.getElementById('financeAverage').textContent = fmt(average);
-        const firstPayment = data.FirstPaymentDate ?? data.firstPaymentDate;
-        const firstDateOnly = firstPayment ? String(firstPayment).slice(0, 10) : '';
-        if (/^\d{4}-\d{2}-\d{2}$/.test(firstDateOnly)) ensureFinanceYear(Number(document.getElementById('financeYear').value), Number(firstDateOnly.slice(0, 4)));
-        document.getElementById('financeFirstPayment').textContent = /^\d{4}-\d{2}-\d{2}$/.test(firstDateOnly)
-          ? firstDateOnly.split('-').reverse().join('/')
-          : 'Nenhum pagamento registrado';
-        document.getElementById('financeStoreAge').textContent = formatStoreAge(firstDateOnly);
-        document.getElementById('financeMetrics').classList.remove('hidden');
-        document.getElementById('financeEmpty').classList.toggle('hidden', sales !== 0);
-        status.textContent = `Pagamentos de ${_fingerprint} no período selecionado.`;
-        _financesLoaded = true;
-      } catch (e) {
-        if (revision !== _financeRequestRevision) return;
-        status.textContent = e.message || 'Não foi possível consultar as finanças.';
-        _financesLoaded = false;
-      } finally {
-        if (revision === _financeRequestRevision) {
-          btn.disabled = false;
-          btn.textContent = 'Consultar';
-        }
-      }
-    }
-
-    function toggleSidebar() {
-      const sidebar = document.getElementById('pricingSidebar');
-      const button = document.getElementById('sidebarToggle');
-      const isOpen = sidebar.classList.toggle('is-open');
-      button.setAttribute('aria-expanded', String(isOpen));
-    }
-
-    function isListVisible() {
-      return !document.getElementById('appShell').classList.contains('hidden') &&
-        !document.getElementById('panel-list').classList.contains('hidden');
-    }
-
-    function invalidateList() {
-      invalidateInsights();
-      _listDirty = true;
-      _listRevision++;
-      if (isListVisible()) doList(false);
-    }
-
-    function resetListState() {
-      _listRevision++;
-      _listLoaded = false;
-      _listDirty = true;
-      _listLoadedAt = 0;
-      _allKeyItems = [];
-      _selectedKey = '';
-      _visibleKeyCount = 0;
-      applyFilters();
-    }
-
-    function switchTab(t) {
-      document.querySelectorAll('#panelTabs .tab').forEach((b, i) => {
-        if (TAB_IDS[i] === t) {
-          b.classList.add('tab-active');
-        } else {
-          b.classList.remove('tab-active');
-        }
-      });
-      TAB_IDS.forEach(id => {
-        const panel = document.getElementById('panel-' + id);
-        if (id === t) {
-          panel.classList.remove('hidden');
-          panel.classList.add('block');
-        } else {
-          panel.classList.add('hidden');
-          panel.classList.remove('block');
-        }
-      });
-      document.getElementById('billingNotice').classList.toggle('hidden', t !== 'admin');
-      if (t === 'list') doList(false);
-      if (t === 'insights') loadInsights(false);
-      if (t === 'finance' && !_financesLoaded) loadFinances();
-    }
-
-    function rnd(n) {
-      const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let o = '';
-      for (let i = 0; i < n; i++) o += c[Math.floor(Math.random() * c.length)];
-      return o;
-    }
-
-    // Decodifica o payload de um JWT (Bearer token) sem validar assinatura.
-    function parseJwt(token) {
-      try {
-        const base64Url = token.split('.')[1];
-        if (!base64Url) return null;
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const json = decodeURIComponent(
-          atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        );
-        return JSON.parse(json);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    let _fingerprint = '';
-    function setFingerprintFromToken(val) {
-      const payload = parseJwt(val);
-      _fingerprint = (payload && (payload.fingerprint ?? payload.Fingerprint)) || '';
-      updateKeyPreview();
-      updateAdminOnlyVisibility();
-      resetFinanceState();
-      resetInsightsState();
-    }
-
-    // Ferramentas administrativas só aparecem para o fingerprint ADMINSTORE.
-    function updateAdminOnlyVisibility() {
-      const isAdmin = _fingerprint === 'ADMINSTORE';
-      const ids = ['menuItemDelete', 'btnDeleteSelected', 'menuItemTransfer', 'btnTransferSelected', 'menuItemManualFinance'];
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.toggle('hidden', !isAdmin);
-      });
-    }
-
-    const TOKEN_KEY = 'ring_admin_token';
-
-    function showAuthLoading(msg) {
-      const el = document.getElementById('authLoading');
-      const label = document.getElementById('authLoadingLabel');
-      if (label) label.textContent = msg || 'Validando acesso…';
-      el.classList.remove('hidden');
-      document.body.classList.add('overflow-hidden');
-    }
-
-    function hideAuthLoading() {
-      document.getElementById('authLoading').classList.add('hidden');
-      document.body.classList.remove('overflow-hidden');
-    }
-
-    function showLogin(errorMsg) {
-      StorePanelCustomizer.resetSession();
-      resetInsightsState();
-      PRICES = {};
-      updateCalc();
-      updateCreateCost();
-      stopDebtCountdown();
-      _debtBalanceRevision++;
-      document.getElementById('pixCoupon').value = '';
-      updatePixCouponButton();
-      if (document.getElementById('modalPixCoupon').open) document.getElementById('modalPixCoupon').close();
-      document.getElementById('paymentAmountSummary').classList.add('hidden');
-      hideAuthLoading();
-      document.getElementById('loginGate').classList.remove('hidden');
-      document.getElementById('appShell').classList.add('hidden');
-      document.body.classList.add('overflow-hidden');
-      const err = document.getElementById('loginError');
-      if (err) err.textContent = errorMsg || '';
-      const input = document.getElementById('loginToken');
-      if (input) {
-        input.value = '';
-        setTimeout(() => input.focus(), 50);
-      }
-    }
-
-    function showApp() {
-      hideAuthLoading();
-      document.getElementById('loginGate').classList.add('hidden');
-      document.getElementById('appShell').classList.remove('hidden');
-      document.body.classList.remove('overflow-hidden');
-      if (isListVisible()) doList(false);
-      if (isInsightsVisible()) loadInsights(false);
-      if (!document.getElementById('panel-finance').classList.contains('hidden') && !_financesLoaded) loadFinances();
-    }
-
-    function applyAuthToken(val) {
-      localStorage.setItem(TOKEN_KEY, val);
-      document.getElementById('token').value = val;
-    }
-
-    async function validateToken(val) {
-      StorePanelCustomizer.resetSession();
-      document.getElementById('token').value = val;
-      PRICES = {};
-      updateCalc();
-      updateCreateCost();
-      const response = await api('/admin/stores/current', {});
-      if (document.getElementById('token').value !== val) throw new Error('A sessão foi alterada. Entre novamente.');
-      applyStoreConfiguration(response.Result);
-      return response;
-    }
-
-    async function doLogin(e) {
-      if (e) e.preventDefault();
-      const val = (document.getElementById('loginToken').value || '').trim();
-      const err = document.getElementById('loginError');
-      const btn = document.getElementById('btnLogin');
-      if (!val) {
-        err.textContent = 'Digite o Bearer token.';
-        return;
-      }
-
-      const hadSaved = !!localStorage.getItem(TOKEN_KEY);
-      err.textContent = '';
-      btn.disabled = true;
-      const orig = btn.textContent;
-      btn.textContent = 'Validando…';
-      showAuthLoading('Validando token…');
-
-      try {
-        await validateToken(val);
-        applyAuthToken(val);
-        setFingerprintFromToken(val);
-        showApp();
-        loadDebtBalance();
-      } catch (ex) {
-        hideAuthLoading();
-        if (!hadSaved) document.getElementById('token').value = '';
-        else document.getElementById('token').value = localStorage.getItem(TOKEN_KEY) || '';
-        err.textContent = ex.message || 'Token inválido.';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = orig;
-      }
-    }
-
-    async function loadToken() {
-      const saved = localStorage.getItem(TOKEN_KEY);
-      if (!saved) {
-        showLogin();
-        return;
-      }
-
-      showAuthLoading('Validando acesso…');
-      document.getElementById('token').value = saved;
-
-      try {
-        await validateToken(saved);
-        setFingerprintFromToken(saved);
-        showApp();
-        loadDebtBalance();
-      } catch (ex) {
-        localStorage.removeItem(TOKEN_KEY);
-        document.getElementById('token').value = '';
-        showLogin(ex.message || 'Token inválido. Faça login novamente.');
-      }
-    }
-
-    function clearToken() {
-      stopDebtCountdown();
-      _debtBalanceRevision++;
-      document.getElementById('pixCoupon').value = '';
-      updatePixCouponButton();
-      if (document.getElementById('modalPixCoupon').open) document.getElementById('modalPixCoupon').close();
-      document.getElementById('paymentAmountSummary').classList.add('hidden');
-      localStorage.removeItem(TOKEN_KEY);
-      document.getElementById('token').value = '';
-      _fingerprint = '';
-      resetListState();
-      resetFinanceState();
-      updateAdminOnlyVisibility();
-      showLogin();
-    }
-
-    function getHeaders() {
-      const h = { 'Content-Type': 'application/json' };
-      const t = (document.getElementById('token').value || '').trim();
-      if (t) h['Authorization'] = 'Bearer ' + t;
-      return h;
-    }
-
-    function getBase() {
-      return 'https://ringapi.guaranihub.com';
-    }
-
-    async function api(path, body) {
-      const r = await fetch(getBase() + path, {
-        method: 'POST',
-        headers: getHeaders(),
-        credentials: 'include',
-        body: JSON.stringify(body)
-      });
-      const ct = r.headers.get('content-type') || '';
-      const d = ct.includes('application/json') ? await r.json() : await r.text();
-      if (!r.ok) {
-        const m = typeof d === 'string' ? d : d?.StatusMessage || JSON.stringify(d);
-        throw new Error(`HTTP ${r.status}: ${m}`);
-      }
-      if (d && d.StatusCode && d.StatusCode !== 200) {
-        throw new Error(d.StatusMessage || `Erro ${d.StatusCode}`);
-      }
-      return d;
-    }
-
-    let _debtCountdownInterval = null;
-    let _debtBalanceRevision = 0;
-
-    function stopDebtCountdown() {
-      if (_debtCountdownInterval !== null) clearInterval(_debtCountdownInterval);
-      _debtCountdownInterval = null;
-      document.getElementById('debtDeadlineWrap').classList.add('hidden');
-    }
-
-    function startDebtCountdown(secondsUntilOverdue, isOverdue) {
-      stopDebtCountdown();
-      if (secondsUntilOverdue == null) return;
-      const seconds = Number(secondsUntilOverdue);
-      if (!Number.isFinite(seconds)) return;
-
-      const wrap = document.getElementById('debtDeadlineWrap');
-      const countdown = document.getElementById('debtCountdown');
-      wrap.classList.remove('hidden');
-      if (isOverdue || seconds <= 0) {
-        countdown.textContent = 'Prazo vencido';
-        countdown.classList.replace('text-warning', 'text-error');
-        if (!isOverdue && document.getElementById('token').value.trim()) {
-          setTimeout(loadDebtBalance, 2000);
-        }
-        return;
-      }
-
-      countdown.classList.replace('text-error', 'text-warning');
-      const deadline = performance.now() + seconds * 1000;
-      function update() {
-        const remaining = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
-        if (remaining === 0) {
-          countdown.textContent = 'Prazo vencido';
-          countdown.classList.replace('text-warning', 'text-error');
-          document.getElementById('debtStatusLabel').textContent = 'Débito vencido!';
-          clearInterval(_debtCountdownInterval);
-          _debtCountdownInterval = null;
-          setTimeout(() => {
-            if (document.getElementById('token').value.trim()) loadDebtBalance();
-          }, 2000);
-          return;
-        }
-        const days = Math.floor(remaining / 86400);
-        const hours = Math.floor((remaining % 86400) / 3600);
-        const minutes = Math.floor((remaining % 3600) / 60);
-        const secs = remaining % 60;
-        countdown.textContent = `${days}d ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-      }
-      _debtCountdownInterval = setInterval(update, 1000);
-      update();
-    }
-
-    async function loadDebtBalance() {
-      const btn = document.getElementById('btnPayDebt');
-      const val = document.getElementById('debtValue');
-      const lbl = document.getElementById('debtStatusLabel');
-
-      if (!btn || !val || !lbl) return;
-
-      const revision = ++_debtBalanceRevision;
-
-      document.getElementById('qrWrap').classList.add('hidden');
-
-      if (!document.getElementById('token').value.trim()) {
-        stopDebtCountdown();
-        lbl.textContent = 'Sem token';
-        val.textContent = 'R$ 0,00';
-        btn.disabled = true;
-        return;
-      }
-
-      try {
-        lbl.textContent = 'Consultando...';
-        val.classList.remove('text-error', 'text-success');
-        val.classList.add('text-base-content/60');
-        const res = await api('/admin/auth-keys/debt-balance', {});
-        if (revision !== _debtBalanceRevision) return;
-        const data = res.Result || {};
-        const debt = parseFloat(data.Balance ?? data.balance) || 0;
-        const isOverdue = data.IsOverdue === true || data.isOverdue === true;
-
-        val.textContent = fmt(debt);
-        if (debt > 0) startDebtCountdown(data.SecondsUntilOverdue ?? data.secondsUntilOverdue, isOverdue);
-        else stopDebtCountdown();
-
-        if (isOverdue) {
-          lbl.textContent = 'Débito vencido!';
-          val.classList.remove('text-base-content/60', 'text-success');
-          val.classList.add('text-error');
-          btn.disabled = false;
-        } else if (debt > 0) {
-          lbl.textContent = 'Você deve';
-          val.classList.remove('text-base-content/60', 'text-success');
-          val.classList.add('text-error');
-          btn.disabled = false;
-        } else {
-          lbl.textContent = 'Tudo pago!';
-          val.classList.remove('text-base-content/60', 'text-error');
-          val.classList.add('text-success');
-          btn.disabled = true;
-        }
-      } catch (e) {
-        if (revision !== _debtBalanceRevision) return;
-        stopDebtCountdown();
-        lbl.textContent = 'Erro ao ler';
-        val.textContent = 'R$ 0,00';
-        val.classList.remove('text-base-content/60', 'text-success');
-        val.classList.add('text-error');
-        btn.disabled = true;
-      }
-    }
-
-    function updatePixCouponButton() {
-      const coupon = document.getElementById('pixCoupon').value;
-      const button = document.getElementById('btnPixCoupon');
-      button.textContent = coupon ? 'Cupom selecionado · Alterar' : 'Adicionar cupom';
-      button.setAttribute('aria-label', coupon ? `Alterar cupom ${coupon}` : 'Adicionar cupom de desconto');
-    }
-
-    function openPixCouponModal() {
-      if (_payMethod !== 'pix') return;
-      const coupon = document.getElementById('pixCoupon').value;
-      document.getElementById('pixCouponDraft').value = coupon;
-      document.getElementById('btnRemovePixCoupon').classList.toggle('hidden', !coupon);
-      document.getElementById('modalPixCoupon').showModal();
-      document.getElementById('pixCouponDraft').focus();
-    }
-
-    function savePixCoupon() {
-      if (_payMethod !== 'pix') return;
-      const coupon = document.getElementById('pixCouponDraft').value.trim().toUpperCase();
-      if (coupon && coupon.length !== 18) {
-        toast('O cupom deve ter 18 caracteres.', true);
-        return;
-      }
-      if (document.getElementById('pixCoupon').value !== coupon) {
-        document.getElementById('qrWrap').classList.add('hidden');
-        document.getElementById('paymentAmountSummary').classList.add('hidden');
-        _lastPixCode = '';
-      }
-      document.getElementById('pixCoupon').value = coupon;
-      updatePixCouponButton();
-      document.getElementById('modalPixCoupon').close();
-    }
-
-    function removePixCoupon() {
-      document.getElementById('pixCouponDraft').value = '';
-      savePixCoupon();
-    }
-
-    let _payMethod = 'pix';
-    function setPayMethod(m) {
-      _payMethod = m;
-      document.getElementById('pixCoupon').disabled = m !== 'pix';
-      if (m !== 'pix') document.getElementById('pixCoupon').value = '';
-      updatePixCouponButton();
-      if (m !== 'pix' && document.getElementById('modalPixCoupon').open) document.getElementById('modalPixCoupon').close();
-      document.getElementById('paymentAmountSummary').classList.add('hidden');
-      document.getElementById('qrWrap').classList.add('hidden');
-      _lastPixCode = '';
-      const pixBtn = document.getElementById('btnMethodPix');
-      const creditBtn = document.getElementById('btnMethodCredit');
-      const cpfWrap = document.getElementById('cpfWrap');
-
-      if (m === 'pix') {
-        pixBtn.classList.remove('btn-neutral');
-        pixBtn.classList.add('btn-brand');
-        creditBtn.classList.remove('btn-brand');
-        creditBtn.classList.add('btn-neutral');
-        cpfWrap.classList.remove('hidden');
-      } else {
-        creditBtn.classList.remove('btn-neutral');
-        creditBtn.classList.add('btn-brand');
-        pixBtn.classList.remove('btn-brand');
-        pixBtn.classList.add('btn-neutral');
-        cpfWrap.classList.add('hidden');
-      }
-    }
-
-    let _lastPixCode = '';
-    function copyPixCode() {
-      if (!_lastPixCode) return;
-      navigator.clipboard.writeText(_lastPixCode).then(() => {
-        toast("Código PIX copiado!");
-      }).catch(() => {
-        prompt("Copie o código PIX abaixo:", _lastPixCode);
-      });
-    }
-
-    async function doPayDebt() {
-      if (document.getElementById('btnPayDebt').disabled) return;
-      const method = _payMethod;
-      let doc = '';
-      const body = { paymentMethod: method, cpf: doc };
-      if (method === 'pix') {
-        doc = document.getElementById('pixCpf').value.trim().replace(/\D/g, '');
-        if (!doc || doc.length < 11) {
-          toast('Digite seu CPF para emitir o PIX.', true);
-          return;
-        }
-        body.cpf = doc;
-        body.cupom = document.getElementById('pixCoupon').value.trim().toUpperCase();
-      }
-      const tokenAtStart = document.getElementById('token').value;
-      const isCurrent = () => document.getElementById('token').value === tokenAtStart && _payMethod === method;
-      document.getElementById('qrWrap').classList.add('hidden');
-      document.getElementById('paymentAmountSummary').classList.add('hidden');
-      _lastPixCode = '';
-      setLoading('btnPayDebt', true);
-      try {
-        const res = await api('/api/gateway/pay-debt', body);
-        if (!isCurrent()) return;
-        const data = res?.Result;
-        const type = data?.type || data?.Type;
-        const raw = data?.raw || data?.Raw;
-
-        if (raw) {
-          const total = Number(data.totalAmount ?? data.TotalAmount);
-          const discount = Number(data.discountAmount ?? data.DiscountAmount);
-          if (Number.isFinite(total) && total > 0) {
-            const summary = document.getElementById('paymentAmountSummary');
-            summary.textContent = Number.isFinite(discount) && discount > 0
-              ? `Desconto: ${fmt(discount)} · Total a pagar: ${fmt(total)}`
-              : `Total a pagar: ${fmt(total)}`;
-            summary.classList.remove('hidden');
-          }
-          if (type === 'qr') {
-            _lastPixCode = raw;
-            document.getElementById('qrWrap').classList.remove('hidden');
-            document.getElementById('qrImg').innerHTML = '';
-            new QRCode(document.getElementById("qrImg"), {
-              text: raw,
-              width: 180,
-              height: 180,
-              colorDark: "#000000",
-              colorLight: "#ffffff",
-              correctLevel: QRCode.CorrectLevel.M
-            });
-          } else {
-            window.open(raw, '_blank');
-            toast("Sessão de pagamento criada! Finalize na aba que se abriu.");
-          }
-        } else {
-          toast("Gateway não retornou URL/QR Code.", true);
-        }
-      } catch (e) {
-        if (isCurrent()) toast("Erro: " + e.message, true);
-      } finally {
-        setLoading('btnPayDebt', false);
-      }
-    }
-
-    function updateCreateCost() {
-      const qty = Number(document.getElementById('createQty').value);
-      const days = Number(document.getElementById('createDays').value) || 0;
-      const product = document.getElementById('createProduct').value;
-      const prices = PRICES[product];
-      const unit = prices?.[PRICE_DURATIONS[days]];
-      const validQty = Number.isInteger(qty) && qty >= 1 && qty <= 100;
-      document.getElementById('createCost').textContent = unit === undefined || !validQty ? '—' : fmt(unit * qty);
-    }
-
-    // Mapeia dias -> código de duração usado no valor da key (1D / 7D / 30D)
-    const DURATION_CODE = { 1: '1D', 7: '7D', 30: '30D', 90: '90D', 365: '365D' };
-
-    // Monta o valor final da key: FINGERPRINT-DURACAO-PREFIXOALEATORIO
-    function buildKeyValue(durationCode) {
-      const fp = _fingerprint || 'FINGERPRINT';
-      const dc = durationCode || 'XD';
-      return `${fp}-${dc}-${rnd(6)}`;
-    }
-
-    // Atualiza o campo (somente leitura) com um preview do padrão que será gerado
-    function getKeyDurationWarning(key, days) {
-      const match = key.match(/(?:^|[-_])(\d+)D(?=[-_]|$)/i);
-      return match && days && Number(match[1]) !== days
-        ? `O código contém ${match[1]}D, mas a duração selecionada é ${days} ${days === 1 ? 'dia' : 'dias'}.`
-        : '';
-    }
-
-    function updateKeyDurationWarning() {
-      const warning = document.getElementById('createKeyDurationWarning');
-      warning.textContent = _manualKeyMode
-        ? getKeyDurationWarning(document.getElementById('createKey').value.trim(), Number(document.getElementById('createDays').value))
-        : '';
-      warning.classList.toggle('hidden', !warning.textContent);
-    }
-
-    function updateKeyPreview() {
-      updateKeyDurationWarning();
-      if (_manualKeyMode) return;
-      const field = document.getElementById('createKey');
-      if (!field) return;
-      const d = Number(document.getElementById('createDays').value);
-      const dc = DURATION_CODE[d];
-      const fp = _fingerprint || 'FINGERPRINT';
-      field.value = dc ? `${fp}-${dc}-XXXXXX` : '';
-    }
-
-    // Alterna entre key gerada automaticamente e digitação manual (casos especiais)
-    let _manualKeyMode = false;
-    function toggleManualKey() {
-      _manualKeyMode = !_manualKeyMode;
-      const field = document.getElementById('createKey');
-      const note = document.getElementById('createKeyNote');
-      const btn = document.getElementById('btnManualKey');
-
-      if (_manualKeyMode) {
-        field.readOnly = false;
-        field.removeAttribute('tabindex');
-        field.value = '';
-        field.placeholder = 'Digite a key manualmente';
-        field.classList.remove('cursor-not-allowed', 'opacity-70');
-        note.textContent = '(modo manual — use com cautela em casos especiais)';
-        btn.textContent = 'usar automático';
-        field.focus();
-      } else {
-        field.readOnly = true;
-        field.setAttribute('tabindex', '-1');
-        field.placeholder = 'Selecione a duração para gerar';
-        field.classList.add('cursor-not-allowed', 'opacity-70');
-        note.textContent = '(gerada automaticamente: fingerprint + duração + prefixo aleatório)';
-        btn.textContent = 'editar manualmente';
-      }
-      updateKeyPreview();
-    }
-
-    function setLoading(id, on) {
-      const b = document.getElementById(id);
-      if (!b) return;
-      b.disabled = on;
-      if (on) b.setAttribute('data-orig', b.textContent);
-      else b.textContent = b.getAttribute('data-orig') || b.textContent;
-      if (on) b.textContent = 'Processando…';
-    }
-
-    function onQtyChange() {
-      const qty = Number(document.getElementById('createQty').value);
-      const btn = document.getElementById('btnCreate');
-      const label = Number.isInteger(qty) && qty > 1 && qty <= 100 ? `Revisar ${qty} chaves` : 'Revisar criação';
-      btn.setAttribute('data-orig', label);
-      if (!btn.disabled) btn.textContent = label;
-      updateCreateCost();
-    }
-
-    function reviewKeyCreation({ product, quantity, duration, mode, pattern, warning, total }) {
-      const dialog = document.getElementById('modalCreateReview');
-      document.getElementById('createReviewProduct').textContent = product;
-      document.getElementById('createReviewQuantity').textContent = quantity;
-      document.getElementById('createReviewDuration').textContent = duration;
-      document.getElementById('createReviewMode').textContent = mode;
-      document.getElementById('createReviewPattern').textContent = pattern;
-      document.getElementById('createReviewWarningText').textContent = warning;
-      document.getElementById('createReviewWarning').classList.toggle('hidden', !warning);
-      document.getElementById('createReviewTotal').textContent = total;
-      document.getElementById('createReviewAccept').textContent = `Gerar ${quantity}`;
-      dialog.returnValue = '';
-      dialog.showModal();
-      return new Promise(resolve => {
-        dialog.addEventListener('close', () => resolve(dialog.returnValue === 'create'), { once: true });
-      });
-    }
-
-    async function doCreate() {
-      const button = document.getElementById('btnCreate');
-      if (button.disabled) return;
-      const qty = Number(document.getElementById('createQty').value);
-      const d = Number(document.getElementById('createDays').value);
-      const product = document.getElementById('createProduct');
-      const productType = product.value;
-      const durationCode = DURATION_CODE[d];
-      const unit = PRICES[productType]?.[PRICE_DURATIONS[d]];
-
-      if (!productType) { toast('Selecione um produto.', true); return; }
-      if (!durationCode) { toast('Selecione uma duração válida.', true); return; }
-      if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
-        toast('Informe uma quantidade inteira de 1 a 100.', true); return;
-      }
-      if (unit === undefined) {
-        toast('Os preços da loja não foram carregados. Entre novamente.', true); return;
-      }
-      if (!_fingerprint) {
-        toast('Fingerprint não encontrado no token. Faça login novamente.', true); return;
-      }
-
-      const manual = _manualKeyMode;
-      const manualBase = manual ? document.getElementById('createKey').value.trim() : '';
-      if (manual && !manualBase) {
-        toast('Digite a chave manualmente ou volte ao modo automático.', true); return;
-      }
-      const pattern = manual
-        ? (qty > 1 ? `${manualBase}-XXXXXXXX` : manualBase)
-        : `${_fingerprint}-${durationCode}-XXXXXX`;
-      const warning = manual ? getKeyDurationWarning(manualBase, d) : '';
-      const review = {
-        product: product.selectedOptions[0].textContent.trim(),
-        quantity: qty === 1 ? '1 chave' : `${qty} chaves`,
-        duration: `${d} ${d === 1 ? 'dia' : 'dias'}`,
-        mode: manual ? 'Modo manual' : 'Modo automático',
-        pattern,
-        warning,
-        total: fmt(unit * qty)
-      };
-
-      const token = document.getElementById('token');
-      const tokenAtStart = token.value;
-      button.disabled = true;
-      try {
-        const accepted = await reviewKeyCreation(review);
-        if (!accepted || token.value !== tokenAtStart) return;
-
-        setLoading('btnCreate', true);
-        const createdKeys = [];
-        let failed = 0;
-        for (let i = 0; i < qty && token.value === tokenAtStart; i++) {
-          const keyValue = manual
-            ? (qty > 1 ? `${manualBase}-${rnd(4)}${rnd(4)}` : manualBase)
-            : buildKeyValue(durationCode);
-          try {
-            await api('/admin/auth-keys/create', { keyValue, durationDays: String(d), productType });
-            createdKeys.push(keyValue);
-          } catch {
-            failed++;
-          }
-        }
-
-        if (token.value !== tokenAtStart) return;
-        _lastCreatedKeys = createdKeys;
-        document.getElementById('btnCopyCreated').classList.toggle('hidden', !createdKeys.length);
-        if (createdKeys.length) {
-          loadDebtBalance();
-          invalidateList();
-        }
-        if (failed) {
-          toast(`${createdKeys.length} de ${qty} chaves criadas. Falharam ${failed}.`, true);
-        } else {
-          toast(qty === 1 ? '1 chave criada com sucesso!' : `${qty} chaves criadas com sucesso!`);
-        }
-      } finally {
-        button.disabled = false;
-        onQtyChange();
-      }
-    }
-
-    async function doRevoke() {
-      setLoading('btnRevoke', true);
-      try {
-        const k = document.getElementById('revokeKey').value.trim();
-        if (!k) throw new Error('Informe a key.');
-        const r = await api('/admin/auth-keys/revoke', { keyValue: k });
-        toast(r?.StatusMessage || 'Key revogada com sucesso!');
-        invalidateList();
-      } catch (e) {
-        toast('Erro: ' + e.message, true);
-      }
-      setLoading('btnRevoke', false);
-    }
-
-    async function doDelete() {
-      const k = document.getElementById('deleteKey').value.trim();
-      if (!k) { toast('Informe a key.', true); return; }
-      if (!await confirmModal('Deseja realmente deletar essa key permanentemente? Essa ação não pode ser desfeita.')) return;
-
-      setLoading('btnDelete', true);
-      try {
-        const r = await api('/admin/auth-keys/delete', { keyValue: k });
-        toast(r?.StatusMessage || 'Key deletada com sucesso!');
-        document.getElementById('modalDelete').close();
-        invalidateList();
-      } catch (e) {
-        toast('Erro: ' + e.message, true);
-      }
-      setLoading('btnDelete', false);
-    }
-
-    async function doTransfer() {
-      const k = document.getElementById('transferKey').value.trim();
-      const targetToken = document.getElementById('transferTargetToken').value.trim();
-      if (!k) { toast('Informe a key.', true); return; }
-      if (!targetToken) { toast('Informe o token da loja destino.', true); return; }
-      if (!await confirmModal('Deseja realmente transferir essa key para a loja destino?')) return;
-
-      setLoading('btnTransfer', true);
-      try {
-        const r = await api('/admin/auth-keys/transfer', { keyValue: k, targetToken });
-        toast(r?.StatusMessage || 'Key transferida com sucesso!');
-        document.getElementById('modalTransfer').close();
-        document.getElementById('transferTargetToken').value = '';
-        invalidateList();
-      } catch (e) {
-        toast('Erro: ' + e.message, true);
-      }
-      setLoading('btnTransfer', false);
-    }
-
-    function openManualFinanceModal() {
-      if (_fingerprint !== 'ADMINSTORE') return;
-      const date = document.getElementById('manualFinanceDate');
-      if (!date.value) date.value = new Date().toISOString().slice(0, 10);
-      document.getElementById('modalManualFinance').showModal();
-    }
-
-    function generateManualFinanceReference() {
-      const bytes = crypto.getRandomValues(new Uint8Array(16));
-      bytes[6] = (bytes[6] & 0x0f) | 0x40;
-      bytes[8] = (bytes[8] & 0x3f) | 0x80;
-      const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
-      document.getElementById('manualFinanceReference').value =
-        `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-    }
-
-    let _manualFinanceBusy = false;
-
-    function updateManualFinanceAction() {
-      if (_manualFinanceBusy) return;
-      document.getElementById('btnManualFinance').textContent = document.getElementById('manualFinanceSettleDebt').checked
-        ? 'Registrar e quitar' : 'Registrar entrada';
-    }
-
-    async function doAddManualFinance() {
-      if (_manualFinanceBusy) return;
-      if (_fingerprint !== 'ADMINSTORE') { toast('Acesso restrito ao administrador.', true); return; }
-      const targetToken = document.getElementById('manualFinanceTargetToken').value.trim();
-      const amount = document.getElementById('manualFinanceAmount').value.trim();
-      const paymentDate = document.getElementById('manualFinanceDate').value;
-      const reference = document.getElementById('manualFinanceReference').value.trim();
-      const description = document.getElementById('manualFinanceDescription').value.trim();
-      const settleDebt = document.getElementById('manualFinanceSettleDebt').checked;
-      const targetPayload = parseJwt(targetToken);
-      const targetFingerprint = String(targetPayload?.fingerprint ?? targetPayload?.Fingerprint ?? '').trim().toUpperCase();
-
-      if (!targetToken || !targetFingerprint) { toast('Informe um token válido da loja de destino.', true); return; }
-      if (!/^\d+(?:\.\d{1,2})?$/.test(amount) || Number(amount) <= 0 || Number(amount) > 9999999999.99) {
-        toast('Informe um valor positivo em reais, com até duas casas decimais.', true); return;
-      }
-      if (!paymentDate || !reference) { toast('Informe a data e a referência.', true); return; }
-      const tokenAtStart = document.getElementById('token').value;
-      const isCurrent = () => document.getElementById('token').value === tokenAtStart && _fingerprint === 'ADMINSTORE';
-      const message = `Registrar ${fmt(Number(amount))} em ${targetFingerprint} no dia ${paymentDate}? ` + (settleDebt
-        ? 'Isso também quitará o saldo devedor integral da loja. Se o valor não conferir, nada será registrado.'
-        : 'Isso altera apenas as finanças, sem quitar dívidas.');
-
-      _manualFinanceBusy = true;
-      document.getElementById('manualFinanceFields').disabled = true;
-      document.getElementById('manualFinanceClose').disabled = true;
-      setLoading('btnManualFinance', true);
-      try {
-        if (!await confirmModal(message) || !isCurrent()) return;
-        const result = await api('/admin/finance/add-manual-entry', { targetToken, amount, paymentDate, reference, description, settleDebt });
-        if (!isCurrent()) return;
-        toast(result?.StatusMessage || (settleDebt ? 'Entrada registrada e saldo devedor quitado.' : 'Entrada financeira registrada.'));
-        document.getElementById('manualFinanceAmount').value = '';
-        document.getElementById('manualFinanceReference').value = '';
-        document.getElementById('manualFinanceDescription').value = '';
-        document.getElementById('manualFinanceSettleDebt').checked = false;
-        _financesLoaded = false;
-        if (!document.getElementById('panel-finance').classList.contains('hidden')) loadFinances();
-        if (settleDebt && targetFingerprint === _fingerprint) {
-          invalidateList();
-          loadDebtBalance();
-        }
-      } catch (e) {
-        if (isCurrent()) toast('Erro: ' + e.message, true);
-      } finally {
-        _manualFinanceBusy = false;
-        document.getElementById('manualFinanceFields').disabled = false;
-        document.getElementById('manualFinanceClose').disabled = false;
-        setLoading('btnManualFinance', false);
-        updateManualFinanceAction();
-        if (isCurrent() && document.getElementById('modalManualFinance').open) document.getElementById('manualFinanceAmount').focus();
-      }
-    }
-
-    async function doResetHwid() {
-      setLoading('btnResetHwid', true);
-      try {
-        const k = document.getElementById('resetHwidKey').value.trim();
-        if (!k) throw new Error('Informe a key.');
-        const r = await api('/admin/auth-keys/reset-hwid', { keyValue: k });
-        toast(r?.StatusMessage || 'HWID reset habilitado com sucesso!');
-        invalidateList();
-      } catch (e) {
-        toast('Erro: ' + e.message, true);
-      }
-      setLoading('btnResetHwid', false);
-    }
-
-    async function doActivate() {
-      setLoading('btnActivate', true);
-      try {
-        const k = document.getElementById('activateKey').value.trim();
-        if (!k) throw new Error('Informe a key.');
-        const testHwid = 'TEST-HWID-SIMULATED-PC-' + navigator.userAgent.length;
-        const activateProduct = document.getElementById('activateProduct').value;
-        const r = await api('/user/auth-keys/activate', { keyValue: k, hwid: testHwid, productType: activateProduct });
-        toast(r?.StatusMessage || 'Key ativada com sucesso!');
-        invalidateList();
-      } catch (e) {
-        toast('Erro: ' + e.message, true);
-      }
-      setLoading('btnActivate', false);
-    }
-
-    async function doList(force = true) {
-      if (_listRequest) return _listRequest;
-      if (!force && _listLoaded && !_listDirty && Date.now() - _listLoadedAt < LIST_MAX_AGE_MS) return;
-
-      const revision = _listRevision;
-      const tokenAtStart = document.getElementById('token').value;
-      setLoading('btnList', true);
-      _listRequest = (async () => {
-        try {
-          const d = await api('/admin/auth-keys/list', {});
-          if (tokenAtStart !== document.getElementById('token').value || revision !== _listRevision) return;
-          _allKeyItems = sortKeys(d?.Result || d?.result || []);
-          _selectedKey = '';
-          _listLoaded = true;
-          _listLoadedAt = Date.now();
-          _listDirty = revision !== _listRevision;
-          applyFilters();
-        } catch (e) {
-          if (tokenAtStart === document.getElementById('token').value && revision === _listRevision) {
-            toast('Erro: ' + e.message, true);
-          }
-        } finally {
-          setLoading('btnList', false);
-          _listRequest = null;
-          if (revision !== _listRevision && isListVisible()) doList(false);
-        }
-      })();
-      return _listRequest;
-    }
-
-    function parseUtcDate(v) {
-      if (!v) return null;
-      // Backend grava/serializa TIMESTAMP sem timezone (ex: "2026-09-13T00:20:59.98").
-      // O valor já É UTC, mas sem o 'Z' o navegador assumiria hora local, deslocando a
-      // comparação pelo fuso do usuário. Forçamos UTC quando não há Z nem offset explícito.
-      const hasTz = /Z$|[+-]\d{2}:\d{2}$/.test(v);
-      const d = new Date(hasTz ? v : v + 'Z');
-      return isNaN(d) ? null : d;
-    }
-
-    function fmtDate(v) {
-      const d = parseUtcDate(v);
-      return d ? d.toLocaleDateString('pt-BR') : (v ? String(v) : '—');
-    }
-
-    function getStatusKey(i) {
-      const ok = Boolean(i.is_active ?? i.IsActive);
-      const paused = Boolean(i.is_paused ?? i.IsPaused);
-      const endDate = parseUtcDate(i.ends_at ?? i.EndsAt);
-      const isExpired = endDate && endDate < new Date();
-      if (paused) return 'congelada';
-      if (ok) return isExpired ? 'expirado' : 'ativa';
-      return 'inativa';
-    }
-
-    function sortKeys(items) {
-      const statusOrder = { ativa: 0, congelada: 1, inativa: 2, expirado: 3 };
-      return items.map((item, index) => ({ item, index })).sort((a, b) => {
-        const aStatus = getStatusKey(a.item);
-        const bStatus = getStatusKey(b.item);
-        if (aStatus !== bStatus) return statusOrder[aStatus] - statusOrder[bStatus];
-
-        const aEnd = parseUtcDate(a.item.ends_at ?? a.item.EndsAt);
-        const bEnd = parseUtcDate(b.item.ends_at ?? b.item.EndsAt);
-        if (aStatus !== 'inativa') {
-          if (aEnd && !bEnd) return -1;
-          if (!aEnd && bEnd) return 1;
-          if (aEnd && bEnd) {
-            const endOrder = aStatus === 'expirado' ? bEnd - aEnd : aEnd - bEnd;
-            if (endOrder) return endOrder;
-          }
-        }
-
-        const aCreated = parseUtcDate(a.item.created_at ?? a.item.CreatedAt);
-        const bCreated = parseUtcDate(b.item.created_at ?? b.item.CreatedAt);
-        if (aCreated && !bCreated) return -1;
-        if (!aCreated && bCreated) return 1;
-        if (aCreated && bCreated) return bCreated - aCreated || a.index - b.index;
-        return a.index - b.index;
-      }).map(({ item }) => item);
-    }
-
-    function keyBatchSize() {
-      return mobileKeysMedia.matches ? MOBILE_KEY_BATCH : DESKTOP_KEY_BATCH;
-    }
-
-    function loadMoreKeys() {
-      _visibleKeyCount += keyBatchSize();
-      applyFilters(false);
-    }
-
-    function applyFilters(resetLimit = true) {
-      const q = (document.getElementById('filterSearch').value || '').trim().toLowerCase();
-      const statusFilter = document.getElementById('filterStatus').value;
-      const productFilter = document.getElementById('filterProduct').value;
-      const durationFilter = document.getElementById('filterDuration').value;
-
-      const filtered = _allKeyItems.filter(i => {
-        if (statusFilter && getStatusKey(i) !== statusFilter) return false;
-        if (durationFilter && Number(i.duration_days ?? i.DurationDays) !== Number(durationFilter)) return false;
-        if (productFilter) {
-          const pt = i.product_type ?? i.ProductType;
-          const ptCode = resolveProductCode(pt) || 'PB';
-          if (ptCode !== productFilter) return false;
-        }
-        if (q) {
-          const k = (i.key_value || i.KeyValue || '').toLowerCase();
-          const hwid = (i.hwid || i.Hwid || '').toLowerCase();
-          if (!k.includes(q) && !hwid.includes(q)) return false;
-        }
-        return true;
-      });
-
-      if (resetLimit) _selectedKey = '';
-      if (resetLimit || !_visibleKeyCount) _visibleKeyCount = keyBatchSize();
-      const visible = filtered.slice(0, _visibleKeyCount);
-      renderTable(visible);
-
-      const countEl = document.getElementById('filterCount');
-      if (countEl) {
-        const total = _allKeyItems.length;
-        countEl.textContent = total
-          ? (filtered.length === total
-            ? `${visible.length} de ${total} exibidas`
-            : `${visible.length} de ${filtered.length} filtradas · ${total} no total`)
-          : '';
-      }
-
-      const btnLoadMore = document.getElementById('btnLoadMore');
-      const remaining = filtered.length - visible.length;
-      btnLoadMore.classList.toggle('hidden', remaining <= 0);
-      if (remaining > 0) btnLoadMore.textContent = `Carregar mais ${Math.min(keyBatchSize(), remaining)} chaves`;
-    }
-
-    function clearFilters() {
-      document.getElementById('filterSearch').value = '';
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('filterProduct').value = '';
-      document.getElementById('filterDuration').value = '';
-      applyFilters();
-    }
-
-    function statusPill(kind, label) {
-      const styles = {
-        success: 'bg-success/15 text-success',
-        warning: 'bg-warning/15 text-warning',
-        error: 'bg-error/15 text-error',
-        neutral: 'bg-base-content/10 text-base-content/50',
-      };
-      return `<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${styles[kind]}">
-        <span class="w-1.5 h-1.5 rounded-full ${kind === 'neutral' ? 'bg-base-content/40' : 'bg-current'}"></span>${label}
-      </span>`;
-    }
-
-    function renderTable(items) {
-      const body = document.getElementById('keysBody');
-      if (!Array.isArray(items) || !items.length) {
-        body.innerHTML = `<tr><td colspan="9" class="py-14">
-          <div class="flex flex-col items-center gap-2.5 text-base-content/40">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-            <span class="text-xs">Nenhuma key encontrada.</span>
-          </div>
-        </td></tr>`;
-        return;
-      }
-      body.innerHTML = items.map(i => {
-        const k = i.key_value || i.KeyValue || '';
-        const ok = Boolean(i.is_active ?? i.IsActive);
-        const paused = Boolean(i.is_paused ?? i.IsPaused);
-        const days = i.duration_days ?? i.DurationDays ?? '—';
-        const act = fmtDate(i.activated_at ?? i.ActivatedAt);
-        const end = fmtDate(i.ends_at ?? i.EndsAt);
-        const pt = i.product_type ?? i.ProductType;
-        const ptCode = resolveProductCode(pt) || 'PB';
-        const productName = pt !== null && pt !== undefined ? productLabel(ptCode) : '—';
-
-        // Check if key is expired
-        const endDate = parseUtcDate(i.ends_at ?? i.EndsAt);
-        const isExpired = endDate && endDate < new Date();
-
-        let statusHtml = '';
-        let actionBtn = '';
-        const freezeBtnClass = 'btn btn-xs rounded-full px-3 font-semibold btn-outline btn-warning border-warning/40 hover:border-warning';
-        const resumeBtnClass = 'btn btn-xs rounded-full px-3 font-semibold btn-outline btn-success border-success/40 hover:border-success';
-        if (paused) {
-          statusHtml = statusPill('warning', 'Congelada');
-          actionBtn = `<button class="${resumeBtnClass}" onclick="doFreeze('${k}', false); event.stopPropagation();">Retomar</button>`;
-        } else if (ok) {
-          if (isExpired) {
-            statusHtml = statusPill('error', 'Expirado');
-          } else {
-            statusHtml = statusPill('success', 'Ativa');
-          }
-          actionBtn = `<button class="${freezeBtnClass}" onclick="doFreeze('${k}', true); event.stopPropagation();">Congelar</button>`;
-        } else {
-          statusHtml = statusPill('neutral', 'Inativa');
-        }
-
-        const hwid = i.hwid || i.Hwid || '';
-        const hwidCell = hwid
-          ? `<td data-label="HWID" class="mobile-extra mono text-[10px] text-base-content/70 truncate max-w-0 overflow-hidden" title="${hwid}">${hwid}</td>`
-          : `<td data-label="HWID" class="mobile-extra text-base-content/30 text-[10px]">—</td>`;
-
-        const fb = i.frozen_by || i.FrozenBy || '';
-        const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
-        return `<tr data-key="${k.replace(/"/g, '&quot;')}" data-product="${ptCode}" class="key-row group hover:bg-brand/[0.04] cursor-pointer transition-colors">
-          <td data-label="Key" class="py-3 pl-5">
-            <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5 shrink-0 text-base-content/25 group-hover:text-brand transition-colors">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
-              </svg>
-              <span class="mono text-[11.5px] tracking-[0.02em] truncate max-w-[170px] group-hover:text-brand transition-colors" title="${k}">${k}</span>
-            </div>
-          </td>
-          <td data-label="Status">${statusHtml}</td>
-          <td data-label="Produto" class="text-sm font-medium">${productName}</td>
-          <td data-label="Dias" class="mobile-extra text-center mono text-xs text-base-content/70">${days}</td>
-          ${hwidCell}
-          <td data-label="Ativada em" class="mobile-extra text-xs text-base-content/60">${act}</td>
-          <td data-label="Termina em" class="mobile-extra text-xs text-base-content/60">${end}</td>
-          <td data-label="Congelado por" class="mobile-extra text-xs text-base-content/60">${paused ? frozenByLabel : '—'}</td>
-          <td data-label="Ação" class="text-right pr-5">${actionBtn}</td>
-        </tr>`;
-      }).join('');
-
-      const rows = body.querySelectorAll('tr[data-key]');
-      rows.forEach(row => {
-        if (row.getAttribute('data-key') === _selectedKey) {
-          row.classList.add('bg-brand/10', 'ring-1', 'ring-brand/30');
-        }
-        row.addEventListener('click', () => {
-          rows.forEach(r => r.classList.remove('bg-brand/10', 'ring-1', 'ring-brand/30'));
-          row.classList.add('bg-brand/10', 'ring-1', 'ring-brand/30');
-          _selectedKey = row.getAttribute('data-key');
-          navigator.clipboard.writeText(_selectedKey).then(() => {
-            toast('Key copiada!');
-          }).catch(() => { });
-        });
-      });
-    }
-
-    function copySelected() {
-      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
-      document.getElementById('revokeKey').value = _selectedKey;
-      document.getElementById('modalRevoke').showModal();
-    }
-
-    function copySelectedToDelete() {
-      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
-      document.getElementById('deleteKey').value = _selectedKey;
-      document.getElementById('modalDelete').showModal();
-    }
-
-    function copySelectedToTransfer() {
-      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
-      document.getElementById('transferKey').value = _selectedKey;
-      document.getElementById('modalTransfer').showModal();
-    }
-
-    function copySelectedToHwid() {
-      if (!_selectedKey) { toast('Selecione uma linha na tabela primeiro.', true); return; }
-      document.getElementById('resetHwidKey').value = _selectedKey;
-      document.getElementById('modalResetHwid').showModal();
-    }
-
-    function copyAllKeys() {
-      const keys = _allKeyItems.map(i => i.key_value || i.KeyValue || '').filter(k => k);
-      if (!keys.length) { toast('Nenhuma chave na lista.', true); return; }
-      navigator.clipboard.writeText(keys.join('\n')).then(() => {
-        toast(`${keys.length} chave${keys.length > 1 ? 's' : ''} copiada${keys.length > 1 ? 's' : ''}!`);
-      }).catch(() => {
-        toast('Erro ao copiar.', true);
-      });
-    }
-
-    function copyCreatedKeys() {
-      if (!_lastCreatedKeys.length) { toast('Nenhuma chave gerada.', true); return; }
-      navigator.clipboard.writeText(_lastCreatedKeys.join('\n')).then(() => {
-        toast(`${_lastCreatedKeys.length} chave${_lastCreatedKeys.length > 1 ? 's' : ''} copiada${_lastCreatedKeys.length > 1 ? 's' : ''}!`);
-      }).catch(() => {
-        toast('Erro ao copiar.', true);
-      });
-      _lastCreatedKeys = [];
-      const btnCopy = document.getElementById('btnCopyCreated');
-      if (btnCopy) btnCopy.classList.add('hidden');
-    }
-
-    function getFreezeProduct(key) {
-      if (key === 'ALL') return document.getElementById('freezeProductModal').value;
-      const row = document.querySelector(`tr[data-key="${key.replace(/"/g, '&quot;')}"]`);
-      return row ? row.getAttribute('data-product') : 'PB';
-    }
-
-    function doFreezeFromModal(freeze) {
-      doFreeze('ALL', freeze);
-    }
-
-    async function doFreeze(key, freeze) {
-      if (key === 'ALL') {
-        if (!await confirmModal('Deseja realmente ' + (freeze ? 'congelar' : 'descongelar') + ' TODAS as keys ativas deste produto?')) return;
-      }
-      try {
-        const productType = getFreezeProduct(key);
-        const r = await api('/admin/auth-keys/freeze', { keyValue: key, freeze: freeze, productType });
-        toast(r?.StatusMessage || 'Ação realizada com sucesso!');
-        invalidateList();
-      } catch (e) {
-        toast('Erro: ' + e.message, true);
-      }
-    }
-
-    let _toastTimer;
-    function toast(msg, isErr) {
-      const el = document.getElementById('toast');
-      clearTimeout(_toastTimer);
-      const hasPopover = typeof el.showPopover === 'function';
-      if (hasPopover && el.matches(':popover-open')) el.hidePopover();
-      const dialog = document.activeElement?.closest('dialog[open]') ||
-        Array.from(document.querySelectorAll('dialog[open]')).pop();
-      // Keep announcements inside the active modal's accessible subtree.
-      (dialog || document.body).appendChild(el);
-      const alert = document.createElement('div');
-      alert.className = `alert ${isErr ? 'alert-error' : 'alert-success'} shadow-lg`;
-      const text = document.createElement('span');
-      text.textContent = String(msg ?? '');
-      alert.appendChild(text);
-      el.replaceChildren(alert);
-      if (hasPopover) el.showPopover();
-      _toastTimer = setTimeout(() => {
-        if (hasPopover && el.matches(':popover-open')) el.hidePopover();
-        el.replaceChildren();
-      }, 3500);
-    }
-
-    let _confirmResolve = null;
-    function confirmModal(msg, { accept = 'Confirmar', cancel = 'Cancelar' } = {}) {
-      document.getElementById('confirmYes').textContent = accept;
-      document.getElementById('confirmNo').textContent = cancel;
-      return new Promise(resolve => {
-        _confirmResolve = resolve;
-        document.getElementById('confirmMsg').textContent = msg;
-        document.getElementById('confirmModal').showModal();
-      });
-    }
-    function closeConfirm(accepted = false) {
-      const resolve = _confirmResolve;
-      _confirmResolve = null;
-      document.getElementById('confirmModal').close();
-      if (resolve) resolve(accepted === true);
-    }
-    document.getElementById('confirmYes').addEventListener('click', () => closeConfirm(true));
-    document.getElementById('confirmNo').addEventListener('click', () => closeConfirm());
-    document.getElementById('confirmModal').addEventListener('cancel', event => {
-      event.preventDefault();
-      closeConfirm();
-    });
-    document.querySelector('#confirmModal .modal-backdrop').addEventListener('submit', event => {
-      event.preventDefault();
-      closeConfirm();
-    });
-
-    mobileKeysMedia.addEventListener('change', () => {
-      if (_listLoaded) applyFilters();
-    });
-
-    StorePanelCustomizer.init({
-      getSession: () => ({ token: document.getElementById('token').value, store: _fingerprint }),
-      isAuthenticated: () => !document.getElementById('appShell').classList.contains('hidden'),
-      save: panelSettings => api('/admin/stores/panel-settings', { panelSettings }),
-      onSaved: () => toast('Aparência salva!')
-    });
-    initFinanceDates();
-    loadToken();
-    updateCalc();
-    updateCreateCost();
-  </script>
+  <script defer src="revendas/api.js"></script>
+  <script defer src="revendas/ui.js"></script>
+  <script defer src="revendas/pricing.js"></script>
+  <script defer src="revendas/session.js"></script>
+  <script defer src="revendas/payments.js"></script>
+  <script defer src="revendas/keys-create.js"></script>
+  <script defer src="revendas/keys-list.js"></script>
+  <script defer src="revendas/key-actions.js"></script>
+  <script defer src="revendas/insights.js"></script>
+  <script defer src="revendas/finance.js"></script>
+  <script defer src="revendas/panel.js"></script>
 </body>
 
 </html>
