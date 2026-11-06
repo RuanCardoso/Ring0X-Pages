@@ -465,6 +465,18 @@
                     <span class="mono text-[10px] text-base-content/40 ml-auto" id="filterCount"></span>
                   </div>
 
+                  <dl id="keyContextMenu" popover="auto" aria-label="Detalhes da chave"
+                    class="fixed inset-auto m-0 w-56 max-w-[90vw] space-y-2 rounded-xl border border-base-content/15 bg-base-200 p-3 text-xs text-base-content shadow-xl">
+                    <div>
+                      <dt class="text-base-content/60">HWID</dt>
+                      <dd id="keyContextHwid" class="mono truncate"></dd>
+                    </div>
+                    <div>
+                      <dt class="text-base-content/60">Congelado por</dt>
+                      <dd id="keyContextFrozenBy"></dd>
+                    </div>
+                  </dl>
+
                   <div id="keysTableFrame" class="rounded-2xl border border-base-content/10 bg-base-100 shadow-inner overflow-hidden">
                     <div id="keysTableWrap" class="overflow-x-auto overflow-y-auto max-h-[60vh]">
                       <table id="keysTable" class="table w-full">
@@ -474,16 +486,14 @@
                             <th>Status</th>
                             <th>Produto</th>
                             <th class="text-center">Dias</th>
-                            <th>HWID</th>
                             <th>Ativada em</th>
                             <th>Termina em</th>
-                            <th>Congelado por</th>
                             <th class="text-right pr-5">Ação</th>
                           </tr>
                         </thead>
                         <tbody id="keysBody" class="divide-y divide-base-content/[0.06]">
                           <tr>
-                            <td colspan="9" class="py-14">
+                            <td colspan="7" class="py-14">
                               <div class="flex flex-col items-center gap-2.5 text-base-content/40">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                   stroke-width="1.5" stroke="currentColor" class="w-8 h-8">

@@ -174,10 +174,35 @@ function statusPill(kind, label) {
   </span>`;
 }
 
+const keyContextMenu = document.getElementById('keyContextMenu');
+const keyContextHwid = document.getElementById('keyContextHwid');
+const keyContextFrozenBy = document.getElementById('keyContextFrozenBy');
+
+function showKeyContextMenu(event, item) {
+  if (mobileKeysMedia.matches || typeof keyContextMenu.showPopover !== 'function') return;
+  event.preventDefault();
+
+  const hwid = item.hwid || item.Hwid || '';
+  keyContextHwid.textContent = hwid || '—';
+  keyContextHwid.title = hwid;
+
+  const paused = Boolean(item.is_paused ?? item.IsPaused);
+  const frozenBy = item.frozen_by || item.FrozenBy;
+  keyContextFrozenBy.textContent = paused ? (frozenBy === 'batch' ? 'Lote' : 'Manual') : '—';
+
+  if (!keyContextMenu.matches(':popover-open')) keyContextMenu.showPopover();
+  const margin = 8;
+  const { offsetWidth, offsetHeight } = keyContextMenu;
+  const viewport = document.documentElement;
+  keyContextMenu.style.left = Math.max(margin, Math.min(event.clientX, viewport.clientWidth - offsetWidth - margin)) + 'px';
+  keyContextMenu.style.top = Math.max(margin, Math.min(event.clientY, viewport.clientHeight - offsetHeight - margin)) + 'px';
+}
+
 function renderTable(items) {
+  if (keyContextMenu.matches(':popover-open')) keyContextMenu.hidePopover();
   const body = document.getElementById('keysBody');
   if (!Array.isArray(items) || !items.length) {
-    body.innerHTML = `<tr><td colspan="9" class="py-14">
+    body.innerHTML = `<tr><td colspan="7" class="py-14">
       <div class="flex flex-col items-center gap-2.5 text-base-content/40">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -221,13 +246,6 @@ function renderTable(items) {
       statusHtml = statusPill('neutral', 'Inativa');
     }
 
-    const hwid = i.hwid || i.Hwid || '';
-    const hwidCell = hwid
-      ? `<td data-label="HWID" class="mobile-extra mono text-[10px] text-base-content/70 truncate max-w-0 overflow-hidden" title="${hwid}">${hwid}</td>`
-      : `<td data-label="HWID" class="mobile-extra text-base-content/30 text-[10px]">—</td>`;
-
-    const fb = i.frozen_by || i.FrozenBy || '';
-    const frozenByLabel = fb === 'batch' ? 'Lote' : (paused ? 'Manual' : '—');
     return `<tr data-key="${safeKey}" data-product="${ptCode}" class="key-row group hover:bg-brand/[0.04] cursor-pointer transition-colors">
       <td data-label="Key" class="py-3 pl-5">
         <div class="flex items-center gap-2">
@@ -240,16 +258,15 @@ function renderTable(items) {
       <td data-label="Status">${statusHtml}</td>
       <td data-label="Produto" class="text-sm font-medium">${productName}</td>
       <td data-label="Dias" class="mobile-extra text-center mono text-xs text-base-content/70">${days}</td>
-      ${hwidCell}
       <td data-label="Ativada em" class="mobile-extra text-xs text-base-content/60">${act}</td>
       <td data-label="Termina em" class="mobile-extra text-xs text-base-content/60">${end}</td>
-      <td data-label="Congelado por" class="mobile-extra text-xs text-base-content/60">${paused ? frozenByLabel : '—'}</td>
       <td data-label="Ação" class="text-right pr-5">${actionBtn}</td>
     </tr>`;
   }).join('');
 
   const rows = body.querySelectorAll('tr[data-key]');
-  rows.forEach(row => {
+  rows.forEach((row, index) => {
+    row.addEventListener('contextmenu', event => showKeyContextMenu(event, items[index]));
     if (row.getAttribute('data-key') === _selectedKey) {
       row.classList.add('bg-brand/10', 'ring-1', 'ring-brand/30');
     }
