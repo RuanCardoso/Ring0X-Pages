@@ -177,6 +177,7 @@ function statusPill(kind, label) {
 const keyContextMenu = document.getElementById('keyContextMenu');
 const keyContextHwid = document.getElementById('keyContextHwid');
 const keyContextFrozenBy = document.getElementById('keyContextFrozenBy');
+const keyContextLastUsedAt = document.getElementById('keyContextLastUsedAt');
 
 function showKeyContextMenu(event, item) {
   if (mobileKeysMedia.matches || typeof keyContextMenu.showPopover !== 'function') return;
@@ -189,6 +190,10 @@ function showKeyContextMenu(event, item) {
   const paused = Boolean(item.is_paused ?? item.IsPaused);
   const frozenBy = item.frozen_by || item.FrozenBy;
   keyContextFrozenBy.textContent = paused ? (frozenBy === 'batch' ? 'Lote' : 'Manual') : '—';
+
+  if (keyContextLastUsedAt) {
+    keyContextLastUsedAt.textContent = fmtDate(item.last_used_at ?? item.LastUsedAt);
+  }
 
   if (!keyContextMenu.matches(':popover-open')) keyContextMenu.showPopover();
   const margin = 8;
