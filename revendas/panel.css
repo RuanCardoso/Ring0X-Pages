@@ -115,11 +115,6 @@ html[data-show-annual="false"] .annual-plan {
   #mainContent {
     max-width: 100%;
   }
-
-  #createCard {
-    max-height: none;
-    overflow: visible;
-  }
 }
 
 @media (max-width: 767px) {
