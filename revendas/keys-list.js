@@ -19,6 +19,7 @@ function isListVisible() {
 
 function invalidateList() {
   invalidateInsights();
+  markFinanceDirty();
   _listDirty = true;
   _listRevision++;
   if (isListVisible()) doList(false);

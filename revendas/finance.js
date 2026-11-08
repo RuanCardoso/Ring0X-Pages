@@ -179,7 +179,7 @@ async function loadFinances() {
   const revision = ++_financeRequestRevision;
   btn.disabled = true;
   btn.textContent = 'Consultando…';
-  status.textContent = 'Consultando pagamentos da loja…';
+  status.textContent = 'Consultando finanças da loja…';
   document.getElementById('financeMetrics').classList.add('hidden');
   document.getElementById('financeEmpty').classList.add('hidden');
 
@@ -192,8 +192,12 @@ async function loadFinances() {
     const revenue = Number(data.TotalRevenue ?? data.totalRevenue ?? 0);
     const sales = Number(data.TotalSales ?? data.totalSales ?? 0);
     const average = Number(data.AverageTicket ?? data.averageTicket ?? 0);
-    if (![revenue, sales, average].every(Number.isFinite)) throw new Error('Resposta financeira inválida.');
+    const generatedCount = Number(data.GeneratedKeyCount ?? data.generatedKeyCount ?? 0);
+    const generatedValue = Number(data.GeneratedKeyValue ?? data.generatedKeyValue ?? 0);
+    if (![revenue, sales, average, generatedCount, generatedValue].every(Number.isFinite)) throw new Error('Resposta financeira inválida.');
 
+    document.getElementById('financeGeneratedCount').textContent = generatedCount.toLocaleString('pt-BR');
+    document.getElementById('financeGeneratedValue').textContent = fmt(generatedValue);
     document.getElementById('financeRevenue').textContent = fmt(revenue);
     document.getElementById('financeSales').textContent = sales.toLocaleString('pt-BR');
     document.getElementById('financeAverage').textContent = fmt(average);
@@ -206,7 +210,7 @@ async function loadFinances() {
     document.getElementById('financeStoreAge').textContent = formatStoreAge(firstDateOnly);
     document.getElementById('financeMetrics').classList.remove('hidden');
     document.getElementById('financeEmpty').classList.toggle('hidden', sales !== 0);
-    status.textContent = `Pagamentos de ${_fingerprint} no período selecionado.`;
+    status.textContent = `Finanças de ${_fingerprint} no período selecionado.`;
     _financesLoaded = true;
   } catch (e) {
     if (revision !== _financeRequestRevision) return;
