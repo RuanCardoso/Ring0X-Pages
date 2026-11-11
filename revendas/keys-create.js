@@ -36,12 +36,16 @@ function updateKeyPreview() {
   input.disabled = !custom;
 
   const durationCode = DURATION_CODE[Number(document.getElementById('createDays').value)];
-  const prefix = custom ? getCustomKeyPrefix() : _fingerprint;
+  const prefix = custom ? getCustomKeyPrefix() : document.getElementById('createProduct').value;
   if (custom && !KEY_PREFIX_PATTERN.test(prefix)) {
     preview.textContent = 'Informe um prefixo válido';
     return;
   }
-  preview.textContent = durationCode && prefix
+  if (!prefix) {
+    preview.textContent = 'Selecione o produto';
+    return;
+  }
+  preview.textContent = durationCode
     ? formatKeyValue(prefix, durationCode, 'XXXXXX')
     : 'Selecione a duração';
 }
@@ -94,7 +98,7 @@ async function doCreate() {
   }
 
   const custom = document.getElementById('createCustomPrefix').checked;
-  const prefix = custom ? getCustomKeyPrefix() : _fingerprint;
+  const prefix = custom ? getCustomKeyPrefix() : productType;
   if (custom && !KEY_PREFIX_PATTERN.test(prefix)) {
     toast('Informe um prefixo com letras e números, separados por hífens.', true);
     document.getElementById('createPrefix').focus();
@@ -104,7 +108,7 @@ async function doCreate() {
     product: product.selectedOptions[0].textContent.trim(),
     quantity: qty === 1 ? '1 chave' : `${qty} chaves`,
     duration: `${d} ${d === 1 ? 'dia' : 'dias'}`,
-    mode: custom ? 'Prefixo personalizado' : 'Prefixo da loja',
+    mode: custom ? 'Prefixo personalizado' : 'Prefixo do produto',
     pattern: formatKeyValue(prefix, durationCode, 'XXXXXX'),
     total: fmt(unit * qty)
   };
@@ -163,7 +167,7 @@ document.getElementById('createStorePrefix').addEventListener('change', () => up
 document.getElementById('createCustomPrefix').addEventListener('change', () => updateKeyPreview());
 document.getElementById('createPrefix').addEventListener('input', () => updateKeyPreview());
 document.getElementById('createDays').addEventListener('change', () => { updateCreateCost(); updateKeyPreview(); });
-document.getElementById('createProduct').addEventListener('change', () => updateCreateCost());
+document.getElementById('createProduct').addEventListener('change', () => { updateCreateCost(); updateKeyPreview(); });
 document.getElementById('createQty').addEventListener('input', () => onQtyChange());
 document.getElementById('btnCreate').addEventListener('click', () => doCreate());
 document.getElementById('btnCopyCreated').addEventListener('click', () => copyCreatedKeys());
