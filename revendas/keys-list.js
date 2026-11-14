@@ -73,11 +73,12 @@ function getStatusKey(i) {
   const isExpired = endDate && endDate < new Date();
   if (paused) return 'congelada';
   if (ok) return isExpired ? 'expirado' : 'ativa';
-  return 'inativa';
+  const activatedDate = parseUtcDate(i.activated_at ?? i.ActivatedAt);
+  return activatedDate && endDate ? 'revogada' : 'inativa';
 }
 
 function sortKeys(items) {
-  const statusOrder = { ativa: 0, congelada: 1, inativa: 2, expirado: 3 };
+  const statusOrder = { ativa: 0, congelada: 1, inativa: 2, revogada: 3, expirado: 4 };
   return items.map((item, index) => ({ item, index })).sort((a, b) => {
     const aStatus = getStatusKey(a.item);
     const bStatus = getStatusKey(b.item);
@@ -221,8 +222,7 @@ function renderTable(items) {
   body.innerHTML = items.map(i => {
     const k = i.key_value || i.KeyValue || '';
     const safeKey = k.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const ok = Boolean(i.is_active ?? i.IsActive);
-    const paused = Boolean(i.is_paused ?? i.IsPaused);
+    const status = getStatusKey(i);
     const days = i.duration_days ?? i.DurationDays ?? '—';
     const act = fmtDate(i.activated_at ?? i.ActivatedAt);
     const end = fmtDate(i.ends_at ?? i.EndsAt);
@@ -230,24 +230,22 @@ function renderTable(items) {
     const ptCode = resolveProductCode(pt) || 'PB';
     const productName = pt !== null && pt !== undefined ? productLabel(ptCode) : '—';
 
-    // Check if key is expired
-    const endDate = parseUtcDate(i.ends_at ?? i.EndsAt);
-    const isExpired = endDate && endDate < new Date();
-
     let statusHtml = '';
     let actionBtn = '';
     const freezeBtnClass = 'btn btn-xs rounded-full px-3 font-semibold btn-outline btn-warning border-warning/40 hover:border-warning';
     const resumeBtnClass = 'btn btn-xs rounded-full px-3 font-semibold btn-outline btn-success border-success/40 hover:border-success';
-    if (paused) {
+    if (status === 'congelada') {
       statusHtml = statusPill('warning', 'Congelada');
       actionBtn = `<button class="${resumeBtnClass}" data-freeze="false">Retomar</button>`;
-    } else if (ok) {
-      if (isExpired) {
+    } else if (status === 'ativa' || status === 'expirado') {
+      if (status === 'expirado') {
         statusHtml = statusPill('error', 'Expirado');
       } else {
         statusHtml = statusPill('success', 'Ativa');
       }
       actionBtn = `<button class="${freezeBtnClass}" data-freeze="true">Congelar</button>`;
+    } else if (status === 'revogada') {
+      statusHtml = statusPill('error', 'Revogada');
     } else {
       statusHtml = statusPill('neutral', 'Inativa');
     }
