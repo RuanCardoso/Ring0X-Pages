@@ -30,6 +30,7 @@ function applyStoreConfiguration(store) {
   }
   PRICES = prices;
   StorePanelCustomizer.commit(store.panelSettings);
+  document.getElementById('blackFridayBanner')?.classList.toggle('hidden', store.blackFridayEnabled !== true);
   updateCalc();
   updateCreateCost();
 }
