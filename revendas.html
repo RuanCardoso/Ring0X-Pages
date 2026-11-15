@@ -337,17 +337,6 @@
             <!-- Criação de chaves -->
             <div id="panel-admin" class="block">
 
-              <section id="blackFridayBanner" aria-labelledby="blackFridayTitle"
-                class="hidden mb-4 rounded-2xl border border-brand/30 bg-base-200 bg-gradient-to-br from-brand/15 to-transparent p-5 sm:px-7 sm:py-6">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 id="blackFridayTitle" class="display text-2xl font-bold tracking-tight sm:text-3xl">Black Friday</h2>
-                    <p class="mt-1 text-sm text-base-content/70">Na geração de chaves de 1, 7 e 30 dias.</p>
-                  </div>
-                  <p class="w-fit rounded-xl border border-brand/30 bg-base-100 px-4 py-2 display text-2xl font-bold text-brand sm:text-3xl">30% OFF</p>
-                </div>
-              </section>
-
               <div id="createCard" class="card bg-base-100 border border-base-content/10 shadow-xl mb-4">
                 <div class="card-body">
 
@@ -416,9 +405,19 @@
                   </div>
 
                   <div class="alert bg-base-200 border border-base-content/20 mb-4">
-                    <div class="flex items-center gap-3 w-full justify-between">
-                      <span class="text-sm text-base-content/60">Custo total</span>
-                      <span class="mono text-xl font-semibold text-brand" id="createCost">—</span>
+                    <div class="w-full min-w-0">
+                      <div class="flex items-center justify-between gap-3">
+                        <span class="text-sm text-base-content/60">Custo total</span>
+                        <span class="mono text-xl font-semibold text-brand" id="createCost">—</span>
+                      </div>
+                      <div id="blackFridayBanner"
+                        class="hidden mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-lg border-l-2 border-brand bg-brand/10 px-3 py-1.5 text-xs">
+                        <p class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                          <strong class="display">Black Friday</strong>
+                          <span class="text-base-content/70">Planos de 1, 7 e 30 dias</span>
+                        </p>
+                        <strong class="whitespace-nowrap mono text-brand">30% OFF</strong>
+                      </div>
                     </div>
                   </div>
 
