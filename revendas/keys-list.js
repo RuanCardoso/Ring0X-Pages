@@ -197,6 +197,12 @@ function showKeyContextMenu(event, item) {
     keyContextLastUsedAt.textContent = fmtDate(item.last_used_at ?? item.LastUsedAt);
   }
 
+  const editPrefixButton = document.getElementById('btnEditKeyPrefix');
+  if (editPrefixButton) {
+    editPrefixButton.dataset.key = item.key_value || item.KeyValue || '';
+    editPrefixButton.disabled = !editPrefixButton.dataset.key;
+  }
+
   if (!keyContextMenu.matches(':popover-open')) keyContextMenu.showPopover();
   const margin = 8;
   const { offsetWidth, offsetHeight } = keyContextMenu;

@@ -49,6 +49,78 @@ async function doTransfer() {
   setLoading('btnTransfer', false);
 }
 
+let _editingKeyPrefix = null;
+
+function openKeyPrefixEditor(keyValue) {
+  const input = document.getElementById('editKeyPrefixInput');
+  if (input.disabled) return;
+  const parts = /^(.+)(-[0-9]+[Dd]-[A-Za-z0-9]+)$/.exec(keyValue);
+  if (!parts) {
+    toast('Formato de chave incompatível com a edição de prefixo.', true);
+    return;
+  }
+
+  const [, prefix, tail] = parts;
+  _editingKeyPrefix = { keyValue, tail, token: document.getElementById('token').value };
+  input.maxLength = 255 - tail.length;
+  input.value = prefix;
+  updateKeyPrefixPreview();
+  document.getElementById('modalEditKeyPrefix').showModal();
+  input.select();
+}
+
+function updateKeyPrefixPreview() {
+  const prefix = document.getElementById('editKeyPrefixInput').value.trim().toUpperCase();
+  const preview = document.getElementById('editKeyPrefixPreview');
+  preview.textContent = KEY_PREFIX_PATTERN.test(prefix) ? prefix + _editingKeyPrefix.tail : 'Informe um prefixo válido';
+}
+
+async function doEditKeyPrefix(event) {
+  event.preventDefault();
+  const input = document.getElementById('editKeyPrefixInput');
+  const token = document.getElementById('token');
+  const dialog = document.getElementById('modalEditKeyPrefix');
+  if (input.disabled || !_editingKeyPrefix) return;
+  const { keyValue, tail, token: tokenAtOpen } = _editingKeyPrefix;
+  if (token.value !== tokenAtOpen) {
+    dialog.close();
+    return;
+  }
+
+  const newPrefix = input.value.trim().toUpperCase();
+  if (!KEY_PREFIX_PATTERN.test(newPrefix) || (newPrefix + tail).length > 255) {
+    toast('Informe um prefixo válido. Use letras e números separados por hífens.', true);
+    input.focus();
+    return;
+  }
+  if (newPrefix + tail === keyValue) {
+    dialog.close();
+    return;
+  }
+
+  input.disabled = true;
+  setLoading('btnSaveKeyPrefix', true);
+  try {
+    const result = await api('/admin/auth-keys/update-prefix', { keyValue, newPrefix });
+    if (token.value !== tokenAtOpen) return;
+    dialog.close();
+    toast(result?.StatusMessage || 'Prefixo atualizado com sucesso.');
+    invalidateList();
+  } catch (e) {
+    if (token.value === tokenAtOpen) toast('Erro: ' + e.message, true);
+  } finally {
+    input.disabled = false;
+    setLoading('btnSaveKeyPrefix', false);
+  }
+}
+
+document.getElementById('btnEditKeyPrefix')?.addEventListener('click', event => {
+  document.getElementById('keyContextMenu').hidePopover();
+  openKeyPrefixEditor(event.currentTarget.dataset.key);
+});
+document.getElementById('editKeyPrefixInput')?.addEventListener('input', updateKeyPrefixPreview);
+document.getElementById('editKeyPrefixForm')?.addEventListener('submit', doEditKeyPrefix);
+
 async function doResetHwid() {
   setLoading('btnResetHwid', true);
   try {
